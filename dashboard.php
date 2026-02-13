@@ -3,34 +3,33 @@ session_start();
 
 include  'include/config.php';
 require __DIR__ . '/class/class.control.php';
-if(!isset($_SESSION['token'])){
-	if(isset($_COOKIE['remember_me'])) {
-		$radium_token = $_COOKIE['remember_me'];
-		$_SESSION['token'] = $radium_token;
-	}else{
-		header('location: login');	
-		exit;
-	}
+if (!isset($_SESSION['token'])) {
+  if (isset($_COOKIE['remember_me'])) {
+    $radium_token = $_COOKIE['remember_me'];
+    $_SESSION['token'] = $radium_token;
+  } else {
+    header('location: login');
+    exit;
+  }
 }
 $wallet = new radiumsahil();
 $data = $wallet->balancedata();
-if($data===false){
-unset($_SESSION['token']);
-session_destroy();
-if(isset($_COOKIE['remember_me'])) {
+if ($data === false) {
+  unset($_SESSION['token']);
+  session_destroy();
+  if (isset($_COOKIE['remember_me'])) {
     unset($_COOKIE['remember_me']);
-	setcookie('remember_me', $token, [
-		'expires' => time() - 3600,
-		'path' => '/',
-		'domain' => $_SERVER['HTTP_HOST'],
-		'secure' => true,
-		'httponly' => true,
-		'samesite' => 'radium'
-	]);
-	
-}
-	header('location: login');	
-exit;	
+    setcookie('remember_me', $token, [
+      'expires' => time() - 3600,
+      'path' => '/',
+      'domain' => $_SERVER['HTTP_HOST'],
+      'secure' => true,
+      'httponly' => true,
+      'samesite' => 'radium'
+    ]);
+  }
+  header('location: login');
+  exit;
 }
 
 $userdata = $wallet->userdata();
@@ -44,33 +43,33 @@ $wallet->closeConnection();
 <?php
 $page_title = "Dashboard - " . $site_data['web_name'];
 ?>
-<?php include ('partial/header.php'); ?>
+<?php include('partial/header.php'); ?>
 <style>
-.btn-orange {
-  background-color: orange;
-  color: black;
-  border: 2px solid orange;
-}
+  .btn-orange {
+    background-color: orange;
+    color: black;
+    border: 2px solid orange;
+  }
 
-.btn-orange:hover {
-  background-color: orange;
-  color: black;
-  border-color: orange;
-}
+  .btn-orange:hover {
+    background-color: orange;
+    color: black;
+    border-color: orange;
+  }
 </style>
-<?php include ('partial/loader.php'); ?>
+<?php include('partial/loader.php'); ?>
 
 <div class="page-wrapper compact-wrapper" id="pageWrapper">
   <!-- Page Header Start-->
-  <?php include ('partial/topbar.php'); ?>
+  <?php include('partial/topbar.php'); ?>
   <!-- Page Header Ends -->
   <!-- Page Body Start-->
   <div class="page-body-wrapper">
     <!-- Page Sidebar Start-->
-    <?php include ('partial/sidebar.php'); ?>
+    <?php include('partial/sidebar.php'); ?>
     <!-- Page Sidebar Ends-->
     <div class="page-body">
-      <!-- <?php include ('partial/breadcrumb.php'); ?> -->
+      <!-- <?php include('partial/breadcrumb.php'); ?> -->
       <!-- Container-fluid starts-->
       <br><br>
       <div class="container-fluid mt-6">
@@ -86,8 +85,9 @@ $page_title = "Dashboard - " . $site_data['web_name'];
                       </h4>
                       <p style="color:black;">Get Your Virtual Numbers Today! Buy Now!</p>
                       <div class="whatsnew-btn">
-  <a href="buy-number" class="btn btn-orange">Buy Numbers</a>
-</div></div>
+                        <a href="buy-number" class="btn btn-orange">Buy Numbers</a>
+                      </div>
+                    </div>
 
                   </div>
                   <div>
@@ -245,7 +245,7 @@ $page_title = "Dashboard - " . $site_data['web_name'];
         </div>
         <?php
         if ($top_services) {
-          ?>
+        ?>
           <div class="card">
             <div class="card-header card-no-border">
               <div class="header-top">
@@ -258,7 +258,7 @@ $page_title = "Dashboard - " . $site_data['web_name'];
                 <?php
                 foreach ($top_services as $top_service) {
 
-                  ?>
+                ?>
                   <li class="service-item">
                     <img class="rounded" src="<?php echo $top_service['service_logo']; ?>" width="40" alt="icon">
                     <div>
@@ -269,16 +269,16 @@ $page_title = "Dashboard - " . $site_data['web_name'];
                       <div id="lessonChart1"></div>
                     </div>
                     <div class="buy-now-btn">
-                      <a href="buy-number" ><button class="btn btn-primary">Buy</button></a>
+                      <a href="buy-number"><button class="btn btn-primary">Buy</button></a>
                     </div>
                   </li>
-                  <?php
+                <?php
                 }
                 ?>
               </ul>
             </div>
           </div>
-          <?php
+        <?php
         }
         ?>
       </div>
@@ -287,10 +287,10 @@ $page_title = "Dashboard - " . $site_data['web_name'];
       <!-- Container-fluid Ends-->
     </div>
 
-    <?php include ('partial/footer.php'); ?>
+    <?php include('partial/footer.php'); ?>
   </div>
 </div>
 
-<?php include ('partial/scripts.php'); ?>
+<?php include('partial/scripts.php'); ?>
 <script src="assets/js/tooltip-init.js"></script>
-<?php include ('partial/footer-end.php'); ?>
+<?php include('partial/footer-end.php'); ?>

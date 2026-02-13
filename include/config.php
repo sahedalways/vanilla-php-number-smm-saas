@@ -36,6 +36,7 @@ define("THEAM", $theam);
 define("WEBSITE_URL", $website_url);
 define('SECRET_KEY', getenv('SECRET_KEY'));
 
+
 function check_token($token, $conn)
 {
     $sql = mysqli_query($conn, "SELECT * FROM `login_token` WHERE token='$token' and status='1'");

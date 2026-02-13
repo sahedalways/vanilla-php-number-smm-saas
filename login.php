@@ -15,6 +15,12 @@ if (isset($_COOKIE['remember_me'])) {
     header("Location: dashboard");
     exit;
 }
+
+
+require_once 'helpers/session.php';
+guestOnly('views/customer/dashboard');
+
+
 if (isset($_GET['msg'])) {
     $error_data = $_GET['msg'];
     if ($error_data == "not_found") {
@@ -43,6 +49,8 @@ $page_title = "Login - " . $site_data['web_name'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Allsmsverify</title>
+
     <link rel="shortcut icon" href="./images/logo-png.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -61,10 +69,10 @@ $page_title = "Login - " . $site_data['web_name'];
         <img src="./images/hero-image.png" class="hero-img_" alt="Allsmsverify Hero Image">
     </div>
     <div class="form-area-div">
-        <div class="logo-div-mini mb-x">
+        <a href="/" class="logo-div-mini mb-x" style="text-decoration: none;">
             <img class="logo-img-mini" src="./images/logo-png.png" alt="Allsmsverify logo">
             <h1 class="logo-text-mini">Allsmsverify</h1>
-        </div>
+        </a>
         <div class="form-div">
             <h1 class="small-heading fw-600 mb-4">Sign in</h1>
             <div class="mb-3">
