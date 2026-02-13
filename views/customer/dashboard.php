@@ -1,10 +1,23 @@
+<?php
+require_once 'helpers/session.php';
+require_once 'include/config.php';
+
+authOnly('login');
+
+$userId = $_SESSION['user_id'] ?? null;
+$userName = $_SESSION['name'] ?? 'User';
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Dashboard</title>
+    <title>Customer Dashboard | Allsmsverify</title>
+    <link rel="shortcut icon" href="./images/logo-png.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../../css/customer_dashboard.css">
@@ -15,7 +28,7 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <small class="text-light">Welcome back,</small>
-                <h5 class="fw-bold mb-0">Md Sariful Islam</h5>
+                <h5 class="fw-bold mb-0"><?php echo htmlspecialchars($userName); ?></h5>
             </div>
             <div class="d-flex gap-2">
                 <button class="btn btn-outline-secondary border-0 rounded-circle text-white">
@@ -25,7 +38,10 @@
                     <i class="fa-regular fa-bell"></i>
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">6</span>
                 </button>
+                <!-- Logout Button -->
+                <a href="/logout" class="btn btn-outline-danger border-0 rounded-pill fw-bold ms-2">Logout</a>
             </div>
+
         </div>
 
         <div class="wallet-card mb-4">

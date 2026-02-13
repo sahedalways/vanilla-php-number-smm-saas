@@ -31,18 +31,17 @@ $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 $stmt->close();
 
+
 if (!$user) {
     echo json_encode(['status' => 'error', 'message' => 'Account not found.']);
     exit;
 }
 
 
-if ($user['type'] !== 'customer') {
-    echo json_encode(['status' => 'error', 'message' => 'You are not authorized to access the customer dashboard.']);
+if ($user['type'] !== 'admin') {
+    echo json_encode(['status' => 'error', 'message' => 'You are not authorized to access the admin dashboard.']);
     exit;
 }
-
-
 
 // verify password
 if (!password_verify($password, $user['password'])) {

@@ -30,10 +30,15 @@ function authOnly($redirect = 'login')
 }
 
 // Login helper
-function loginUser($userId)
+function loginUser($user)
 {
+    // $user is the full user array from database
     $_SESSION['auth_token'] = bin2hex(random_bytes(32));
-    $_SESSION['user_id'] = $userId;
+    $_SESSION['user_id']   = $user['id'];
+    $_SESSION['name']      = $user['name'];
+    $_SESSION['email']     = $user['email'];
+    $_SESSION['phone']     = $user['phone'];
+    $_SESSION['type']      = $user['type'];
 }
 
 // Logout helper

@@ -1,3 +1,25 @@
+<?php
+// Make sure session is started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+
+$loggedIn = isset($_SESSION['auth_token']);
+$userName = $_SESSION['name'] ?? '';
+$userType = $_SESSION['type'] ?? '';
+$dashboardUrl = '/views/customer/dashboard';
+if ($userType === 'admin') {
+    $dashboardUrl = '/views/admin/dashboard';
+}
+
+$userAvatar = '/images/default-avatar.png';
+
+?>
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -22,9 +44,22 @@
             <h1 class="logo-text">Allsmsverify</h1>
         </div>
         <div class="right-top-nav">
-            <a href="login" class="btn-clear me-3">Log in</a>
-            <a href="register" class="btn-color">Register</a>
+            <?php if (!$loggedIn): ?>
+                <a href="/login" class="btn-clear me-3">Log in</a>
+                <a href="/register" class="btn-color">Register</a>
+            <?php else: ?>
+
+
+
+                <a href="<?php echo $dashboardUrl; ?>" class="btn-clear me-3 d-flex align-items-center">
+                    <!-- Avatar Icon -->
+                    <i class="fa-solid fa-circle-user fa-lg me-2"></i>
+                    <img src="<?php echo htmlspecialchars($userAvatar); ?>" alt="avatar" class="rounded-circle me-2" style="width:32px; height:32px;">
+                    <span><?php echo htmlspecialchars($userName); ?></span>
+                </a>
+            <?php endif; ?>
         </div>
+
     </nav>
     <header class="hero main-margin">
         <div class="hero-left">

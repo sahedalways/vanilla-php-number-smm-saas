@@ -46,7 +46,7 @@ loginBtn.addEventListener('click', function (e) {
         spinner.classList.remove('d-none');
 
         $.ajax({
-            url: '/controllers/customer/auth/LoginController',
+            url: '/controllers/admin/auth/LoginController',
             type: 'POST',
             data: { email, password, csrf_token: csrfToken },
             dataType: 'json',
@@ -66,7 +66,7 @@ loginBtn.addEventListener('click', function (e) {
                     }).showToast();
 
                     setTimeout(() => {
-                        window.location.href = 'views/customer/dashboard';
+                        window.location.href = '/views/admin/dashboard';
                     }, 1000);
                 } else {
                     Toastify({

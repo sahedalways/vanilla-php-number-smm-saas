@@ -37,7 +37,12 @@ if (isset($_GET['msg'])) {
         $button_url = "index";
     }
 }
-// include 'theam/' . THEAM . '/login.php';
+
+
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
 
 ?>
 <?php
@@ -61,7 +66,9 @@ $page_title = "Login - " . $site_data['web_name'];
     <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <wc-toast id="tt" position="top-right"> </wc-toast>
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 </head>
 
 <body>
@@ -75,23 +82,36 @@ $page_title = "Login - " . $site_data['web_name'];
         </a>
         <div class="form-div">
             <h1 class="small-heading fw-600 mb-4">Sign in</h1>
+
+            <input type="hidden" id="csrf_token" value="<?php echo $csrf_token; ?>">
+
+            <!-- Email -->
             <div class="mb-3">
                 <label for="email" class="form-label">Email address</label>
-                <input type="email" class="form-control" id="email">
+                <input type="email" class="form-control" id="email" placeholder="Enter your email" value="customer@gmail.com">
+                <div id="error-email" class="text-danger small mt-1"></div>
             </div>
+
+            <!-- Password -->
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
                 <div class="position-relative">
-                    <input type="password" class="form-control" id="password">
+                    <input type="password" class="form-control" id="password" placeholder="Enter your password" value="12345678">
                     <i class="bi bi-eye-slash toggle-password" id="togglePassword"></i>
                 </div>
+                <div id="error-password" class="text-danger small mt-1"></div>
             </div>
-            <div class="mt-0  forgot-password-div">
-                <a href="forgot" class="forgot-password">Forgot password?</a>
-            </div>
-            <button id="login" type="submit" class="btn-color create-btn w-100 mt-5">Sign In</button>
+
+            <button id="login" type="button" class="btn-color create-btn w-100 mt-3">
+                <span class="btn-text">Sign In</span>
+                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+            </button>
+
             <p class="small-text mt-3 text-center">Don't have an account? <a href="register">Sign Up</a></p>
         </div>
+
+
+
         <p class="text-center small-text mt-4">Protected by the reCAPTCHA and subject to the Allsmsverify
             <br><a href="privacy-policy.html">Privacy Policy</a> and <a href="tos.html">Terms of Service</a>
         </p>

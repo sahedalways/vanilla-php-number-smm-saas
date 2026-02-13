@@ -1,7 +1,7 @@
 <?php
 session_start();
 session_destroy();
-unset($_SESSION['token']);
+unset($_SESSION['auth_token']);
 setcookie('remember_me', $token, [
 	'expires' => time() - 3600,
 	'path' => '/',
@@ -11,6 +11,5 @@ setcookie('remember_me', $token, [
 	'samesite' => 'radium'
 ]);
 
-	header('location: login');	
-exit;	
-?>
+header('Location: /login');
+exit;

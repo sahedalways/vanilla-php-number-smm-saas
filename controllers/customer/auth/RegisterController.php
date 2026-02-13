@@ -82,13 +82,21 @@ $stmt->bind_param("ssssss", $username, $name, $email, $phone, $hash, $type);
 
 if ($stmt->execute()) {
     $userId = $conn->insert_id;
-    loginUser($userId);
+
+    $stmt = $conn->prepare("SELECT id, name, email, phone, type FROM user_data WHERE id = ?");
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
+    $stmt->close();
+
+
+
+
+    loginUser($user);
 
 
     echo json_encode(['status' => 'success', 'message' => 'Account created successfully']);
 } else {
     echo json_encode(['status' => 'error', 'message' => 'Registration failed: ' . $stmt->error]);
 }
-
-$stmt->close();
-$conn->close();

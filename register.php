@@ -2,7 +2,7 @@
 session_start();
 include  'include/config.php';
 
-var_dump($_SESSION['auth_token']);
+
 
 require_once 'helpers/session.php';
 guestOnly('views/customer/dashboard');
