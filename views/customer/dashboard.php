@@ -2,7 +2,15 @@
 require_once 'helpers/session.php';
 require_once 'include/config.php';
 
-authOnly('login');
+
+if (!isset($_SESSION['type']) || $_SESSION['type'] !== 'customer') {
+    $back = $_SERVER['HTTP_REFERER'] ?? '/';
+    header("Location: $back");
+    exit;
+}
+
+
+authOnly();
 
 $userId = $_SESSION['user_id'] ?? null;
 $userName = $_SESSION['name'] ?? 'User';

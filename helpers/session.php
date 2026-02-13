@@ -12,22 +12,43 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 // Redirect to dashboard if already logged in
-function guestOnly($redirect = 'dashboard')
+function guestOnly()
 {
     if (isset($_SESSION['auth_token'])) {
-        header("Location: /$redirect");
+        // Determine dashboard based on user type
+        $userType = $_SESSION['user_type'] ?? 'customer';
+
+        switch ($userType) {
+            case 'admin':
+                $redirectPage = '/views/admin/dashboard';
+                break;
+            case 'reseller':
+                $redirectPage = '/views/reseller/dashboard';
+                break;
+            default:
+                $redirectPage = '/views/customer/dashboard';
+        }
+
+        header("Location: $redirectPage");
         exit;
     }
 }
 
+
 // Protect pages for authenticated users only
-function authOnly($redirect = 'login')
+function authOnly()
 {
     if (!isset($_SESSION['auth_token'])) {
-        header("Location: /$redirect");
+
+        $loginPage = (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'admin')
+            ? '/views/admin/auth/login'
+            : "/login";
+
+        header("Location: $loginPage");
         exit;
     }
 }
+
 
 // Login helper
 function loginUser($user)

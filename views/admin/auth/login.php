@@ -18,7 +18,7 @@ if (isset($_COOKIE['remember_me'])) {
 
 
 require_once 'helpers/session.php';
-guestOnly('views/customer/dashboard');
+guestOnly();
 
 
 if (isset($_GET['msg'])) {

@@ -5,7 +5,7 @@ include  'include/config.php';
 
 
 require_once 'helpers/session.php';
-guestOnly('views/customer/dashboard');
+guestOnly();
 
 
 if (empty($_SESSION['csrf_token'])) {

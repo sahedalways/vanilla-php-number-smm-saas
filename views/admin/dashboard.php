@@ -1,17 +1,21 @@
 <?php
 require_once 'helpers/session.php';
 require_once 'include/config.php';
+if (!isset($_SESSION['type']) || $_SESSION['type'] !== 'admin') {
+    $back = $_SERVER['HTTP_REFERER'] ?? '/';
+    header("Location: $back");
+    exit;
+}
 
-// Ensure only logged-in admins access
-authOnly('admin'); // change from 'login' to 'admin'
+authOnly();
 
 $userId = $_SESSION['user_id'] ?? null;
 $userName = $_SESSION['name'] ?? 'Admin';
 
-// Example data (replace with actual DB queries)
-$totalUsers = 120;  // total registered users
-$totalBalance = 500000; // total system balance in NGN
-$pendingRequests = 6; // example pending requests
+
+$totalUsers = 120;
+$totalBalance = 500000;
+$pendingRequests = 6;
 ?>
 
 <!DOCTYPE html>
