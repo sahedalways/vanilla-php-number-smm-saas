@@ -17,8 +17,24 @@ if (isset($_COOKIE['remember_me'])) {
 }
 
 
+
+
+
+
 require_once 'helpers/session.php';
 guestOnly();
+
+
+// Detect subdomain
+$host = $_SERVER['HTTP_HOST'];
+$host = explode(':', $host)[0]; // remove port
+$parts = explode('.', $host);
+$resellerName = null;
+
+if (count($parts) > 1 && $parts[0] !== 'www') {
+    header("Location: /");
+}
+
 
 
 if (isset($_GET['msg'])) {

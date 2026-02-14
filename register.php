@@ -8,6 +8,17 @@ require_once 'helpers/session.php';
 guestOnly();
 
 
+// Detect subdomain
+$host = $_SERVER['HTTP_HOST'];
+$host = explode(':', $host)[0]; // remove port
+$parts = explode('.', $host);
+$resellerName = null;
+
+if (count($parts) > 1 && $parts[0] !== 'www') {
+  header("Location: /");
+}
+
+
 if (empty($_SESSION['csrf_token'])) {
   $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }

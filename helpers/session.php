@@ -16,7 +16,7 @@ function guestOnly()
 {
     if (isset($_SESSION['auth_token'])) {
         // Determine dashboard based on user type
-        $userType = $_SESSION['user_type'] ?? 'customer';
+        $userType = $_SESSION['type'] ?? 'customer';
 
         switch ($userType) {
             case 'admin':
@@ -40,9 +40,12 @@ function authOnly()
 {
     if (!isset($_SESSION['auth_token'])) {
 
-        $loginPage = (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'admin')
+        $loginPage = (isset($_SESSION['type']) && $_SESSION['type'] === 'admin')
             ? '/views/admin/auth/login'
-            : "/login";
+            : ((isset($_SESSION['type']) && $_SESSION['type'] === 'reseller')
+                ? '/views/reseller/auth/login'
+                : '/login');
+
 
         header("Location: $loginPage");
         exit;
