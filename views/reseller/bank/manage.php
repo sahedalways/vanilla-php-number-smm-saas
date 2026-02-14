@@ -119,9 +119,6 @@ $swift_code = $bank['swift_code'] ?? '';
                 </div>
 
                 <div class="modal-footer border-0 p-4 pt-0">
-                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">
-                        Cancel
-                    </button>
 
                     <button type="button" id="updateBankAccount" class="btn btn-success px-5">
                         <span class="btn-text">
