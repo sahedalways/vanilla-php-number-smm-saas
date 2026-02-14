@@ -40,23 +40,10 @@ $totalResellers = $totalResellersQuery->fetch_assoc()['total'] ?? 0;
 <body>
     <div class="main-wrapper p-3">
         <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <small class="text-light">Welcome back,</small>
-                <h5 class="fw-bold mb-0"><?php echo htmlspecialchars($userName); ?></h5>
-            </div>
-            <div class="d-flex gap-2">
-                <button class="btn btn-outline-secondary border-0 rounded-circle text-white">
-                    <i class="fa-regular fa-sun"></i>
-                </button>
-                <button class="btn btn-outline-secondary border-0 rounded-circle text-white position-relative">
-                    <i class="fa-regular fa-bell"></i>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;"><?php echo $pendingRequests; ?></span>
-                </button>
-                <!-- Logout Button -->
-                <a href="/logout" class="btn btn-outline-danger border-0 rounded-pill fw-bold ms-2">Logout</a>
-            </div>
-        </div>
+        <?php
+        include __DIR__ . '/components/header.php';
+        ?>
+
 
         <!-- Stats Cards -->
         <div class="row g-3">
@@ -145,13 +132,18 @@ $totalResellers = $totalResellersQuery->fetch_assoc()['total'] ?? 0;
                     </div>
                 </a>
             </div>
-
             <div class="col-3 text-center">
-                <div class="service-card p-3 bg-light rounded">
-                    <div class="icon-box text-success mb-2"><i class="fa-solid fa-wallet"></i></div>
-                    <div style="font-size: 0.85rem;" class="text-dark">Manage Balance</div>
-                </div>
+                <a href="/views/admin/profit/manage" class="text-decoration-none">
+                    <div class="service-card p-3 bg-light rounded">
+                        <div class="icon-box text-dark mb-2">
+                            <i class="fa-solid fa-coins"></i>
+                        </div>
+                        <div style="font-size: 0.85rem;" class="text-dark">Manage Profit</div>
+                    </div>
+                </a>
             </div>
+
+
             <div class="col-3 text-center">
                 <div class="service-card p-3 bg-light rounded">
                     <div class="icon-box text-warning mb-2"><i class="fa-solid fa-cogs"></i></div>
@@ -166,29 +158,10 @@ $totalResellers = $totalResellersQuery->fetch_assoc()['total'] ?? 0;
             </div>
         </div>
 
-        <!-- Bottom Navigation -->
-        <nav class="bottom-nav mt-4 mb-2">
-            <a href="#" class="nav-item active">
-                <i class="fa-solid fa-house"></i>
-                <span>Dashboard</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fa-solid fa-users"></i>
-                <span>Users</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fa-solid fa-wallet"></i>
-                <span>Balance</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fa-solid fa-cogs"></i>
-                <span>Services</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fa-solid fa-file-lines"></i>
-                <span>Logs</span>
-            </a>
-        </nav>
+        <?php
+        $active = 'dashboard';
+        include __DIR__ . '/components/bottom-nav.php';
+        ?>
 
     </div>
 

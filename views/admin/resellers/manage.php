@@ -46,7 +46,7 @@ $csrf_token = $_SESSION['csrf_token'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | Allsmsverify</title>
+    <title>Manage Resellers | Allsmsverify</title>
     <link rel="shortcut icon" href="<?php echo $WEBSITE_URL; ?>/images/logo-png.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -68,23 +68,9 @@ $csrf_token = $_SESSION['csrf_token'];
 <body>
     <div class="main-wrapper p-3">
         <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <small class="text-light">Welcome back,</small>
-                <h5 class="fw-bold mb-0"><?php echo htmlspecialchars($userName); ?></h5>
-            </div>
-            <div class="d-flex gap-2">
-                <button class="btn btn-outline-secondary border-0 rounded-circle text-white">
-                    <i class="fa-regular fa-sun"></i>
-                </button>
-                <button class="btn btn-outline-secondary border-0 rounded-circle text-white position-relative">
-                    <i class="fa-regular fa-bell"></i>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;"><?php echo $pendingRequests; ?></span>
-                </button>
-                <!-- Logout Button -->
-                <a href="/logout" class="btn btn-outline-danger border-0 rounded-pill fw-bold ms-2">Logout</a>
-            </div>
-        </div>
+        <?php
+        include __DIR__ . '/../components/header.php';
+        ?>
         <input type="hidden" id="csrf_token" value="<?php echo $csrf_token; ?>">
 
         <div class="d-flex justify-content-between mb-3 mt-5">
@@ -413,29 +399,10 @@ $csrf_token = $_SESSION['csrf_token'];
 
 
 
-        <!-- Bottom Navigation -->
-        <nav class="bottom-nav mt-4 mb-2">
-            <a href="#" class="nav-item active">
-                <i class="fa-solid fa-house"></i>
-                <span>Dashboard</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fa-solid fa-users"></i>
-                <span>Users</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fa-solid fa-wallet"></i>
-                <span>Balance</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fa-solid fa-cogs"></i>
-                <span>Services</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fa-solid fa-file-lines"></i>
-                <span>Logs</span>
-            </a>
-        </nav>
+        <?php
+        $active = 'reseller';
+        include __DIR__ . '/../components/bottom-nav.php';
+        ?>
 
     </div>
 
