@@ -1,0 +1,45 @@
+function approveRequest(id) {
+    const csrf = $('#csrf_token').val();
+    $.post(
+        '/controllers/admin/withdraw/approve',
+        { id, csrf_token: csrf },
+        function (res) {
+            if (res.status === 'success') {
+                $('#status-' + id).text('Approved');
+                Toastify({
+                    text: res.message,
+                    duration: 3000,
+                    gravity: 'top',
+                    position: 'right',
+                    backgroundColor: 'green',
+                }).showToast();
+            } else {
+                alert(res.message);
+            }
+        },
+        'json'
+    );
+}
+
+function rejectRequest(id) {
+    const csrf = $('#csrf_token').val();
+    $.post(
+        '/controllers/admin/withdraw/reject',
+        { id, csrf_token: csrf },
+        function (res) {
+            if (res.status === 'success') {
+                $('#status-' + id).text('Rejected');
+                Toastify({
+                    text: res.message,
+                    duration: 3000,
+                    gravity: 'top',
+                    position: 'right',
+                    backgroundColor: 'red',
+                }).showToast();
+            } else {
+                alert(res.message);
+            }
+        },
+        'json'
+    );
+}

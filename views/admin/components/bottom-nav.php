@@ -13,11 +13,17 @@
         <span>Profit</span>
     </a>
 
-    <a href="/services" class="nav-item <?= ($active ?? '') === 'services' ? 'active' : ''; ?>">
+    <a href="/views/admin/withdraw/manage" class="nav-item <?= ($active ?? '') === 'withdraw' ? 'active' : ''; ?>">
+        <i class="fa-solid fa-hand-holding-dollar"></i>
+        <span>Withdrawals</span>
+    </a>
+
+
+    <a href="/views/admin/services/manage" class="nav-item <?= ($active ?? '') === 'services' ? 'active' : ''; ?>">
         <i class="fa-solid fa-cogs"></i>
         <span>Services</span>
     </a>
-    <a href="/logs" class="nav-item <?= ($active ?? '') === 'logs' ? 'active' : ''; ?>">
+    <a href="/views/admin/logs/manage" class="nav-item <?= ($active ?? '') === 'logs' ? 'active' : ''; ?>">
         <i class="fa-solid fa-file-lines"></i>
         <span>Logs</span>
     </a>

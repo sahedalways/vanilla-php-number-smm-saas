@@ -143,6 +143,17 @@ $totalResellers = $totalResellersQuery->fetch_assoc()['total'] ?? 0;
                 </a>
             </div>
 
+            <div class="col-3 text-center">
+                <a href="/views/admin/withdraw/manage" class="text-decoration-none">
+                    <div class="service-card p-3 bg-light rounded">
+                        <div class="icon-box text-warning mb-2">
+                            <i class="fa-solid fa-hand-holding-dollar"></i>
+                        </div>
+                        <div style="font-size: 0.85rem;" class="text-dark">Manage Withdrawals</div>
+                    </div>
+                </a>
+            </div>
+
 
             <div class="col-3 text-center">
                 <div class="service-card p-3 bg-light rounded">
