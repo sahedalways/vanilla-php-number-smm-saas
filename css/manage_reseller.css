@@ -1,0 +1,63 @@
+/* Premium Touches */
+.modal-content-premium {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header-premium {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    padding: 1.5rem;
+}
+
+.form-label-premium {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #555;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-control-premium {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #dce1e7;
+    transition: all 0.2s ease;
+}
+
+.form-control-premium:focus {
+    border-color: #198754;
+    box-shadow: 0 0 0 0.25 margin rgba(25, 135, 84, 0.1);
+}
+
+.btn-create {
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.position-relative .toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: #6c757d;
+    /* gray color */
+    transition: color 0.2s;
+}
+
+.position-relative .toggle-password:hover {
+    color: #0d6efd;
+    /* blue on hover */
+}
+
+.form-control-premium {
+    padding-right: 2.5rem;
+}

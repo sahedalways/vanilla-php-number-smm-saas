@@ -54,10 +54,12 @@ if (!$stmt) {
 $stmt->bind_param("s", $email);
 $stmt->execute();
 $stmt->store_result();
+
 if ($stmt->num_rows > 0) {
     echo json_encode(['status' => 'error', 'message' => 'Email already exists']);
     exit;
 }
+
 
 
 $stmt = $conn->prepare("SELECT id FROM user_data WHERE phone = ?");
@@ -72,9 +74,10 @@ if ($stmt->num_rows > 0) {
 
 
 
+
 // hash password
 $hash = password_hash($password, PASSWORD_DEFAULT);
-$type = 'customer';
+$type = 'reseller';
 
 
 
@@ -94,21 +97,6 @@ $stmt->bind_param("ssssss", $username, $name, $email, $phone, $hash, $type);
 
 
 if ($stmt->execute()) {
-    $userId = $conn->insert_id;
-
-    $stmt = $conn->prepare("SELECT id, name, email, phone, type FROM user_data WHERE id = ?");
-    $stmt->bind_param("i", $userId);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $user = $result->fetch_assoc();
-    $stmt->close();
-
-
-
-
-    loginUser($user);
-
-
     echo json_encode(['status' => 'success', 'message' => 'Account created successfully']);
 } else {
     echo json_encode(['status' => 'error', 'message' => 'Registration failed: ' . $stmt->error]);

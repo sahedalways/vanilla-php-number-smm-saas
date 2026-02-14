@@ -74,19 +74,16 @@ $page_title = "Login - " . $site_data['web_name'];
     <div class="login-container">
         <div class="text-center">
             <div class="text-center px-4 py-5 bg-light shadow-sm rounded" style="max-width: 400px; margin: 40px auto;">
-                <!-- Logo -->
                 <img src="<?php echo $WEBSITE_URL; ?>/images/logo-png.png"
                     alt="Logo"
                     class="brand-logo"
-                    style="width: 100px; height: auto; display: block; margin: 0 auto 8px auto;">
+                    style="width: 100px; height: auto; display: block; margin: 0 auto 0px auto;">
 
-                <!-- Badge below the logo -->
                 <div class="admin-badge px-3 py-1 rounded-pill text-white"
-                    style="background-color: #4a90e2; font-size: 0.8rem; display: inline-block; margin-bottom: 12px;">
+                    style="background-color: #4a90e2; font-size: 0.8rem; display: inline-block; margin-top: 5px; margin-bottom: 8px;">
                     Secure Admin Access
                 </div>
 
-                <!-- Welcome Text -->
                 <h2 class="fw-bold mb-1" style="font-size: 1.6rem; color: #333;">Welcome Back</h2>
                 <p class="text-muted small mb-0" style="max-width: 300px; margin: 0 auto;">
                     Enter your credentials to securely access and manage the platform.
