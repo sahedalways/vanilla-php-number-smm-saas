@@ -5,6 +5,41 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 
+$host = $_SERVER['HTTP_HOST'];
+
+// Remove port if exists
+$host = explode(':', $host)[0];
+
+$parts = explode('.', $host);
+
+
+if (count($parts) > 1 && $parts[0] !== 'www') {
+
+    $subdomain = $parts[0];
+
+
+    require_once 'include/config.php';
+
+    $stmt = $conn->prepare("SELECT id FROM user_data WHERE username = ? AND type = 'reseller'");
+    $stmt->bind_param("s", $subdomain);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+
+
+        $_SESSION['reseller_subdomain'] = $subdomain;
+
+
+        header("Location: /views/reseller/auth/login");
+        exit;
+    }
+}
+
+
+
+
+
 $loggedIn = isset($_SESSION['auth_token']);
 $userName = $_SESSION['name'] ?? '';
 $userType = $_SESSION['type'] ?? '';

@@ -1,0 +1,174 @@
+/* General Body */
+body {
+    font-family: 'Figtree', sans-serif;
+    background: #0d1b2a; /* Dark background */
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0d1b2a, #1b2a41);
+}
+
+/* Form Container */
+.form-area-div {
+    background: linear-gradient(145deg, #1e3a5f, #1a2d4f);
+    padding: 40px 30px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(30, 144, 255, 0.5);
+    width: 100%;
+    max-width: 450px;
+    position: relative;
+    backdrop-filter: blur(15px);
+}
+
+/* Logo */
+.logo-div-mini {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 25px;
+}
+
+.logo-img-mini {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+}
+
+.logo-text-mini {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #4da6ff; /* Sky blue */
+}
+
+/* Form Heading */
+.form-div h1.small-heading {
+    font-size: 1.8rem;
+    color: #4da6ff;
+    text-align: center;
+    text-shadow: 1px 1px 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Welcome Text */
+.form-div p.small-text {
+    font-size: 0.95rem;
+    color: #a0cfff;
+    text-align: center;
+}
+
+/* Inputs */
+.form-div .form-control {
+    border-radius: 12px;
+    padding: 12px 15px;
+    border: none;
+    font-size: 1rem;
+    background: linear-gradient(145deg, #2a4a7b, #1e3a5f);
+    color: #fff;
+    box-shadow:
+        inset 4px 4px 8px rgba(255, 255, 255, 0.1),
+        inset -4px -4px 8px rgba(0, 123, 255, 0.3);
+    transition: all 0.3s;
+}
+
+.form-div .form-control::placeholder {
+    color: #a0cfff;
+}
+
+.form-div .form-control:focus {
+    outline: none;
+    box-shadow: 0 0 12px rgba(30, 144, 255, 0.7);
+    background: linear-gradient(145deg, #3568a0, #2a4a7b);
+}
+
+/* Toggle Password Icon */
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #4da6ff;
+}
+
+/* Login Button */
+.btn-color.create-btn {
+    background: linear-gradient(145deg, #4da6ff, #1e90ff);
+    color: #fff;
+    font-weight: 600;
+    padding: 12px 0;
+    border-radius: 12px;
+    transition: all 0.3s;
+    border: none;
+    box-shadow: 0 8px 20px rgba(30, 144, 255, 0.6);
+}
+
+.btn-color.create-btn:hover {
+    background: linear-gradient(145deg, #1e90ff, #4da6ff);
+    box-shadow: 0 12px 25px rgba(30, 144, 255, 0.8);
+}
+
+/* Spinner */
+.spinner-border {
+    margin-left: 8px;
+}
+
+/* Footer Text */
+.form-area-div p.text-center {
+    font-size: 0.85rem;
+    color: #a0cfff;
+    margin-top: 25px;
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+    .form-area-div {
+        padding: 30px 20px;
+    }
+
+    .logo-text-mini {
+        font-size: 1.2rem;
+    }
+
+    .form-div h1.small-heading {
+        font-size: 1.5rem;
+    }
+}
+
+/* Logo Container */
+.logo-div-mini {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 25px;
+}
+
+/* Logo Image */
+.logo-img-mini {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    image-rendering: auto;
+    margin-right: -8px;
+}
+
+/* Logo Text */
+.logo-text-mini {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #1e90ff;
+    white-space: nowrap;
+}
+
+/* Responsive for small screens */
+@media (max-width: 500px) {
+    .logo-img-mini {
+        width: 45px;
+        height: 45px;
+        margin-right: -8px;
+    }
+
+    .logo-text-mini {
+        font-size: 1.3rem;
+    }
+}

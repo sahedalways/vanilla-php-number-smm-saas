@@ -25,6 +25,7 @@ $phone = trim($_POST['phone'] ?? '');
 $password = $_POST['password'] ?? '';
 $confirm_password = $_POST['confirm_password'] ?? '';
 
+
 if (!$name || !$email || !$phone || !$password || !$confirm_password) {
     echo json_encode(['status' => 'error', 'message' => 'All fields are required']);
     exit;
@@ -72,25 +73,16 @@ if ($stmt->num_rows > 0) {
 }
 
 
-// hash password
+
 $hash = password_hash($password, PASSWORD_DEFAULT);
-$type = 'reseller';
+$type = 'customer';
 
-// generate subdomain dynamically
-$website_url = WEBSITE_URL;
 
-// ensure URL has scheme
-if (!preg_match('#^https?://#', $website_url)) {
-    $website_url = 'https://' . $website_url;
-}
+$subdomain = null;
 
-$parsedUrl = parse_url($website_url);
-$domain = $parsedUrl['host'] ?? preg_replace('#^https?://#', '', $website_url);
-$domain = rtrim($domain, '/');
 
-$subdomain = strtolower($username) . '.' . $domain;
 
-// insert user with subdomain
+// insert user
 $stmt = $conn->prepare("
     INSERT INTO user_data (username, name, email, phone, password, type, subdomain, register_date)
     VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
@@ -101,11 +93,28 @@ if (!$stmt) {
     exit;
 }
 
-// bind parameters (7 strings + 1 datetime handled by NOW())
 $stmt->bind_param("sssssss", $username, $name, $email, $phone, $hash, $type, $subdomain);
 
 if ($stmt->execute()) {
-    echo json_encode(['status' => 'success', 'message' => 'Account created successfully', 'subdomain' => $subdomain]);
+    $customerId = $stmt->insert_id;
+
+    $reseller_id = $_SESSION['user_id'] ?? null;
+
+
+    if (!empty($reseller_id)) {
+        $stmt2 = $conn->prepare("
+            INSERT INTO reseller_customers (reseller_id, customer_id, added_at)
+            VALUES (?, ?, NOW())
+        ");
+        $stmt2->bind_param("ii", $reseller_id, $customerId);
+        $stmt2->execute();
+    }
+
+    echo json_encode([
+        'status' => 'success',
+        'message' => 'Account created successfully',
+        'customer_id' => $customerId
+    ]);
 } else {
     echo json_encode(['status' => 'error', 'message' => 'Registration failed: ' . $stmt->error]);
 }

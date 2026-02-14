@@ -82,7 +82,7 @@ document.getElementById('register').addEventListener('click', function (e) {
     const csrfToken = document.getElementById('csrf_token').value;
     // Ajax request example
     $.ajax({
-        url: '/controllers/admin/reseller/register',
+        url: '/controllers/reseller/customer/register',
         method: 'POST',
         data: {
             name,
@@ -95,7 +95,7 @@ document.getElementById('register').addEventListener('click', function (e) {
         dataType: 'json',
         success: function (res) {
             registerBtn.disabled = false;
-            btnText.innerHTML = '<i class="bi bi-check-circle me-2"></i>Create Reseller Account';
+            btnText.innerHTML = '<i class="bi bi-check-circle me-2"></i>Create Customer Account';
             spinner.classList.add('d-none');
             clear();
 
@@ -107,7 +107,7 @@ document.getElementById('register').addEventListener('click', function (e) {
                     position: 'right',
                     backgroundColor: 'linear-gradient(to right, #00b09b, #96c93d)',
                 }).showToast();
-                $('#addResellerModal').modal('hide');
+                $('#addCustomerModal').modal('hide');
 
                 setTimeout(() => {
                     location.reload();
@@ -124,7 +124,7 @@ document.getElementById('register').addEventListener('click', function (e) {
         },
         error: function () {
             registerBtn.disabled = false;
-            btnText.innerHTML = '<i class="bi bi-check-circle me-2"></i>Create Reseller Account';
+            btnText.innerHTML = '<i class="bi bi-check-circle me-2"></i>Create Customer Account';
             spinner.classList.add('d-none');
             Toastify({
                 text: 'Something went wrong.',
@@ -146,14 +146,14 @@ function clear() {
 }
 
 $(document).ready(function () {
-    $('.edit-reseller-btn').on('click', function () {
+    $('.edit-customer-btn').on('click', function () {
         const id = $(this).data('id');
         const name = $(this).data('name');
         const email = $(this).data('email');
         const phone = $(this).data('phone');
 
         // Set modal values
-        $('#reseller_id').val(id);
+        $('#customer_id').val(id);
         $('#edit_name').val(name);
         $('#edit_email').val(email);
         $('#edit_phone').val(phone);
@@ -161,12 +161,12 @@ $(document).ready(function () {
         $('#edit_confirm_password').val('');
 
         // Show modal
-        const modal = new bootstrap.Modal(document.getElementById('editResellerModal'));
+        const modal = new bootstrap.Modal(document.getElementById('editCustomerModal'));
         modal.show();
     });
 });
 
-document.getElementById('updateReseller').addEventListener('click', function (e) {
+document.getElementById('updateCustomer').addEventListener('click', function (e) {
     e.preventDefault();
 
     // Clear previous errors
@@ -178,7 +178,7 @@ document.getElementById('updateReseller').addEventListener('click', function (e)
     );
 
     let hasError = false;
-    const id = document.getElementById('reseller_id').value;
+    const id = document.getElementById('customer_id').value;
     const name = document.getElementById('edit_name').value.trim();
     const email = document.getElementById('edit_email').value.trim();
     const phone = document.getElementById('edit_phone').value.trim();
@@ -227,7 +227,7 @@ document.getElementById('updateReseller').addEventListener('click', function (e)
     const csrfToken = document.getElementById('csrf_token').value;
 
     $.ajax({
-        url: '/controllers/admin/reseller/update',
+        url: '/controllers/reseller/customer/update',
         method: 'POST',
         data: {
             id,
@@ -241,7 +241,7 @@ document.getElementById('updateReseller').addEventListener('click', function (e)
         dataType: 'json',
         success: function (res) {
             updateBtn.disabled = false;
-            btnText.innerHTML = '<i class="bi bi-check-circle me-2"></i>Update Reseller';
+            btnText.innerHTML = '<i class="bi bi-check-circle me-2"></i>Update Customer';
             spinner.classList.add('d-none');
 
             if (res.status === 'success') {
@@ -253,7 +253,7 @@ document.getElementById('updateReseller').addEventListener('click', function (e)
                     backgroundColor: 'linear-gradient(to right, #00b09b, #96c93d)',
                 }).showToast();
 
-                $('#editResellerModal').modal('hide');
+                $('#editCustomerModal').modal('hide');
 
                 // reload table to reflect changes
                 setTimeout(() => {
@@ -271,7 +271,7 @@ document.getElementById('updateReseller').addEventListener('click', function (e)
         },
         error: function () {
             updateBtn.disabled = false;
-            btnText.innerHTML = '<i class="bi bi-check-circle me-2"></i>Update Reseller';
+            btnText.innerHTML = '<i class="bi bi-check-circle me-2"></i>Update Customer';
             spinner.classList.add('d-none');
             Toastify({
                 text: 'Something went wrong.',
@@ -285,12 +285,12 @@ document.getElementById('updateReseller').addEventListener('click', function (e)
 });
 
 function confirmDelete(id) {
-    if (!confirm('Are you sure you want to delete this reseller?')) return;
+    if (!confirm('Are you sure you want to delete this customer?')) return;
 
     const csrfToken = document.getElementById('csrf_token').value;
 
     $.ajax({
-        url: '/controllers/admin/reseller/delete',
+        url: '/controllers/reseller/customer/delete',
         method: 'POST',
         data: {
             id: id,

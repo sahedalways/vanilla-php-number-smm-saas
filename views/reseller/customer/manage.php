@@ -1,7 +1,7 @@
 <?php
 require_once 'helpers/session.php';
 require_once 'include/config.php';
-if (!isset($_SESSION['type']) || $_SESSION['type'] !== 'admin') {
+if (!isset($_SESSION['type']) || $_SESSION['type'] !== 'reseller') {
     $back = $_SERVER['HTTP_REFERER'] ?? '/';
     header("Location: $back");
     exit;
@@ -10,29 +10,20 @@ if (!isset($_SESSION['type']) || $_SESSION['type'] !== 'admin') {
 authOnly();
 
 $userId = $_SESSION['user_id'] ?? null;
-$userName = $_SESSION['name'] ?? 'Admin';
+$userName = $_SESSION['name'] ?? 'Reseller';
 
 
 
-
-$limit = 10;
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$offset = ($page - 1) * $limit;
-
-// Get total resellers
-$totalQuery = $conn->query("SELECT COUNT(*) as total FROM user_data WHERE type='reseller'");
-$totalResellers = $totalQuery->fetch_assoc()['total'];
-$totalPages = ceil($totalResellers / $limit);
-
-
-$resellers = $conn->query("
-    SELECT id, name, email, username, phone,subdomain, register_date as created_at
-    FROM user_data
-    WHERE type='reseller'
-    ORDER BY id DESC
-    LIMIT $limit OFFSET $offset
+$stmt = $conn->prepare("
+    SELECT u.id as id, u.name as name,u.username as username, u.email as email, u.phone as phone
+    FROM user_data u
+    INNER JOIN reseller_customers rc ON u.id = rc.customer_id
+    WHERE rc.reseller_id = ?
 ");
-
+$stmt->bind_param("i", $userId);
+$stmt->execute();
+$result = $stmt->get_result();
+$customers = $result->fetch_all(MYSQLI_ASSOC);
 
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -46,7 +37,7 @@ $csrf_token = $_SESSION['csrf_token'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Resellers | Allsmsverify</title>
+    <title>Manage Customers | Allsmsverify</title>
     <link rel="shortcut icon" href="<?php echo $WEBSITE_URL; ?>/images/logo-png.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -74,9 +65,9 @@ $csrf_token = $_SESSION['csrf_token'];
         <input type="hidden" id="csrf_token" value="<?php echo $csrf_token; ?>">
 
         <div class="d-flex justify-content-between mb-3 mt-5">
-            <h4>Resellers List</h4>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addResellerModal">
-                + Add New Reseller
+            <h4>Customers List</h4>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
+                + Add New Customer
             </button>
 
         </div>
@@ -91,27 +82,25 @@ $csrf_token = $_SESSION['csrf_token'];
                             <th>Email</th>
                             <th>Username</th>
                             <th>Phone</th>
-                            <th>Subdomain</th>
-                            <th>Created</th>
+
                             <th>Actions</th> <!-- New column for buttons -->
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if ($resellers && $resellers->num_rows > 0) : ?>
+                        <?php if ($customers) : ?>
                             <?php $index = 1; ?>
-                            <?php while ($row = $resellers->fetch_assoc()) : ?>
+                            <?php foreach ($customers as $row) : ?>
                                 <tr>
                                     <td><?= $index++; ?></td>
                                     <td><?= htmlspecialchars($row['name']); ?></td>
                                     <td><?= htmlspecialchars($row['email']); ?></td>
                                     <td><?= htmlspecialchars($row['username']); ?></td>
                                     <td><?= htmlspecialchars($row['phone']); ?></td>
-                                    <td><?= htmlspecialchars($row['subdomain']); ?></td>
-                                    <td><?= $row['created_at']; ?></td>
+
                                     <td>
                                         <!-- Edit Button -->
                                         <a href="javascript:void(0);"
-                                            class="btn btn-sm btn-primary me-1 edit-reseller-btn"
+                                            class="btn btn-sm btn-primary me-1 edit-customer-btn"
                                             data-id="<?= $row['id']; ?>"
                                             data-name="<?= htmlspecialchars($row['name']); ?>"
                                             data-email="<?= htmlspecialchars($row['email']); ?>"
@@ -121,49 +110,27 @@ $csrf_token = $_SESSION['csrf_token'];
                                         </a>
 
                                         <!-- Delete Button -->
-
-
                                         <button class="btn btn-sm btn-danger" onclick="confirmDelete(<?= $row['id']; ?>)">
                                             <i class="bi bi-trash"></i> Delete
                                         </button>
                                     </td>
-
-
                                 </tr>
-                            <?php endwhile; ?>
+                            <?php endforeach; ?>
                         <?php else : ?>
                             <tr>
                                 <td colspan="8" class="text-center py-4 fw-semibold text-muted">
-                                    No Resellers Found Here
+                                    No Customers Found Here
                                 </td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
+
+
+
                 </table>
             </div>
 
-            <!-- Pagination -->
-            <!-- <nav>
-                <ul class="pagination justify-content-center mt-3">
-                    <?php if ($page > 1): ?>
-                        <li class="page-item">
-                            <a class="page-link" href="?page=<?= $page - 1; ?>">Previous</a>
-                        </li>
-                    <?php endif; ?>
 
-                    <?php for ($i = 1; $i <= $totalPages; $i++) : ?>
-                        <li class="page-item <?= ($i == $page) ? 'active' : ''; ?>">
-                            <a class="page-link" href="?page=<?= $i; ?>"><?= $i; ?></a>
-                        </li>
-                    <?php endfor; ?>
-
-                    <?php if ($page < $totalPages): ?>
-                        <li class="page-item">
-                            <a class="page-link" href="?page=<?= $page + 1; ?>">Next</a>
-                        </li>
-                    <?php endif; ?>
-                </ul>
-            </nav> -->
         </div>
 
 
@@ -171,7 +138,7 @@ $csrf_token = $_SESSION['csrf_token'];
 
 
 
-        <div class="modal fade" id="addResellerModal"
+        <div class="modal fade" id="addCustomerModal"
             tabindex="-1"
             aria-hidden="true"
             data-bs-backdrop="static"
@@ -183,9 +150,9 @@ $csrf_token = $_SESSION['csrf_token'];
                         <div>
                             <h5 class="modal-title fw-bold mb-0 text-success">
                                 <i class="bi bi-person-fill-add me-2 text-success"></i>
-                                Add New Reseller
+                                Add New Customer
                             </h5>
-                            <small class="text-muted">Fill in the details to register a new partner account.</small>
+                            <small class="text-muted">Fill in the details to register a new customer account.</small>
                         </div>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -282,7 +249,7 @@ $csrf_token = $_SESSION['csrf_token'];
                     <div class="modal-footer border-0 p-4 pt-0">
                         <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancel</button>
                         <button type="button" id="register" class="btn btn-success btn-create px-5">
-                            <span class="btn-text"><i class="bi bi-check-circle me-2"></i>Create Reseller Account</span>
+                            <span class="btn-text"><i class="bi bi-check-circle me-2"></i>Create Customer Account</span>
                             <span class="spinner-border spinner-border-sm ms-2 d-none" role="status"></span>
                         </button>
                     </div>
@@ -300,7 +267,7 @@ $csrf_token = $_SESSION['csrf_token'];
 
 
 
-        <div class="modal fade" id="editResellerModal"
+        <div class="modal fade" id="editCustomerModal"
             tabindex="-1"
             aria-hidden="true"
             data-bs-backdrop="static"
@@ -311,13 +278,13 @@ $csrf_token = $_SESSION['csrf_token'];
                     <div class="modal-header modal-header-premium">
                         <h5 class="modal-title fw-bold mb-0 text-success">
                             <i class="bi bi-person-fill me-2 text-success"></i>
-                            Edit Reseller
+                            Edit Customer
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
                     <div class="modal-body p-4">
-                        <input type="hidden" id="reseller_id">
+                        <input type="hidden" id="customer_id">
                         <div class="row g-4">
 
                             <!-- Full Name -->
@@ -381,8 +348,8 @@ $csrf_token = $_SESSION['csrf_token'];
 
                     <div class="modal-footer border-0 p-4 pt-0">
                         <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" id="updateReseller" class="btn btn-success btn-create px-5">
-                            <span class="btn-text"><i class="bi bi-check-circle me-2"></i>Update Reseller</span>
+                        <button type="button" id="updateCustomer" class="btn btn-success btn-create px-5">
+                            <span class="btn-text"><i class="bi bi-check-circle me-2"></i>Update Customer</span>
                             <span class="spinner-border spinner-border-sm ms-2 d-none" role="status"></span>
                         </button>
                     </div>
@@ -395,13 +362,13 @@ $csrf_token = $_SESSION['csrf_token'];
 
 
         <?php
-        $active = 'reseller';
+        $active = 'customers';
         include __DIR__ . '/../components/bottom-nav.php';
         ?>
 
     </div>
 
-    <script src="/js/admin/manage-reseller.js"></script>
+    <script src="/js/reseller/manage-customer.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 

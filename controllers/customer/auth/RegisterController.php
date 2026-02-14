@@ -24,6 +24,8 @@ $email = trim($_POST['email'] ?? '');
 $phone = trim($_POST['phone'] ?? '');
 $password = $_POST['password'] ?? '';
 $confirm_password = $_POST['confirm_password'] ?? '';
+$referral = trim($_POST['referral'] ?? '');
+
 
 if (!$name || !$email || !$phone || !$password || !$confirm_password) {
     echo json_encode(['status' => 'error', 'message' => 'All fields are required']);
@@ -58,6 +60,23 @@ if ($stmt->num_rows > 0) {
     echo json_encode(['status' => 'error', 'message' => 'Email already exists']);
     exit;
 }
+
+
+$reseller_id = null;
+if ($referral) {
+    $stmt = $conn->prepare("SELECT id FROM user_data WHERE username = ? AND type='reseller'");
+    $stmt->bind_param("s", $referral);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $referrer = $result->fetch_assoc();
+    if (!$referrer) {
+        echo json_encode(['status' => 'error', 'message' => 'Referral username does not exist']);
+        exit;
+    }
+    $reseller_id = $referrer['id'];
+}
+
+
 
 
 $stmt = $conn->prepare("SELECT id FROM user_data WHERE phone = ?");
@@ -105,6 +124,14 @@ if ($stmt->execute()) {
 
 
 
+    if ($reseller_id) {
+        $stmt2 = $conn->prepare("
+        INSERT INTO reseller_customers (reseller_id, customer_id, added_at)
+        VALUES (?, ?, NOW())
+    ");
+        $stmt2->bind_param("ii", $reseller_id, $userId);
+        $stmt2->execute();
+    }
 
     loginUser($user);
 

@@ -24,7 +24,6 @@ loginBtn.addEventListener('click', function (e) {
 
     let hasError = false;
     const email = document.getElementById('email').value.trim();
-
     const password = document.getElementById('password').value;
     const csrfToken = document.getElementById('csrf_token').value;
 
@@ -47,7 +46,7 @@ loginBtn.addEventListener('click', function (e) {
         spinner.classList.remove('d-none');
 
         $.ajax({
-            url: '/controllers/customer/auth/LoginController',
+            url: '/controllers/reseller/auth/login',
             type: 'POST',
             data: { email, password, csrf_token: csrfToken },
             dataType: 'json',
@@ -67,7 +66,7 @@ loginBtn.addEventListener('click', function (e) {
                     }).showToast();
 
                     setTimeout(() => {
-                        window.location.href = '/views/customer/dashboard';
+                        window.location.href = '/views/reseller/dashboard';
                     }, 1000);
                 } else {
                     Toastify({

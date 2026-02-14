@@ -38,6 +38,7 @@ document.getElementById('register').addEventListener('click', function (e) {
     const name = document.getElementById('name').value.trim();
     const email = document.getElementById('email').value.trim();
     const phone = document.getElementById('phone').value.trim();
+    const referral = document.getElementById('referral').value.trim();
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirm_password').value;
     const termsChecked = document.getElementById('terms_check').checked;
@@ -98,6 +99,7 @@ document.getElementById('register').addEventListener('click', function (e) {
                 email: email,
                 phone: phone,
                 password: password,
+                referral: referral,
                 confirm_password: confirmPassword,
                 csrf_token: csrfToken,
             },
@@ -107,9 +109,8 @@ document.getElementById('register').addEventListener('click', function (e) {
                 btnText.innerText = 'Create Account';
                 spinner.classList.add('d-none');
 
-                clear();
-
                 if (res.status === 'success') {
+                    clear();
                     Toastify({
                         text: res.message,
                         duration: 4000,
@@ -119,7 +120,7 @@ document.getElementById('register').addEventListener('click', function (e) {
                         backgroundColor: 'linear-gradient(to right, #00b09b, #96c93d)',
                     }).showToast();
                     setTimeout(() => {
-                        window.location.href = 'views/customer/dashboard';
+                        window.location.href = '/views/customer/dashboard';
                     }, 1500);
                 } else {
                     Toastify({

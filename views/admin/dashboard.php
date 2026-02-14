@@ -21,6 +21,10 @@ $totalCustomers = $totalCustomersQuery->fetch_assoc()['total'] ?? 0;
 $totalResellersQuery = $conn->query("SELECT COUNT(*) as total FROM user_data WHERE type='reseller'");
 $totalResellers = $totalResellersQuery->fetch_assoc()['total'] ?? 0;
 
+
+$totalRequests = $conn->query("SELECT COUNT(*) as cnt FROM reseller_withdraw_requests")->fetch_assoc()['cnt'];
+$pendingRequests = $conn->query("SELECT COUNT(*) as cnt FROM reseller_withdraw_requests WHERE status='pending'")->fetch_assoc()['cnt'];
+$approvedRequests = $conn->query("SELECT COUNT(*) as cnt FROM reseller_withdraw_requests WHERE status='approved'")->fetch_assoc()['cnt'];
 ?>
 
 <!DOCTYPE html>
@@ -102,7 +106,7 @@ $totalResellers = $totalResellersQuery->fetch_assoc()['total'] ?? 0;
                 <div class="card text-center p-3">
                     <i class="fa-solid fa-money-bill-transfer text-danger fa-2x mb-2"></i>
                     <h6>Total W. Requests</h6>
-                    <h4>0</h4>
+                    <h4><?= $totalRequests ?></h4>
                 </div>
             </div>
 
@@ -110,9 +114,19 @@ $totalResellers = $totalResellersQuery->fetch_assoc()['total'] ?? 0;
                 <div class="card text-center p-3">
                     <i class="fa-solid fa-clock text-warning fa-2x mb-2"></i>
                     <h6>Pending Withdraw</h6>
-                    <h4>0</h4>
+                    <h4><?= $pendingRequests ?></h4>
                 </div>
             </div>
+
+            <div class="col-md-4">
+                <div class="card text-center p-3">
+                    <i class="fa-solid fa-circle-check text-success fa-2x mb-2"></i>
+                    <h6>Approved Withdraw</h6>
+                    <h4><?= $approvedRequests ?></h4>
+                </div>
+            </div>
+
+
 
         </div>
 

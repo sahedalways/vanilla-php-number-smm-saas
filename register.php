@@ -79,6 +79,13 @@ $page_title = "Register- " . $site_data['web_name'];
       <div id="error-phone" class="text-danger small mt-1"></div>
     </div>
 
+
+    <div class="mb-3">
+      <label for="referral" class="form-label">Referral Username (Optional)</label>
+      <input type="text" class="form-control" id="referral" placeholder="Enter referral username">
+      <div id="error-referral" class="text-danger small mt-1"></div>
+    </div>
+
     <!-- Password -->
     <div class="mb-3">
       <label for="password" class="form-label">Password <span class="text-danger">*</span></label>

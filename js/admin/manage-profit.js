@@ -29,7 +29,7 @@ document.getElementById('profitForm').addEventListener('submit', function (e) {
     const csrfToken = document.getElementById('csrf_token').value;
 
     $.ajax({
-        url: '/controllers/admin/profit/update', // create this endpoint
+        url: '/controllers/admin/profit/update',
         method: 'POST',
         data: {
             profit_percentage: profitPercentage,

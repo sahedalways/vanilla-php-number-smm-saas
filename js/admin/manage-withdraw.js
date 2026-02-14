@@ -14,7 +14,13 @@ function approveRequest(id) {
                     backgroundColor: 'green',
                 }).showToast();
             } else {
-                alert(res.message);
+                Toastify({
+                    text: res.message,
+                    duration: 4000,
+                    gravity: 'top',
+                    position: 'right',
+                    backgroundColor: 'linear-gradient(to right, #ff5f6d, #ffc371)',
+                }).showToast();
             }
         },
         'json'
@@ -37,7 +43,13 @@ function rejectRequest(id) {
                     backgroundColor: 'red',
                 }).showToast();
             } else {
-                alert(res.message);
+                Toastify({
+                    text: res.message,
+                    duration: 4000,
+                    gravity: 'top',
+                    position: 'right',
+                    backgroundColor: 'linear-gradient(to right, #ff5f6d, #ffc371)',
+                }).showToast();
             }
         },
         'json'
