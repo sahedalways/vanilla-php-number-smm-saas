@@ -133,6 +133,30 @@ $balance = $stmt->get_result()->fetch_assoc()['balance'] ?? 0;
                 </a>
             </div>
 
+            <div class="col-md-4 text-center">
+                <a href="/views/reseller/bank/manage" class="text-decoration-none">
+                    <div class="service-card p-3 bg-gradient rounded shadow-sm">
+                        <div class="icon-box text-white mb-2">
+                            <i class="fa-solid fa-building-columns"></i>
+                        </div>
+                        <div class="text-white">Manage Bank Account</div>
+                    </div>
+                </a>
+            </div>
+
+
+            <div class="col-md-4 text-center">
+                <a href="/views/reseller/withdraw/manage" class="text-decoration-none">
+                    <div class="service-card p-3 bg-gradient rounded shadow-sm">
+                        <div class="icon-box text-white mb-2">
+                            <i class="fa-solid fa-money-bill-transfer"></i>
+                        </div>
+                        <div class="text-white">Withdraw Balance</div>
+                    </div>
+                </a>
+            </div>
+
+
 
             <div class="col-md-4 text-center">
                 <a href="/views/reseller/orders/manage" class="text-decoration-none">

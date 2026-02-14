@@ -13,6 +13,12 @@
         <span>Profit</span>
     </a>
 
+    <a href="/views/reseller/bank/manage" class="nav-item <?= ($active ?? '') === 'bank' ? 'active' : ''; ?>">
+        <i class="fa-solid fa-university"></i>
+        <span>Bank Account</span>
+    </a>
+
+
     <a href="/views/reseller/withdraw/manage" class="nav-item <?= ($active ?? '') === 'withdraw' ? 'active' : ''; ?>">
         <i class="fa-solid fa-hand-holding-dollar"></i>
         <span>Withdrawals</span>
@@ -23,6 +29,9 @@
         <i class="fa-solid fa-cogs"></i>
         <span>Services</span>
     </a>
+
+
+
     <a href="/views/reseller/logs/manage" class="nav-item <?= ($active ?? '') === 'logs' ? 'active' : ''; ?>">
         <i class="fa-solid fa-file-lines"></i>
         <span>Logs</span>

@@ -10,7 +10,7 @@ guestOnly();
 
 // Detect subdomain
 $host = $_SERVER['HTTP_HOST'];
-$host = explode(':', $host)[0]; // remove port
+$host = explode(':', $host)[0];
 $parts = explode('.', $host);
 $resellerName = null;
 

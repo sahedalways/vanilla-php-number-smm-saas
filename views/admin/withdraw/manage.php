@@ -69,8 +69,9 @@ $csrf_token = $_SESSION['csrf_token'];
                             <th>Reseller</th>
                             <th>Amount</th>
                             <th>Bank</th>
-                            <th>Account</th>
-                            <th>IFSC</th>
+                            <th>Account Name</th>
+                            <th>Account No.</th>
+                            <th>Swift Code</th>
                             <th>Status</th>
                             <th>Action</th>
                         </tr>
@@ -85,11 +86,23 @@ $csrf_token = $_SESSION['csrf_token'];
                                 <tr id="request-<?= $row['id'] ?>">
                                     <td><?= $row['id'] ?></td>
                                     <td><?= htmlspecialchars($row['name']) ?> (<?= htmlspecialchars($row['username']) ?>)</td>
-                                    <td><?= $row['amount'] ?></td>
+                                    <td>₦<?= $row['amount'] ?></td>
                                     <td><?= htmlspecialchars($row['bank_name']) ?></td>
+                                    <td><?= htmlspecialchars($row['account_name']) ?></td>
                                     <td><?= htmlspecialchars($row['account_number']) ?></td>
-                                    <td><?= htmlspecialchars($row['ifsc_code']) ?></td>
-                                    <td id="status-<?= $row['id'] ?>"><?= ucfirst($row['status']) ?></td>
+                                    <td><?= htmlspecialchars($row['swift_code']) ?></td>
+                                    <td id="status-<?= $row['id'] ?>">
+                                        <?php
+                                        $status = $row['status'];
+                                        $badgeClass = match ($status) {
+                                            'pending' => 'bg-warning text-dark',
+                                            'approved' => 'bg-success text-white',
+                                            'rejected' => 'bg-danger text-white',
+                                            default => 'bg-secondary text-white'
+                                        };
+                                        ?>
+                                        <span class="badge <?= $badgeClass ?>"><?= ucfirst($status) ?></span>
+                                    </td>
                                     <td>
                                         <?php if ($row['status'] === 'pending'): ?>
                                             <button class="btn btn-success btn-sm" onclick="approveRequest(<?= $row['id'] ?>)">Approve</button>

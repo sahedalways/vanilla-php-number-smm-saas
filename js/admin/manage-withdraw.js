@@ -13,6 +13,10 @@ function approveRequest(id) {
                     position: 'right',
                     backgroundColor: 'green',
                 }).showToast();
+
+                setTimeout(() => {
+                    location.reload();
+                }, 500);
             } else {
                 Toastify({
                     text: res.message,
@@ -42,6 +46,10 @@ function rejectRequest(id) {
                     position: 'right',
                     backgroundColor: 'red',
                 }).showToast();
+
+                setTimeout(() => {
+                    location.reload();
+                }, 500);
             } else {
                 Toastify({
                     text: res.message,
