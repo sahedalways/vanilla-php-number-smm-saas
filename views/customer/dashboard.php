@@ -14,6 +14,17 @@ authOnly();
 
 $userId = $_SESSION['user_id'] ?? null;
 $userName = $_SESSION['name'] ?? 'User';
+
+$balance = 0.0;
+
+if ($userId) {
+    $stmt = $conn->prepare("SELECT balance FROM user_data WHERE id = ?");
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $stmt->bind_result($balance);
+    $stmt->fetch();
+    $stmt->close();
+}
 ?>
 
 
@@ -33,24 +44,10 @@ $userName = $_SESSION['name'] ?? 'User';
 
 <body>
     <div class="main-wrapper p-3">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <small class="text-light">Welcome back,</small>
-                <h5 class="fw-bold mb-0"><?php echo htmlspecialchars($userName); ?></h5>
-            </div>
-            <div class="d-flex gap-2">
-                <button class="btn btn-outline-secondary border-0 rounded-circle text-white">
-                    <i class="fa-regular fa-sun"></i>
-                </button>
-                <button class="btn btn-outline-secondary border-0 rounded-circle text-white position-relative">
-                    <i class="fa-regular fa-bell"></i>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">6</span>
-                </button>
-                <!-- Logout Button -->
-                <a href="/logout" class="btn btn-outline-danger border-0 rounded-pill fw-bold ms-2">Logout</a>
-            </div>
 
-        </div>
+        <?php
+        include __DIR__ . '/components/header.php';
+        ?>
 
         <div class="wallet-card mb-4">
             <div class="d-flex justify-content-between align-items-center">
@@ -60,7 +57,7 @@ $userName = $_SESSION['name'] ?? 'User';
                     <span class="px-3 py-1 text-white">NGN</span>
                 </div>
             </div>
-            <div class="balance-amount">₦0.00</div>
+            <div class="balance-amount"> ₦<?php echo number_format($balance, 2); ?></div>
             <div class="row g-2">
                 <div class="col-6">
                     <button class="btn btn-light w-100 py-2 fw-bold text-primary"><i class="fa-solid fa-plus me-1"></i> Top Up</button>
@@ -73,37 +70,47 @@ $userName = $_SESSION['name'] ?? 'User';
 
         <h6 class="fw-bold mb-3">Quick Services</h6>
         <div class="row g-3">
-            <div class="col-3 text-center">
-                <div class="service-card">
-                    <div class="icon-box text-primary"><i class="fa-solid fa-mobile-screen"></i></div>
-                    <div style="font-size: 0.75rem;">Airtime</div>
+
+
+
+            <!-- Services -->
+            <div class="col-4 text-center">
+                <a href="/views/customer/services/smm/manage" class="text-decoration-none">
+                    <div class="service-card p-3 shadow-sm rounded border h-100">
+                        <div class="icon-box text-success mb-2" style="font-size: 24px;">
+                            <i class="fa-solid fa-layer-group"></i>
+                        </div>
+                        <div class="fw-semibold small">SMM Services</div>
+                        <div class="text-light" style="font-size: 0.7rem;">
+                            Manage available digital services
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Phone Numbers -->
+            <div class="col-4 text-center">
+                <div class="service-card p-3 shadow-sm rounded border h-100">
+                    <div class="icon-box text-warning mb-2" style="font-size: 24px;">
+                        <i class="fa-solid fa-phone"></i>
+                    </div>
+                    <div class="fw-semibold small">Phone Numbers</div>
+                    <div class="text-light" style="font-size: 0.7rem;">
+                        View and manage phone numbers
+                    </div>
                 </div>
             </div>
+
         </div>
+
     </div>
 
-    <nav class="bottom-nav mb-2">
-        <a href="#" class="nav-item active">
-            <i class="fa-solid fa-house"></i>
-            <span>Home</span>
-        </a>
-        <a href="#" class="nav-item">
-            <i class="fa-solid fa-rocket"></i>
-            <span>Boosting</span>
-        </a>
-        <a href="#" class="nav-item">
-            <i class="fa-solid fa-mobile-button"></i>
-            <span>Buy Number</span>
-        </a>
-        <a href="#" class="nav-item">
-            <i class="fa-solid fa-file-lines"></i>
-            <span>Logs</span>
-        </a>
-        <a href="#" class="nav-item">
-            <i class="fa-solid fa-user"></i>
-            <span>Profile</span>
-        </a>
-    </nav>
+
+
+    <?php
+    $active = 'dashboard';
+    include __DIR__ . '/components/bottom-nav.php';
+    ?>
 
 </body>
 

@@ -25,10 +25,10 @@ if ($conn->connect_error) {
 $site_sql = $conn->query("SELECT * FROM settings WHERE id='1'");
 $site_data = $site_sql->fetch_assoc();
 $theam = $site_data['theam'];
-$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
-$hosted_folder = dirname($_SERVER['SCRIPT_NAME']);
+$protocol = 'https';
+$host = $_SERVER['HTTP_HOST'] ?? getenv('SITE_HOST') ?? 'localhost';
+$website_url = $protocol . '://' . $host;
 
-$website_url = $protocol . '://' . $_SERVER['HTTP_HOST'];
 
 $web_name = $site_data['web_name'];
 
