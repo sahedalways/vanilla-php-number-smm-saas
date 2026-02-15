@@ -62,6 +62,7 @@ $csrf_token = $_SESSION['csrf_token'];
         <?php
         include __DIR__ . '/../components/header.php';
         ?>
+
         <input type="hidden" id="csrf_token" value="<?php echo $csrf_token; ?>">
 
         <div class="d-flex justify-content-between mb-3 mt-5">

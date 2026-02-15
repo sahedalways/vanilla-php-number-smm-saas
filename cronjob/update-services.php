@@ -2,9 +2,10 @@
 require_once __DIR__ . '/../helpers/smm_helper.php';
 require_once __DIR__ . '/../include/config.php';
 require_once __DIR__ . '/../helpers/currency_helper.php';
+$api = new SMMAPI('DUMMY_KEY', true);
 
 
-$response = smmAPI('services');
+$response = $api->services();
 $conn->query("TRUNCATE TABLE services");
 
 $profitRow = $conn->query("SELECT profit_percentage FROM profit_settings ORDER BY id DESC LIMIT 1")->fetch_assoc();

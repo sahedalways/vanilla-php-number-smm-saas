@@ -63,6 +63,7 @@ function loginUser($user)
     $_SESSION['email']     = $user['email'];
     $_SESSION['phone']     = $user['phone'];
     $_SESSION['type']      = $user['type'];
+    $_SESSION['balance']   = $user['balance'];
 }
 
 // Logout helper

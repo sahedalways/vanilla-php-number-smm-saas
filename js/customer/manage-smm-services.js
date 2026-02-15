@@ -1,109 +1,118 @@
-$(document).ready(function () {
-    loadServices();
-});
+document.querySelectorAll('.buy-service-btn').forEach((btn) => {
+    btn.addEventListener('click', function () {
+        const serviceName = $(this).data('service-name');
+        const servicePrice = $(this).data('service-price');
+        const serviceMin = $(this).data('service-min');
+        const serviceMax = $(this).data('service-max');
+        const serviceId = $(this).data('service-id');
 
-function loadServices() {
-    $('#servicesList').html(`
-        <div class="text-center text-muted">
-            Loading services...
-        </div>
-    `);
+        // User balance from PHP session
+        const userBalance = parseFloat($('#userBalanceHidden').val()) || 0;
 
-    $.ajax({
-        url: '/controllers/customer/services/smm/get-services',
-        type: 'GET',
+        // Fill modal
+        $('#buyServiceId').val(serviceId);
+        $('#buyServiceName').text(serviceName);
+        $('#buyServicePrice').text(servicePrice.toFixed(2));
+        $('#buyServiceMin').text(serviceMin);
+        $('#buyServiceMax').text(serviceMax);
+        $('#userBalance').text(userBalance.toFixed(2));
 
-        success: function (response) {
-            if (response.status === 'success') {
-                renderServices(response.services);
-            } else {
-                $('#servicesList').html('Failed to load services');
-            }
-        },
+        const $qty = $('#buyQuantity');
+        $qty.val(serviceMin);
+        $qty.attr('min', serviceMin);
+        $qty.attr('max', serviceMax);
 
-        error: function () {
-            $('#servicesList').html('API Error');
-        },
+        // Show modal
+        const buyModal = new bootstrap.Modal(document.getElementById('buyServiceModal'));
+        buyModal.show();
     });
-}
+});
+document.getElementById('buyServiceBtn').addEventListener('click', function (e) {
+    e.preventDefault();
 
-function renderServices(services) {
-    let html = '';
+    const btn = this;
+    const btnText = btn.querySelector('.btn-text');
+    const spinner = btn.querySelector('.spinner-border');
+    const errorEl = document.getElementById('buyError');
 
-    if (services.length === 0) {
-        html = `
-            <div class="text-center text-muted">
-                No services found
-            </div>
-        `;
-    } else {
-        services.forEach((service) => {
-            html += `
+    errorEl.textContent = '';
 
-            <div class="col-6">
+    const serviceName = document.getElementById('buyServiceName').textContent;
+    const unitPrice = parseFloat(document.getElementById('buyServicePrice').textContent) || 0;
+    const minQty = parseInt(document.getElementById('buyServiceMin').textContent) || 1;
+    const maxQty = parseInt(document.getElementById('buyServiceMax').textContent) || 999999;
+    const userBalance = parseFloat(document.getElementById('userBalanceHidden').value) || 0;
+    const serviceId = document.getElementById('buyServiceId').value;
 
-                <div class="card shadow-sm border-0">
+    let quantity = parseInt(document.getElementById('buyQuantity').value);
 
-                    <div class="card-body text-center">
-
-                        <i class="fa-solid fa-share-nodes fa-2x text-primary mb-2"></i>
-
-                        <div class="fw-semibold">
-                            ${service.name}
-                        </div>
-
-                        <div class="text-muted small">
-                            Min: ${service.min}
-                            <br>
-                            Max: ${service.max}
-                        </div>
-
-                        <div class="text-success fw-semibold mt-1 mb-2">
-                            ₦${service.price.toFixed(2)}
-                        </div>
-
-                        <button class="btn btn-primary btn-sm"
-                            onclick="buyService(${service.id})">
-
-                            Buy Now
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            `;
-        });
+    if (quantity < minQty) {
+        errorEl.textContent = `Quantity cannot be less than minimum (${minQty}).`;
+        return;
+    }
+    if (quantity > maxQty) {
+        errorEl.textContent = `Quantity cannot exceed maximum (${maxQty}).`;
+        return;
     }
 
-    $('#servicesList').html(html);
-}
+    const totalPrice = unitPrice * quantity;
+    if (totalPrice > userBalance) {
+        errorEl.textContent = `Insufficient balance. Your total price is ₦${totalPrice.toFixed(2)}, but your balance is ₦${userBalance.toFixed(2)}.`;
+        return;
+    }
 
-function buyService(serviceId) {
+    btn.disabled = true;
+    btnText.textContent = 'Processing...';
+    spinner.classList.remove('d-none');
+
+    const csrfToken = document.getElementById('csrf_token').value;
+
+    // Ajax request
     $.ajax({
         url: '/controllers/customer/services/smm/buy-service',
-        type: 'POST',
-
+        method: 'POST',
         data: {
             service_id: serviceId,
-            csrf_token: $('#csrf_token').val(),
+            service_name: serviceName,
+            unit_price: unitPrice,
+            quantity: quantity,
+            total_price: totalPrice,
+            csrf_token: csrfToken,
         },
+        dataType: 'json',
+        success: function (res) {
+            btn.disabled = false;
+            btnText.innerHTML = '<i class="fa-solid fa-circle-check me-2"></i> Confirm & Purchase';
+            spinner.classList.add('d-none');
 
-        success: function (response) {
-            if (response.status === 'success') {
+            if (res.status === 'success') {
                 Toastify({
-                    text: 'Order placed. ID: ' + response.order_id,
-                    duration: 3000,
+                    text: res.message,
+                    duration: 4000,
                     gravity: 'top',
                     position: 'right',
-                    backgroundColor: 'green',
+                    backgroundColor: 'linear-gradient(to right, #00b09b, #96c93d)',
                 }).showToast();
+
+                // Update user balance in modal and top badge
+                const newBalance = userBalance - totalPrice;
+                document.getElementById('userBalance').textContent = newBalance.toFixed(2);
+                document.getElementById('userBalanceHidden').value = newBalance;
+
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(
+                    document.getElementById('buyServiceModal')
+                );
+                modal.hide();
             } else {
-                alert('Failed');
+                errorEl.textContent = res.message || 'Something went wrong.';
             }
         },
+        error: function () {
+            btn.disabled = false;
+            btnText.innerHTML = '<i class="fa-solid fa-circle-check me-2"></i> Confirm & Purchase';
+            spinner.classList.add('d-none');
+            errorEl.textContent = 'Something went wrong.';
+        },
     });
-}
+});

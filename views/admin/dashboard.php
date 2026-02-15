@@ -164,16 +164,20 @@ $approvedRequests = $conn->query("SELECT COUNT(*) as cnt FROM reseller_withdraw_
                 </a>
             </div>
 
+
+
+
             <div class="col-3 text-center">
                 <a href="/views/admin/services/smm/manage" class="text-decoration-none">
                     <div class="service-card p-3 bg-light rounded">
-                        <div class="icon-box text-primary mb-2">
+                        <div class="icon-box text-dark mb-2">
                             <i class="fa-solid fa-layer-group"></i>
                         </div>
                         <div style="font-size: 0.85rem;" class="text-dark">Manage Services</div>
                     </div>
                 </a>
             </div>
+
 
 
 

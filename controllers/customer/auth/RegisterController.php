@@ -115,7 +115,7 @@ $stmt->bind_param("ssssss", $username, $name, $email, $phone, $hash, $type);
 if ($stmt->execute()) {
     $userId = $conn->insert_id;
 
-    $stmt = $conn->prepare("SELECT id, name, email, phone, type FROM user_data WHERE id = ?");
+    $stmt = $conn->prepare("SELECT id, name, email, phone, balance, type FROM user_data WHERE id = ?");
     $stmt->bind_param("i", $userId);
     $stmt->execute();
     $result = $stmt->get_result();

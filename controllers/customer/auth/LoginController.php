@@ -24,7 +24,7 @@ if (!$email || !$password) {
 }
 
 // fetch user from database
-$stmt = $conn->prepare("SELECT id, name, email, phone, type, password FROM user_data WHERE email = ?");
+$stmt = $conn->prepare("SELECT id, name, email, phone,balance, type, password FROM user_data WHERE email = ?");
 $stmt->bind_param("s", $email);
 $stmt->execute();
 $result = $stmt->get_result();
