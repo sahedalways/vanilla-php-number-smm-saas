@@ -176,9 +176,6 @@ $stmt->bind_param(
 );
 
 if ($stmt->execute()) {
-
-    // Deduct user balance
-    $stmt->close();
     $stmt = $conn->prepare("UPDATE user_data SET balance = balance - ? WHERE id = ?");
     $stmt->bind_param("di", $totalPrice, $userId);
     $stmt->execute();

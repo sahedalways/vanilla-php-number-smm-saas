@@ -101,6 +101,21 @@ if ($userId) {
                 </div>
             </div>
 
+
+            <div class="col-4 text-center">
+                <a href="/views/customer/services/smm/orders" class="text-decoration-none">
+                    <div class="service-card p-3 shadow-sm rounded border h-100">
+                        <div class="icon-box text-info mb-2" style="font-size: 24px;">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                        </div>
+                        <div class="fw-semibold small">My SMM Orders</div>
+                        <div class="text-light" style="font-size: 0.7rem;">
+                            View all purchased SMM services
+                        </div>
+                    </div>
+                </a>
+            </div>
+
         </div>
 
     </div>

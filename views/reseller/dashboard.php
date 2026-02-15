@@ -173,7 +173,7 @@ $balance = $stmt->get_result()->fetch_assoc()['balance'] ?? 0;
 
 
             <div class="col-md-4 text-center">
-                <a href="/views/reseller/orders/manage" class="text-decoration-none">
+                <a href="/views/reseller/services/smm/orders" class="text-decoration-none">
                     <div class="service-card p-3 bg-gradient rounded shadow-sm">
                         <div class="icon-box text-white mb-2">
                             <i class="fa-solid fa-list-check"></i>

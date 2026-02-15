@@ -21,6 +21,17 @@ $csrf_token = $_SESSION['csrf_token'];
 
 
 require_once __DIR__ . '/../../../../controllers/customer/services/smm/get-services.php';
+
+$balance = 0.0;
+
+if ($userId) {
+    $stmt = $conn->prepare("SELECT balance FROM user_data WHERE id = ?");
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $stmt->bind_result($balance);
+    $stmt->fetch();
+    $stmt->close();
+}
 ?>
 
 <!DOCTYPE html>
@@ -52,7 +63,7 @@ require_once __DIR__ . '/../../../../controllers/customer/services/smm/get-servi
         <input type="hidden" id="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
         <div class="d-flex justify-content-end align-items-center mb-3">
             <span class="badge bg-info text-dark">
-                Balance: ₦ <?= number_format($_SESSION['balance'] ?? 0, 2) ?>
+                Balance: ₦ <?= number_format($balance ?? 0, 2) ?>
             </span>
         </div>
         <div class="container mt-4">
@@ -145,7 +156,7 @@ require_once __DIR__ . '/../../../../controllers/customer/services/smm/get-servi
             }
         </style>
 
-        <input type="hidden" id="userBalanceHidden" value="<?= floatval($_SESSION['balance'] ?? 0) ?>">
+        <input type="hidden" id="userBalanceHidden" value="<?= floatval($balance ?? 0) ?>">
 
 
         <!-- Buy Modal -->

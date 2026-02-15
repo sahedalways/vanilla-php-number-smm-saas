@@ -104,6 +104,10 @@ document.getElementById('buyServiceBtn').addEventListener('click', function (e) 
                     document.getElementById('buyServiceModal')
                 );
                 modal.hide();
+
+                setTimeout(() => {
+                    location.reload();
+                }, 500);
             } else {
                 errorEl.textContent = res.message || 'Something went wrong.';
             }

@@ -14,7 +14,7 @@
 
     <a href="/views/customer/services/smm/manage" class="nav-item <?= ($active ?? '') === 'smm' ? 'active' : ''; ?>">
         <i class="fa-solid fa-cogs"></i>
-        <span>Services</span>
+        <span>SMM Services</span>
     </a>
 
     <a href="/views/customer/logs/manage" class="nav-item <?= ($active ?? '') === 'logs' ? 'active' : ''; ?>">
