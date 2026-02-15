@@ -8,6 +8,11 @@
         <i class="fa-solid fa-users"></i>
         <span>Resellers</span>
     </a>
+
+    <a href="/views/admin/customer/manage" class="nav-item <?= ($active ?? '') === 'customers' ? 'active' : ''; ?>">
+        <i class="fa-solid fa-user"></i>
+        <span>Customers</span>
+    </a>
     <a href="/views/admin/profit/manage" class="nav-item <?= ($active ?? '') === 'profit' ? 'active' : ''; ?>">
         <i class="fa-solid fa-coins"></i>
         <span>Profit</span>

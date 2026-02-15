@@ -22,12 +22,10 @@ if (count($parts) > 1 && $parts[0] !== 'www') {
         $reseller = $result->fetch_assoc();
         $resellerName = $reseller['name']; // use in page
     } else {
-        // Invalid subdomain, redirect main site
         header("Location: /");
         exit;
     }
 } else {
-    // No subdomain, redirect main site
     header("Location: /");
     exit;
 }
