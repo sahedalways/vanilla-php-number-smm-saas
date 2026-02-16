@@ -1,12 +1,16 @@
 <?php
-require_once __DIR__ . '/../helpers/smm_helper.php';
 require_once __DIR__ . '/../include/config.php';
+require_once __DIR__ . '/../class/SMMApi.php';
 require_once __DIR__ . '/../helpers/currency_helper.php';
-$api = new SMMAPI('DUMMY_KEY', true);
 
 
-$response = $api->services();
-$conn->query("TRUNCATE TABLE services");
+$api = new SMMApi();
+$services = $api->services();
+
+
+
+$conn->query("DELETE FROM services");
+
 
 $profitRow = $conn->query("SELECT profit_percentage FROM profit_settings ORDER BY id DESC LIMIT 1")->fetch_assoc();
 $adminProfitPercent = floatval($profitRow['profit_percentage'] ?? 0);
@@ -14,7 +18,7 @@ $adminProfitPercent = floatval($profitRow['profit_percentage'] ?? 0);
 // Prepare services array
 $servicesData = [];
 
-foreach ($response as $service) {
+foreach ($services as $service) {
     $usdPrice = $service['rate'];
     $basePrice = usdToNaira($usdPrice);
 
@@ -29,37 +33,67 @@ foreach ($response as $service) {
         'min' => $service['min'],
         'max' => $service['max'],
         'status' => 'active',
+
+        // ADD THESE ↓↓↓
+        'category' => $service['category'] ?? null,
+        'type' => $service['type'] ?? null,
+        'cancel' => $service['cancel'] ?? false,
+        'refill' => $service['refill'] ?? false,
     ];
 }
 
 // Insert / Update services table
 foreach ($servicesData as $s) {
+
+    $cancel = !empty($s['cancel']) ? 1 : 0;
+    $refill = !empty($s['refill']) ? 1 : 0;
+
     $stmt = $conn->prepare("
-        INSERT INTO services (api_service_id, name, base_price,api_price, status, min, max)
-        VALUES (?, ?, ?, ?, ?,?, ?)
+        INSERT INTO services (
+            api_service_id,
+            name,
+            base_price,
+            api_price,
+            status,
+            min,
+            max,
+            category,
+            cancel,
+            refill,
+            type
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON DUPLICATE KEY UPDATE
             name = VALUES(name),
             base_price = VALUES(base_price),
             api_price = VALUES(api_price),
+            status = VALUES(status),
             min = VALUES(min),
             max = VALUES(max),
-            status = VALUES(status)
+            category = VALUES(category),
+            cancel = VALUES(cancel),
+            refill = VALUES(refill),
+            type = VALUES(type)
     ");
 
-
     $stmt->bind_param(
-        "isddsss",
+        "isddsiissis",
         $s['api_service_id'],
         $s['name'],
         $s['base_price'],
         $s['api_price'],
         $s['status'],
         $s['min'],
-        $s['max']
+        $s['max'],
+        $s['category'],
+        $cancel,
+        $refill,
+        $s['type']
     );
 
     $stmt->execute();
 }
+
 
 
 // Update reseller prices

@@ -113,3 +113,11 @@ body {
 .bottom-nav .nav-item.active {
     color: #00b09b;
 }
+
+body {
+    padding-bottom: 80px !important;
+}
+
+.main-wrapper {
+    padding-bottom: 90px;
+}

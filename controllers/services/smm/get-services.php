@@ -16,6 +16,10 @@ SELECT
     s.api_price,
     s.min,
     s.max,
+    s.type,
+    s.category,
+    s.cancel,
+    s.refill,
     s.status,
     rp.price AS reseller_price
 FROM services s
@@ -34,16 +38,19 @@ $result = $stmt->get_result();
 $services = [];
 while ($row = $result->fetch_assoc()) {
     $price = is_null($row['reseller_price']) ? floatval($row['base_price']) : floatval($row['reseller_price']);
-
     $services[] = [
-        'id' => $row['id'],
+        'id'             => $row['id'],
         'api_service_id' => $row['api_service_id'],
-        'name' => $row['name'],
-        'base_price' => floatval($row['base_price']),
-        'api_price' => floatval($row['api_price']),
-        'price' => $price,
-        'min' => $row['min'],
-        'max' => $row['max'],
-        'status' => $row['status']
+        'name'           => $row['name'],
+        'base_price'     => floatval($row['base_price']),
+        'api_price'      => floatval($row['api_price']),
+        'price'          => $price,
+        'min'            => $row['min'],
+        'max'            => $row['max'],
+        'status'         => $row['status'],
+        'type'           => $row['type'] ?? 'Default',
+        'category'       => $row['category'] ?? '',
+        'cancel'         => intval($row['cancel'] ?? 0),
+        'refill'         => intval($row['refill'] ?? 0)
     ];
 }

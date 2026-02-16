@@ -68,11 +68,11 @@ $stmt->close();
                                 <?php
 
                                 $statusColors = [
-                                    'processing' => 'text-primary',
-                                    'success'    => 'text-success',
-                                    'failed'     => 'text-danger',
-                                    'partial'    => 'text-warning',
-                                    'rejected'   => 'text-secondary'
+                                    'Completed'    => 'text-success',
+                                    'Failed'     => 'text-danger',
+                                    'In Progress'    => 'text-primary',
+                                    'Rejected'   => 'text-danger',
+                                    'Partial'    => 'text-warning',
                                 ];
                                 ?>
 
@@ -80,7 +80,8 @@ $stmt->close();
                                     <?php echo ucfirst($order['status']); ?>
                                 </td>
 
-                                <td><?php echo intval($order['remains']); ?></td>
+                                <td><?php echo intval($order['remains'] ?? $order['quantity']); ?></td>
+
                                 <td><?php echo $order['created_at']; ?></td>
                             </tr>
                         <?php endforeach; ?>

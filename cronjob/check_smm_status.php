@@ -1,12 +1,13 @@
 <?php
 require_once __DIR__ . '/../include/config.php';
-require_once __DIR__ . '/../helpers/smm_helper.php';
+require_once __DIR__ . '/../class/SMMApi.php';
 
-$api = new SMMAPI('DUMMY_KEY', true);
+$api = new SMMApi();
 
 
 
-$stmt = $conn->prepare("SELECT * FROM smm_orders WHERE status = 'processing'");
+
+$stmt = $conn->prepare("SELECT * FROM smm_orders WHERE status = 'In Progress'");
 $stmt->execute();
 $res = $stmt->get_result();
 $orders = $res->fetch_all(MYSQLI_ASSOC);
@@ -22,29 +23,30 @@ foreach ($orders as $order) {
     $apiOrderId = $order['api_order_id'];
     $orderId = $order['id'];
 
-    $statusData = $api->call('status', ['order' => $apiOrderId]);
+    $statusData = $api->status($apiOrderId);
 
     if (!$statusData) {
         echo "Order ID $orderId: API returned no data.\n";
         continue;
     }
 
-    $apiStatus = strtolower($statusData['status'] ?? '');
+    $apiStatus = strtolower($statusData->status ?? '');
+
 
     // Map API status to local status
-    if ($apiStatus === 'completed' || $apiStatus === 'success') {
-        $newStatus = 'success';
-    } elseif ($apiStatus === 'in progress' || $apiStatus === 'partial') {
-        $newStatus = 'processing';
-    } elseif ($apiStatus === 'rejected' || $apiStatus === 'failed') {
-        $newStatus = 'failed';
+    if ($apiStatus == 'Completed' || $apiStatus === 'Success') {
+        $newStatus = 'Completed';
+    } elseif ($apiStatus == 'Partial') {
+        $newStatus = 'Partial';
+    } elseif ($apiStatus == 'Rejected' || $apiStatus == 'Failed') {
+        $newStatus = 'Failed';
     } else {
-        $newStatus = 'processing';
+        $newStatus = 'In Progress';
     }
 
     // Handle processing/partial updates
-    if ($newStatus === 'processing') {
-        $remains = intval($statusData['remains'] ?? $order['remains']);
+    if ($newStatus == 'In Progress' || $newStatus == 'Partial') {
+        $remains   = intval($statusData->remains ?? $order['remains']);
 
         $stmt = $conn->prepare("UPDATE smm_orders SET status = ?, remains = ? WHERE id = ?");
         $stmt->bind_param("sii", $newStatus, $remains, $orderId);
@@ -57,7 +59,7 @@ foreach ($orders as $order) {
     }
 
     // Handle completed/success orders
-    if ($newStatus === 'success') {
+    if ($newStatus == 'Success' || $newStatus == 'Completed' || $newStatus == 'Partial') {
         // Admin balance
         $adminStmt = $conn->prepare("SELECT id FROM user_data WHERE type = 'admin'");
         $adminStmt->execute();
@@ -85,8 +87,8 @@ foreach ($orders as $order) {
         }
 
 
-        $stmt = $conn->prepare("UPDATE smm_orders SET status = 'success' WHERE id = ?");
-        $stmt->bind_param("i", $orderId);
+        $stmt = $conn->prepare("UPDATE smm_orders SET status = ? WHERE id = ?");
+        $stmt->bind_param("si", $newStatus, $orderId);
         $stmt->execute();
         $stmt->close();
 
@@ -94,7 +96,7 @@ foreach ($orders as $order) {
     }
 
 
-    if ($newStatus === 'failed') {
+    if ($newStatus == 'Rejected' || $newStatus == 'Failed') {
         // Refund user
         $stmt = $conn->prepare("UPDATE user_data SET balance = balance + ? WHERE id = ?");
         $stmt->bind_param("di", $order['cost'], $order['user_id']);
@@ -103,7 +105,7 @@ foreach ($orders as $order) {
 
 
 
-        $stmt = $conn->prepare("UPDATE smm_orders SET status = 'failed' WHERE id = ?");
+        $stmt = $conn->prepare("UPDATE smm_orders SET status = 'Failed' WHERE id = ?");
         $stmt->bind_param("i", $orderId);
         $stmt->execute();
         $stmt->close();

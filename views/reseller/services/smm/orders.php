@@ -77,11 +77,11 @@ $stmt->close();
                                 <?php
 
                                 $statusColors = [
-                                    'processing' => 'text-primary',
-                                    'success'    => 'text-success',
-                                    'failed'     => 'text-danger',
-                                    'partial'    => 'text-warning',
-                                    'rejected'   => 'text-secondary'
+                                    'Completed'    => 'text-success',
+                                    'Failed'     => 'text-danger',
+                                    'In Progress'    => 'text-primary',
+                                    'Rejected'   => 'text-danger',
+                                    'Partial'    => 'text-warning',
                                 ];
                                 ?>
 

@@ -38,7 +38,49 @@ while ($row = $result->fetch_assoc()) {
         }
         $stmt->close();
     }
+    $orderParams = [];
 
+    switch ($row['type'] ?? 'Default') {
+        case 'Default':
+            $orderParams = [
+                'link' => '',
+                'quantity' => null,
+            ];
+            break;
+
+        case 'Custom Comments':
+        case 'Custom Comments Package':
+            $orderParams = [
+                'link' => '',
+                'comments' => '',
+            ];
+            break;
+
+        case 'Comment Likes':
+            $orderParams = [
+                'link' => '',
+                'username' => '',
+                'quantity' => null,
+            ];
+            break;
+
+        case 'YouTube Likes':
+        case 'TikTok Views':
+            $orderParams = [
+                'link' => '',
+                'quantity' => null,
+            ];
+            break;
+
+        default:
+            $orderParams = [
+                'link' => '',
+                'quantity' => null,
+            ];
+            break;
+    }
+
+    // Add service to array
     $services[] = [
         'id' => $row['id'],
         'api_service_id' => $row['api_service_id'],
@@ -48,6 +90,11 @@ while ($row = $result->fetch_assoc()) {
         'price' => $price,
         'min' => $row['min'],
         'max' => $row['max'],
-        'status' => $row['status']
+        'status' => $row['status'],
+        'type' => $row['type'] ?? 'Default',
+        'category' => $row['category'] ?? '',
+        'refill' => $row['refill'] ?? false,
+        'cancel' => $row['cancel'] ?? false,
+        'order_params' => $orderParams
     ];
 }

@@ -71,10 +71,9 @@ if ($userId) {
                 <div style="width: 5px; height: 30px; background: #0d6efd; border-radius: 10px; margin-right: 15px;"></div>
                 <h4 class="mb-0" style="font-weight: 800; color: #c9d0d6; letter-spacing: -0.5px;">Available SMM Services</h4>
             </div>
-
             <div class="row g-4">
                 <?php foreach ($services as $index => $s):
-                    $delay = $index * 0.05; // Cards will pop up one by one
+                    $delay = $index * 0.05; // Cards animation delay
                 ?>
                     <div class="col-md-6 col-lg-4" style="animation: zoomIn 0.5s ease forwards; animation-delay: <?= $delay ?>s; opacity: 0;">
                         <div class="card h-100 border-0"
@@ -82,25 +81,43 @@ if ($userId) {
                             onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 20px 40px rgba(0,0,0,0.1)';"
                             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.05)';">
 
+                            <!-- Decorative Circle -->
                             <div style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: rgba(13, 110, 253, 0.03); border-radius: 50%; z-index: 0;"></div>
 
+                            <!-- Card Body -->
                             <div class="card-body p-4" style="position: relative; z-index: 1;">
+
+                                <!-- Icon -->
                                 <div class="d-flex justify-content-between align-items-start mb-3">
                                     <div style="width: 45px; height: 45px; background: #f0f7ff; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
                                         <i class="fa-solid fa-bolt-lightning text-primary" style="font-size: 1.2rem;"></i>
                                     </div>
-                                    <span style="font-size: 0.7rem; font-weight: 700; color: #0d6efd; background: #e7f1ff; padding: 4px 10px; border-radius: 50px; text-transform: uppercase;">Instant</span>
                                 </div>
 
-                                <h6 class="fw-bold mb-3" style="color: #2c3e50; line-height: 1.5; height: 45px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                                <!-- Service Name -->
+                                <h6 class="fw-bold mb-2" style="color: #2c3e50; line-height: 1.5; height: 45px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
                                     <?= htmlspecialchars($s['name']) ?>
                                 </h6>
 
+                                <!-- Badges: Type, Category, Cancel, Refill -->
+                                <div class="mb-3">
+                                    <span class="badge bg-secondary me-1"><?= htmlspecialchars($s['type']) ?></span>
+                                    <span class="badge bg-info text-dark me-1"><?= htmlspecialchars($s['category']) ?></span>
+                                    <?php if ($s['cancel']): ?>
+                                        <span class="badge bg-warning text-dark me-1">Cancelable</span>
+                                    <?php endif; ?>
+                                    <?php if ($s['refill']): ?>
+                                        <span class="badge bg-success">Refill</span>
+                                    <?php endif; ?>
+                                </div>
+
+                                <!-- Price -->
                                 <div class="mb-4">
                                     <span style="font-size: 0.75rem; color: #95a5a6; display: block; margin-bottom: 2px;">Rate per 1000</span>
                                     <h5 style="font-weight: 800; color: #2ecc71; margin: 0;">₦ <?= number_format($s['price'], 2) ?></h5>
                                 </div>
 
+                                <!-- Min/Max Limits -->
                                 <div class="row g-0 py-2 px-3" style="background: #f8f9fa; border-radius: 12px;">
                                     <div class="col-6 border-end text-center">
                                         <small style="color: #7f8c8d; display: block; font-size: 0.65rem; text-transform: uppercase;">Min</small>
@@ -113,6 +130,7 @@ if ($userId) {
                                 </div>
                             </div>
 
+                            <!-- Card Footer: Order Button -->
                             <div class="card-footer bg-transparent border-0 p-4 pt-0">
                                 <button class="btn btn-primary w-100 buy-service-btn"
                                     style="border-radius: 12px; padding: 12px; font-weight: 700; background: linear-gradient(135deg, #0d6efd 0%, #0052cc 100%); border: none; box-shadow: 0 4px 15px rgba(13, 110, 253, 0.2); transition: all 0.3s;"
@@ -121,6 +139,7 @@ if ($userId) {
                                     data-service-price="<?= $s['price'] ?>"
                                     data-service-min="<?= $s['min'] ?>"
                                     data-service-max="<?= $s['max'] ?>"
+                                    data-service-type="<?= htmlspecialchars($s['type']) ?>"
                                     onmouseover="this.style.boxShadow='0 8px 20px rgba(13, 110, 253, 0.4)';"
                                     onmouseout="this.style.boxShadow='0 4px 15px rgba(13, 110, 253, 0.2)';">
                                     <i class="fa-solid fa-basket-shopping me-2"></i> Order Now
@@ -130,6 +149,22 @@ if ($userId) {
                     </div>
                 <?php endforeach; ?>
             </div>
+
+            <!-- Animations -->
+            <style>
+                @keyframes zoomIn {
+                    from {
+                        opacity: 0;
+                        transform: scale(0.95);
+                    }
+
+                    to {
+                        opacity: 1;
+                        transform: scale(1);
+                    }
+                }
+            </style>
+
         </div>
 
         <style>
@@ -203,6 +238,10 @@ if ($userId) {
                             <span style="font-weight: 700; color: #856404;">₦ <span id="userBalance">0.00</span></span>
                         </div>
 
+                        <div class="mb-3" id="typeSpecificFields">
+
+                        </div>
+
                         <div class="mb-3">
                             <label class="form-label" style="font-weight: 600; color: #1a1a1a; font-size: 0.9rem;">Enter Quantity</label>
                             <div class="input-group" style="box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
@@ -227,6 +266,8 @@ if ($userId) {
                 </div>
             </div>
         </div>
+
+
 
         <?php
         $active = 'smm';

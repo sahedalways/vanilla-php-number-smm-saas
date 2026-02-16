@@ -3,9 +3,11 @@
 
 <?php
 require_once __DIR__ . '/../../../../helpers/session.php';
+require_once __DIR__ . '/../../../../helpers/currency_helper.php';
 require_once __DIR__ . '/../../../../include/config.php';
-require_once __DIR__ . '/../../../../helpers/smm_helper.php';
-$api = new SMMAPI('DUMMY_KEY', true);
+require_once __DIR__ . '/../../../../class/SMMApi.php';
+$api = new SMMApi();
+
 
 header('Content-Type: application/json');
 
@@ -27,6 +29,9 @@ $serviceName = trim($_POST['service_name'] ?? '');
 $unitPrice   = floatval($_POST['unit_price'] ?? 0);
 $quantity    = intval($_POST['quantity'] ?? 0);
 $totalPrice  = floatval($_POST['total_price'] ?? 0);
+$orderParams  = $_POST['order_params'] ?? [];
+
+
 
 // Validation
 if ($serviceId <= 0 || $quantity <= 0 || $unitPrice <= 0) {
@@ -35,7 +40,7 @@ if ($serviceId <= 0 || $quantity <= 0 || $unitPrice <= 0) {
 }
 
 // Check if service exists and active
-$stmt = $conn->prepare("SELECT id, base_price, api_price FROM services WHERE id = ? AND status = 'active'");
+$stmt = $conn->prepare("SELECT id, base_price, api_price, type, category, cancel, refill FROM services WHERE id = ? AND status = 'active'");
 $stmt->bind_param("i", $serviceId);
 $stmt->execute();
 $res = $stmt->get_result();
@@ -69,6 +74,26 @@ if ($quantity < $minQty || $quantity > $maxQty) {
     exit;
 }
 
+
+$totalPriceNaira = $unitPrice * $quantity;
+
+
+$totalPriceUSD = nairaToUsd($totalPriceNaira);
+
+
+$apiBalanceObj = $api->balance();
+$apiBalance = floatval($apiBalanceObj->balance ?? 0);
+
+
+if ($totalPriceUSD > $apiBalance) {
+    echo json_encode([
+        'status' => 'error',
+        'message' => "An error occurred, please try again later."
+    ]);
+    exit;
+}
+
+
 // Check user balance
 $stmt = $conn->prepare("SELECT balance FROM user_data WHERE id = ?");
 $stmt->bind_param("i", $userId);
@@ -96,37 +121,14 @@ if ($row = $res->fetch_assoc()) {
 $stmt->close();
 
 
-$order = $api->addOrder($serviceId, $quantity);
-// Check if API returned an error
-if (!$order) {
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'API did not respond.'
-    ]);
+$apiOrder = $api->order(array_merge(['service' => $serviceId, 'quantity' => $quantity], $orderParams));
+
+if (!$apiOrder || !isset($apiOrder->order)) {
+    echo json_encode(['status' => 'error', 'message' => 'Failed to place order with API.']);
     exit;
 }
 
-// If API explicitly returned an error key/message
-if (isset($order['error'])) {
-    echo json_encode([
-        'status' => 'error',
-        'message' => $order['error']
-    ]);
-    exit;
-}
-
-// If API didn't provide order ID
-if (!isset($order['order'])) {
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Failed to place order with API. No order ID returned.'
-    ]);
-    exit;
-}
-
-$apiOrderId = $order['order'];
-
-
+$apiOrderId = $apiOrder->order;
 
 
 // Calculate profit
@@ -156,15 +158,24 @@ if ($resellerId) {
     $resellerProfit = 0;
 }
 
+
+$serviceType = $service['type'] ?? 'Default';
+$category    = $service['category'] ?? '';
+$cancel      = intval($service['cancel'] ?? 0);
+$refill      = intval($service['refill'] ?? 0);
+
+
+
 // Insert order
 $stmt = $conn->prepare("
     INSERT INTO smm_orders
-    (service_id, quantity, user_id, reseller_id, cost, admin_profit, reseller_profit, api_order_id, status)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'processing')
+    (service_id, quantity, user_id, reseller_id, cost, admin_profit, reseller_profit, api_order_id, status, service_type, category, cancel, refill)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'In Progress', ?, ?, ?, ?)
 ");
 
+
 $stmt->bind_param(
-    "iiiiidds",
+    "iiiidddsssii",
     $serviceId,
     $quantity,
     $userId,
@@ -172,8 +183,16 @@ $stmt->bind_param(
     $totalPrice,
     $adminProfit,
     $resellerProfit,
-    $apiOrderId
+    $apiOrderId,
+    $serviceType,
+    $category,
+    $cancel,
+    $refill
 );
+
+
+
+
 
 if ($stmt->execute()) {
     $stmt = $conn->prepare("UPDATE user_data SET balance = balance - ? WHERE id = ?");
