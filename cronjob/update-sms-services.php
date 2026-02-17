@@ -9,7 +9,11 @@ $api = new FiveSimApi();
 $services = $api->getProducts(null, null);
 
 
+
+$conn->query("SET FOREIGN_KEY_CHECKS = 0");
 $conn->query("DELETE FROM sms_provider_services");
+$conn->query("SET FOREIGN_KEY_CHECKS = 1");
+
 
 
 $profitRow = $conn->query("SELECT profit_percentage FROM profit_settings ORDER BY id DESC LIMIT 1")->fetch_assoc();
