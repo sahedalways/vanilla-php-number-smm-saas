@@ -56,18 +56,29 @@ foreach ($orders as $order) {
             }
         }
 
-        // Update order status and OTP
-        $updateStmt = $conn->prepare("
+        if (in_array($orderStatus, ['CANCELED', 'TIMEOUT', 'BANNED', 'FINISHED'])) {
+            $updateStmt = $conn->prepare("
+            UPDATE sms_orders
+            SET status = ?, otp = ?, updated_at = NOW(), expiry_time = ?
+            WHERE id = ?
+        ");
+            $updateStmt->bind_param("sssi", $orderStatus, $otpCode, $now, $order['id']);
+            $updateStmt->execute();
+            $updateStmt->close();
+        } else {
+
+            $updateStmt = $conn->prepare("
             UPDATE sms_orders
             SET status = ?, otp = ?, updated_at = NOW()
             WHERE id = ?
         ");
-        $updateStmt->bind_param("ssi", $orderStatus, $otpCode, $order['id']);
-        $updateStmt->execute();
-        $updateStmt->close();
+            $updateStmt->bind_param("ssi", $orderStatus, $otpCode, $order['id']);
+            $updateStmt->execute();
+            $updateStmt->close();
+        }
 
         $conn->commit();
-        echo "Order {$order['order_id']} updated: Status={$orderStatus}, OTP={$otpCode}\n";
+        echo "Order {$order['order_id']} updated with expiry_time if needed.\n";
     } catch (Exception $e) {
         $conn->rollback();
         echo "Failed to update order {$order['order_id']}: {$e->getMessage()}\n";
