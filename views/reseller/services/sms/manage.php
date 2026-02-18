@@ -28,6 +28,7 @@ $services = $servicesQuery->fetch_all(MYSQLI_ASSOC);
 <head>
     <meta charset="UTF-8">
     <title>Manage SMS Services | Reseller</title>
+    <link rel="shortcut icon" href="./../../images/logo-png.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/admin_dashboard.css">
@@ -128,7 +129,7 @@ $services = $servicesQuery->fetch_all(MYSQLI_ASSOC);
                                     data-service-id="<?= $s['id'] ?>"
                                     data-selling-price="<?= $selling_price ?>"
                                     data-base-price="<?= $s['base_price'] ?>">
-                                    <i class="fa-solid fa-pen-to-square"></i> Edit
+                                    <i class="fa-solid fa-pen-to-square"></i> Set Price
                                 </button>
                             </td>
                         </tr>

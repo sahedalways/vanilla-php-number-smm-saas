@@ -202,7 +202,7 @@ class FiveSimApi
             // simulate SMS after random
             if (rand(0, 1)) {
                 return [
-                    'status' => 'RECEIVED',
+                    'status' => 'FINISHED',
                     'sms' => [
                         [
                             'code' => rand(1000, 9999)
@@ -245,9 +245,9 @@ class FiveSimApi
         return $this->request("/prices/$country/$service");
     }
 
-    public function buyNumber($country, $service)
+    public function buyNumber($country, $operator, $service)
     {
-        return $this->request("/buy/activation/$country/any/$service");
+        return $this->request("/buy/activation/$country/$operator/$service");
     }
 
     public function getSMS($orderId)

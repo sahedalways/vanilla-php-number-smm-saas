@@ -7,9 +7,9 @@
     </a>
 
     <!-- NEW: Phone Numbers -->
-    <a href="/views/customer/numbers/manage" class="nav-item <?= ($active ?? '') === 'numbers' ? 'active' : ''; ?>">
+    <a href="/views/customer/numbers/list" class="nav-item <?= ($active ?? '') === 'sms' ? 'active' : ''; ?>">
         <i class="fa-solid fa-phone"></i>
-        <span>Numbers</span>
+        <span>SMS Services</span>
     </a>
 
     <a href="/views/customer/services/smm/manage" class="nav-item <?= ($active ?? '') === 'smm' ? 'active' : ''; ?>">

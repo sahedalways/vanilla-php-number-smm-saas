@@ -36,7 +36,7 @@ if ($userId) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Dashboard | Allsmsverify</title>
-    <link rel="shortcut icon" href="./images/logo-png.png" type="image/x-icon">
+    <link rel="shortcut icon" href="./../../images/logo-png.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../../css/customer_dashboard.css">
@@ -90,15 +90,17 @@ if ($userId) {
 
             <!-- Phone Numbers -->
             <div class="col-4 text-center">
-                <div class="service-card p-3 shadow-sm rounded border h-100">
-                    <div class="icon-box text-warning mb-2" style="font-size: 24px;">
-                        <i class="fa-solid fa-phone"></i>
+                <a href="/views/customer/services/sms/list" class="text-decoration-none">
+                    <div class="service-card p-3 shadow-sm rounded border h-100">
+                        <div class="icon-box text-warning mb-2" style="font-size: 24px;">
+                            <i class="fa-solid fa-phone"></i>
+                        </div>
+                        <div class="fw-semibold small">SMS Services</div>
+                        <div class="text-light" style="font-size: 0.7rem;">
+                            View and manage SMS services
+                        </div>
                     </div>
-                    <div class="fw-semibold small">Phone Numbers</div>
-                    <div class="text-light" style="font-size: 0.7rem;">
-                        View and manage phone numbers
-                    </div>
-                </div>
+                </a>
             </div>
 
 
@@ -116,6 +118,24 @@ if ($userId) {
                 </a>
             </div>
 
+
+
+
+
+
+            <div class="col-4 text-center">
+                <a href="/views/customer/services/sms/orders" class="text-decoration-none">
+                    <div class="service-card p-3 shadow-sm rounded border h-100">
+                        <div class="icon-box text-info mb-2" style="font-size: 24px;">
+                            <i class="fa-solid fa-sms"></i>
+                        </div>
+                        <div class="fw-semibold small">My SMS Orders</div>
+                        <div class="text-light" style="font-size: 0.7rem;">
+                            View all purchased SMS services
+                        </div>
+                    </div>
+                </a>
+            </div>
         </div>
 
     </div>

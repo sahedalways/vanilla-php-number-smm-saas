@@ -124,7 +124,7 @@ $stmt->close();
 $apiOrder = $api->order(array_merge(['service' => $serviceId, 'quantity' => $quantity], $orderParams));
 
 if (!$apiOrder || !isset($apiOrder->order)) {
-    echo json_encode(['status' => 'error', 'message' => 'Failed to place order with API.']);
+    echo json_encode(['status' => 'error', 'message' => 'Failed to place order.']);
     exit;
 }
 

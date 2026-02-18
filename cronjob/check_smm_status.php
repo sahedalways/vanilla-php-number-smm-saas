@@ -63,26 +63,23 @@ foreach ($orders as $order) {
 
     // Handle completed/success orders
     if (in_array($newStatus, ['Completed', 'Success'])) {
-        // Admin balance
-        $adminStmt = $conn->prepare("SELECT id FROM user_data WHERE type = 'admin'");
-        $adminStmt->execute();
-        $adminRes = $adminStmt->get_result();
-
-        while ($adminRow = $adminRes->fetch_assoc()) {
-            $adminId = $adminRow['id'];
-
-            $stmt = $conn->prepare("UPDATE user_data SET balance = balance + ? WHERE id = ?");
-            $stmt->bind_param("di", $order['admin_profit'], $adminId);
-            $stmt->execute();
-            $stmt->close();
-
-            echo "Admin ID $adminId balance updated with {$order['admin_profit']}\n";
-        }
-        $adminStmt->close();
+        $stmt = $conn->prepare("
+    UPDATE user_data
+    SET balance = COALESCE(balance, 0) + ?
+    WHERE type = 'admin'
+    LIMIT 1
+");
+        $stmt->bind_param("d", $order['admin_profit']);
+        $stmt->execute();
+        $stmt->close();
 
         // Reseller balance
         if (!empty($order['reseller_id'])) {
-            $stmt = $conn->prepare("UPDATE user_data SET balance = balance + ? WHERE id = ?");
+            $stmt = $conn->prepare("
+        UPDATE user_data
+        SET balance = COALESCE(balance, 0) + ?
+        WHERE id = ?
+    ");
             $stmt->bind_param("di", $order['reseller_profit'], $order['reseller_id']);
             $stmt->execute();
             $stmt->close();
@@ -99,10 +96,15 @@ foreach ($orders as $order) {
     // Handle rejected/failed orders
     if ($newStatus == 'Failed') {
         // Refund user
-        $stmt = $conn->prepare("UPDATE user_data SET balance = balance + ? WHERE id = ?");
+        $stmt = $conn->prepare("
+    UPDATE user_data
+    SET balance = COALESCE(balance, 0) + ?
+    WHERE id = ?
+");
         $stmt->bind_param("di", $order['cost'], $order['user_id']);
         $stmt->execute();
         $stmt->close();
+
 
         $stmt = $conn->prepare("UPDATE smm_orders SET status = 'Failed' WHERE id = ?");
         $stmt->bind_param("i", $orderId);
