@@ -73,7 +73,7 @@ if ($userId) {
             </div>
             <div class="row g-4">
                 <?php foreach ($services as $index => $s):
-                    $delay = $index * 0.05; // Cards animation delay
+                    $delay = $index * 0.05;
                 ?>
                     <div class="col-md-6 col-lg-4" style="animation: zoomIn 0.5s ease forwards; animation-delay: <?= $delay ?>s; opacity: 0;">
                         <div class="card h-100 border-0"
@@ -113,7 +113,7 @@ if ($userId) {
 
                                 <!-- Price -->
                                 <div class="mb-4">
-                                    <span style="font-size: 0.75rem; color: #95a5a6; display: block; margin-bottom: 2px;">Rate per 1000</span>
+                                    <span style="font-size: 0.75rem; color: #95a5a6; display: block; margin-bottom: 2px;">Rate per</span>
                                     <h5 style="font-weight: 800; color: #2ecc71; margin: 0;">₦ <?= number_format($s['price'], 2) ?></h5>
                                 </div>
 

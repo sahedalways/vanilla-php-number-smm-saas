@@ -87,8 +87,7 @@ foreach ($resellers as $reseller) {
 
         $serviceId = $serviceIdRow['id'] ?? 0;
         if ($serviceId > 0) {
-            $resellerProfit = 0.03;
-            $resellerPrice = $s['base_price'] + $resellerProfit;
+            $resellerPrice = $s['base_price'];
 
             $stmt2 = $conn->prepare("
                 INSERT INTO reseller_sms_services_prices (reseller_id, service_id, reseller_price)

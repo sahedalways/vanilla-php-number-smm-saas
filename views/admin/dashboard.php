@@ -25,6 +25,56 @@ $totalResellers = $totalResellersQuery->fetch_assoc()['total'] ?? 0;
 $totalRequests = $conn->query("SELECT COUNT(*) as cnt FROM reseller_withdraw_requests")->fetch_assoc()['cnt'];
 $pendingRequests = $conn->query("SELECT COUNT(*) as cnt FROM reseller_withdraw_requests WHERE status='pending'")->fetch_assoc()['cnt'];
 $approvedRequests = $conn->query("SELECT COUNT(*) as cnt FROM reseller_withdraw_requests WHERE status='approved'")->fetch_assoc()['cnt'];
+
+
+
+$stmt = $conn->prepare("
+    SELECT
+        IFNULL(SUM(cost), 0) as total
+    FROM sms_orders
+    WHERE status = 'FINISHED'
+");
+$stmt->execute();
+$totalRevenue = $stmt->get_result()->fetch_assoc()['total'] ?? 0;
+$stmt->close();
+
+// Monthly Revenue (current month)
+$stmt = $conn->prepare("
+    SELECT
+        IFNULL(SUM(cost), 0) as total
+    FROM sms_orders
+    WHERE status = 'FINISHED'
+      AND MONTH(created_at) = MONTH(NOW())
+      AND YEAR(created_at) = YEAR(NOW())
+");
+$stmt->execute();
+$monthlyRevenue = $stmt->get_result()->fetch_assoc()['total'] ?? 0;
+$stmt->close();
+
+// Yearly Revenue (current year)
+$stmt = $conn->prepare("
+    SELECT
+        IFNULL(SUM(cost), 0) as total
+    FROM sms_orders
+    WHERE status = 'FINISHED'
+      AND YEAR(created_at) = YEAR(NOW())
+");
+$stmt->execute();
+$yearlyRevenue = $stmt->get_result()->fetch_assoc()['total'] ?? 0;
+$stmt->close();
+
+$stmt = $conn->prepare("SELECT COUNT(*) as cnt FROM services");
+$stmt->execute();
+$servicesCount = $stmt->get_result()->fetch_assoc()['cnt'] ?? 0;
+$stmt->close();
+
+$stmt = $conn->prepare("SELECT COUNT(*) as cnt FROM sms_provider_services");
+$stmt->execute();
+$smsServicesCount = $stmt->get_result()->fetch_assoc()['cnt'] ?? 0;
+$stmt->close();
+
+// Total combined
+$totalServices = $servicesCount + $smsServicesCount;
 ?>
 
 <!DOCTYPE html>
@@ -72,32 +122,33 @@ $approvedRequests = $conn->query("SELECT COUNT(*) as cnt FROM reseller_withdraw_
                 <div class="card text-center p-3">
                     <i class="fa-solid fa-cogs text-warning fa-2x mb-2"></i>
                     <h6>Total Services</h6>
-                    <h4>0</h4>
+                    <h4><?= $totalServices ?></h4>
                 </div>
             </div>
 
-            <div class="col-md-4">
-                <div class="card text-center p-3">
-                    <i class="fa-solid fa-money-bill-wave text-success fa-2x mb-2"></i>
-                    <h6>Total Revenue</h6>
-                    <h4>₦0.00</h4>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="card text-center p-3">
+                        <i class="fa-solid fa-money-bill-wave text-success fa-2x mb-2"></i>
+                        <h6>Total Revenue</h6>
+                        <h4>₦<?= number_format($totalRevenue, 2) ?></h4>
+                    </div>
                 </div>
-            </div>
 
-            <div class="col-md-4">
-                <div class="card text-center p-3">
-                    <i class="fa-solid fa-calendar text-info fa-2x mb-2"></i>
-
-                    <h6>Monthly Revenue</h6>
-                    <h4>₦0.00</h4>
+                <div class="col-md-4">
+                    <div class="card text-center p-3">
+                        <i class="fa-solid fa-calendar text-info fa-2x mb-2"></i>
+                        <h6>Monthly Revenue</h6>
+                        <h4>₦<?= number_format($monthlyRevenue, 2) ?></h4>
+                    </div>
                 </div>
-            </div>
 
-            <div class="col-md-4">
-                <div class="card text-center p-3">
-                    <i class="fa-solid fa-calendar text-danger fa-2x mb-2"></i>
-                    <h6>Yearly Revenue</h6>
-                    <h4>₦0.00</h4>
+                <div class="col-md-4">
+                    <div class="card text-center p-3">
+                        <i class="fa-solid fa-calendar text-danger fa-2x mb-2"></i>
+                        <h6>Yearly Revenue</h6>
+                        <h4>₦<?= number_format($yearlyRevenue, 2) ?></h4>
+                    </div>
                 </div>
             </div>
 
@@ -166,18 +217,28 @@ $approvedRequests = $conn->query("SELECT COUNT(*) as cnt FROM reseller_withdraw_
 
 
 
-
             <div class="col-3 text-center">
-                <a href="/views/admin/services/smm/manage" class="text-decoration-none">
-                    <div class="service-card p-3 bg-light rounded">
+                <a href="/views/admin/services/smm/list" class="text-decoration-none">
+                    <div class="service-card p-3 bg-light rounded shadow-sm">
                         <div class="icon-box text-dark mb-2">
-                            <i class="fa-solid fa-layer-group"></i>
+                            <i class="fa-solid fa-layer-group fa-2x"></i>
                         </div>
-                        <div style="font-size: 0.85rem;" class="text-dark">Manage Services</div>
+                        <div style="font-size: 0.85rem;" class="text-dark">SMM Services</div>
                     </div>
                 </a>
             </div>
 
+            <!-- SMS Services Card -->
+            <div class="col-3 text-center">
+                <a href="/views/admin/services/sms/list" class="text-decoration-none">
+                    <div class="service-card p-3 bg-light rounded shadow-sm">
+                        <div class="icon-box text-dark mb-2">
+                            <i class="fa-solid fa-message fa-2x"></i>
+                        </div>
+                        <div style="font-size: 0.85rem;" class="text-dark">SMS Services</div>
+                    </div>
+                </a>
+            </div>
 
 
 

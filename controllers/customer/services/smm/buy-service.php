@@ -40,7 +40,7 @@ if ($serviceId <= 0 || $quantity <= 0 || $unitPrice <= 0) {
 }
 
 // Check if service exists and active
-$stmt = $conn->prepare("SELECT id, base_price, api_price, type, category, cancel, refill FROM services WHERE id = ? AND status = 'active'");
+$stmt = $conn->prepare("SELECT id, base_price, api_price, type, category, cancel, refill, api_service_id FROM services WHERE id = ? AND status = 'active'");
 $stmt->bind_param("i", $serviceId);
 $stmt->execute();
 $res = $stmt->get_result();
@@ -138,21 +138,20 @@ $resellerProfit = 0;
 if ($resellerId) {
     // Reseller customer: calculate profits
     $stmt = $conn->prepare("SELECT price FROM reseller_prices WHERE reseller_id = ? AND service_id = ?");
-    $stmt->bind_param("ii", $resellerId, $serviceId);
+    $stmt->bind_param("ii", $resellerId, $service['api_service_id']);
     $stmt->execute();
     $res = $stmt->get_result();
     $resellerPriceRow = $res->fetch_assoc();
     $stmt->close();
 
-    $resellerPricePerUnit = floatval($resellerPriceRow['price'] ?? $basePrice);
-
 
     $adminOriginalProfitPerUnit = $basePrice - $apiCost;
-    $resellerExtraProfitPerUnit = max(0, $resellerPricePerUnit - $basePrice);
-
-    // 3. Total profits for order
-    $resellerProfit = $resellerExtraProfitPerUnit * $quantity;
     $adminProfit = $adminOriginalProfitPerUnit * $quantity;
+
+    $resellerPrice = floatval($resellerPriceRow['price']);
+    $basePrice = floatval($basePrice);
+    $resellerProfitPerUnit = $resellerPrice - $basePrice;
+    $resellerProfit = $resellerProfitPerUnit * $quantity;
 } else {
     $adminProfit = ($basePrice - $apiCost) * $quantity;
     $resellerProfit = 0;

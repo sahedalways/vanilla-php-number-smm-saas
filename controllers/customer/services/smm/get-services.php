@@ -18,9 +18,12 @@ if ($row = $res->fetch_assoc()) {
 }
 $stmt->close();
 
+
 // Fetch services
 $sql = "SELECT * FROM services WHERE status = 'active' ORDER BY id DESC";
 $result = $conn->query($sql);
+
+
 
 $services = [];
 
@@ -30,7 +33,7 @@ while ($row = $result->fetch_assoc()) {
 
     if ($resellerId) {
         $stmt = $conn->prepare("SELECT price FROM reseller_prices WHERE service_id = ? AND reseller_id = ?");
-        $stmt->bind_param("ii", $row['id'], $resellerId);
+        $stmt->bind_param("ii", $row['api_service_id'], $resellerId);
         $stmt->execute();
         $resPriceResult = $stmt->get_result();
         if ($resPriceRow = $resPriceResult->fetch_assoc()) {

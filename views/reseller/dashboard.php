@@ -39,6 +39,12 @@ $stmt = $conn->prepare("SELECT balance FROM user_data WHERE id=?");
 $stmt->bind_param("i", $userId);
 $stmt->execute();
 $balance = $stmt->get_result()->fetch_assoc()['balance'] ?? 0;
+
+$stmt = $conn->prepare("SELECT COUNT(*) as cnt FROM reseller_customers WHERE reseller_id = ?");
+$stmt->bind_param("i", $userId);
+$stmt->execute();
+$totalCustomers = $stmt->get_result()->fetch_assoc()['cnt'] ?? 0;
+$stmt->close();
 ?>
 
 <!DOCTYPE html>
@@ -65,7 +71,7 @@ $balance = $stmt->get_result()->fetch_assoc()['balance'] ?? 0;
                 <div class="card text-center p-3 shadow-sm">
                     <i class="fa-solid fa-users text-primary fa-2x mb-2"></i>
                     <h6>Total Customers</h6>
-                    <h4>0</h4>
+                    <h4><?= $totalCustomers ?></h4>
                 </div>
             </div>
 
@@ -192,10 +198,24 @@ $balance = $stmt->get_result()->fetch_assoc()['balance'] ?? 0;
                         <div class="icon-box text-white mb-2">
                             <i class="fa-solid fa-list-check"></i>
                         </div>
-                        <div class="text-white">View Orders</div>
+                        <div class="text-white">View SMM Orders</div>
                     </div>
                 </a>
             </div>
+
+
+            <div class="col-md-4 text-center">
+                <a href="/views/reseller/services/sms/orders" class="text-decoration-none">
+                    <div class="service-card p-3 bg-gradient rounded shadow-sm">
+                        <div class="icon-box text-white mb-2">
+                            <!-- SMS icon -->
+                            <i class="fa-solid fa-sms fa-2x"></i>
+                        </div>
+                        <div class="text-white">View SMS Orders</div>
+                    </div>
+                </a>
+            </div>
+
         </div>
     </div>
 

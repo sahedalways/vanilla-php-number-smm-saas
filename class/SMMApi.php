@@ -207,8 +207,8 @@ class SMMApi
             'order' => $order_id,
             'charge' => rand(10, 100) / 10,
             'start_count' => rand(100, 5000),
-            'status' => 'In progress',
-            'remains' => rand(0, 500)
+            'status' => 'Completed',
+            'remains' => 0
         ];
     }
 
