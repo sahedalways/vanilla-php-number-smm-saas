@@ -105,6 +105,36 @@ if (!$stmt) {
 $stmt->bind_param("sssssss", $username, $name, $email, $phone, $hash, $type, $subdomain);
 
 if ($stmt->execute()) {
+    $resellerId = $stmt->insert_id;
+
+
+    // Fetch all active services
+    // Fetch all active services
+    $servicesData = $conn->query("SELECT * FROM sms_provider_services");
+
+    if ($servicesData && $servicesData->num_rows > 0) {
+        // Prepare insert statement once
+        $stmtInsert = $conn->prepare("
+        INSERT INTO reseller_sms_services_prices (reseller_id, service_id, reseller_price)
+        VALUES (?, ?, ?)
+        ON DUPLICATE KEY UPDATE reseller_price = VALUES(reseller_price)
+    ");
+
+        while ($s = $servicesData->fetch_assoc()) {
+            $serviceId = $s['id'] ?? 0;
+            if ($serviceId > 0) {
+                $resellerPrice = floatval($s['base_price']);
+
+                // Bind parameters and execute for each service
+                $stmtInsert->bind_param("iid", $resellerId, $serviceId, $resellerPrice);
+                $stmtInsert->execute();
+            }
+        }
+
+        $stmtInsert->close();
+    }
+
+
     echo json_encode(['status' => 'success', 'message' => 'Account created successfully', 'subdomain' => $subdomain]);
 } else {
     echo json_encode(['status' => 'error', 'message' => 'Registration failed: ' . $stmt->error]);

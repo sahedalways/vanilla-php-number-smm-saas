@@ -28,50 +28,50 @@ $approvedRequests = $conn->query("SELECT COUNT(*) as cnt FROM reseller_withdraw_
 
 
 
+// Total admin income
 $stmt = $conn->prepare("
     SELECT
-        IFNULL(SUM(cost), 0) as total
-    FROM sms_orders
-    WHERE status = 'FINISHED'
+        (SELECT IFNULL(SUM(admin_profit),0) FROM sms_orders WHERE status='FINISHED') +
+        (SELECT IFNULL(SUM(admin_profit),0) FROM smm_orders WHERE status='Completed') AS total
 ");
 $stmt->execute();
 $totalRevenue = $stmt->get_result()->fetch_assoc()['total'] ?? 0;
 $stmt->close();
 
-// Monthly Revenue (current month)
+// Monthly admin income (current month)
 $stmt = $conn->prepare("
     SELECT
-        IFNULL(SUM(cost), 0) as total
-    FROM sms_orders
-    WHERE status = 'FINISHED'
-      AND MONTH(created_at) = MONTH(NOW())
-      AND YEAR(created_at) = YEAR(NOW())
+        (SELECT IFNULL(SUM(admin_profit),0) FROM sms_orders
+            WHERE status='FINISHED'
+              AND MONTH(created_at) = MONTH(NOW())
+              AND YEAR(created_at) = YEAR(NOW())
+        ) +
+        (SELECT IFNULL(SUM(admin_profit),0) FROM smm_orders
+            WHERE status='Completed'
+              AND MONTH(created_at) = MONTH(NOW())
+              AND YEAR(created_at) = YEAR(NOW())
+        ) AS total
 ");
 $stmt->execute();
 $monthlyRevenue = $stmt->get_result()->fetch_assoc()['total'] ?? 0;
 $stmt->close();
 
-// Yearly Revenue (current year)
+// Yearly admin income (current year)
 $stmt = $conn->prepare("
     SELECT
-        IFNULL(SUM(cost), 0) as total
-    FROM sms_orders
-    WHERE status = 'FINISHED'
-      AND YEAR(created_at) = YEAR(NOW())
+        (SELECT IFNULL(SUM(admin_profit),0) FROM sms_orders
+            WHERE status='FINISHED'
+              AND YEAR(created_at) = YEAR(NOW())
+        ) +
+        (SELECT IFNULL(SUM(admin_profit),0) FROM smm_orders
+            WHERE status='Completed'
+              AND YEAR(created_at) = YEAR(NOW())
+        ) AS total
 ");
 $stmt->execute();
 $yearlyRevenue = $stmt->get_result()->fetch_assoc()['total'] ?? 0;
 $stmt->close();
 
-$stmt = $conn->prepare("SELECT COUNT(*) as cnt FROM services");
-$stmt->execute();
-$servicesCount = $stmt->get_result()->fetch_assoc()['cnt'] ?? 0;
-$stmt->close();
-
-$stmt = $conn->prepare("SELECT COUNT(*) as cnt FROM sms_provider_services");
-$stmt->execute();
-$smsServicesCount = $stmt->get_result()->fetch_assoc()['cnt'] ?? 0;
-$stmt->close();
 
 // Total combined
 $totalServices = $servicesCount + $smsServicesCount;
