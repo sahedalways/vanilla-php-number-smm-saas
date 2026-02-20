@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 
 include  'include/config.php';
@@ -25,14 +26,28 @@ require_once 'helpers/session.php';
 guestOnly();
 
 
-// Detect subdomain
+// Detect subdomainন
 $host = $_SERVER['HTTP_HOST'];
-$host = explode(':', $host)[0]; // remove port
+$host = explode(':', $host)[0];
 $parts = explode('.', $host);
-$resellerName = null;
 
-if (count($parts) > 1 && $parts[0] !== 'www') {
-    header("Location: /");
+
+$is_local = ($host == 'localhost' || $host == '127.0.0.1' || strpos($host, '.localhost') !== false);
+
+if (!$is_local) {
+    if (count($parts) > 2) { 
+        $subdomain = $parts[0];
+        if ($subdomain !== 'www') {
+            header("Location: /");
+            exit;
+        }
+    }
+  
+} else {
+    if (count($parts) > 1 && $parts[0] !== 'www') {
+        header("Location: /");
+        exit;
+    }
 }
 
 
@@ -118,7 +133,7 @@ $page_title = "Login - " . $site_data['web_name'];
                 <div id="error-password" class="text-danger small mt-1"></div>
             </div>
 
-            <button id="login" type="button" class="btn-color create-btn w-100 mt-3">
+            <button id="loginBtn" type="button" class="btn-color create-btn w-100 mt-3">
                 <span class="btn-text">Sign In</span>
                 <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
             </button>
@@ -134,7 +149,7 @@ $page_title = "Login - " . $site_data['web_name'];
     </div>
 
     <script src="js/signin.js"></script>
-    <?php include('partial/custom_js.php'); ?>
+
 </body>
 
 </html>

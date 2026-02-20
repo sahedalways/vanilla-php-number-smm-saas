@@ -12,10 +12,24 @@ guestOnly();
 $host = $_SERVER['HTTP_HOST'];
 $host = explode(':', $host)[0];
 $parts = explode('.', $host);
-$resellerName = null;
 
-if (count($parts) > 1 && $parts[0] !== 'www') {
-  header("Location: /");
+
+$is_local = ($host == 'localhost' || $host == '127.0.0.1' || strpos($host, '.localhost') !== false);
+
+if (!$is_local) {
+    if (count($parts) > 2) { 
+        $subdomain = $parts[0];
+        if ($subdomain !== 'www') {
+            header("Location: /");
+            exit;
+        }
+    }
+  
+} else {
+    if (count($parts) > 1 && $parts[0] !== 'www') {
+        header("Location: /");
+        exit;
+    }
 }
 
 

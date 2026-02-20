@@ -1,4 +1,4 @@
-const loginBtn = document.getElementById('login');
+const loginBtn = document.getElementById('loginBtn');
 const btnText = loginBtn.querySelector('.btn-text');
 const spinner = loginBtn.querySelector('.spinner-border');
 
