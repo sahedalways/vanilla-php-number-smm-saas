@@ -4,9 +4,9 @@ require_once __DIR__ . '/env.php';
 
 loadEnv(__DIR__ . '/../.env');
 
-header("Cache-Control: no-cache, no-store, must-revalidate"); // HTTP 1.1.
-header("Pragma: no-cache"); // HTTP 1.0.
-header("Expires: 0"); // Proxies.
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
 //  error_reporting(0);
 date_default_timezone_set('Africa/Lagos');
 
@@ -27,7 +27,7 @@ $site_data = $site_sql->fetch_assoc();
 $theam = $site_data['theam'];
 $protocol = 'https';
 $host = $_SERVER['HTTP_HOST'] ?? getenv('SITE_HOST') ?? 'localhost';
-$website_url = $protocol . '://' . $host;
+$website_url = getenv('BASE_URL');
 
 
 $web_name = $site_data['web_name'];

@@ -164,7 +164,7 @@ $stmt->close();
                 <!-- Section Title -->
                 <div class="d-flex align-items-center mb-4" style="animation: fadeIn 0.8s ease-out;">
                     <div style="width: 5px; height: 30px; background: #0d6efd; border-radius: 10px; margin-right: 15px;"></div>
-                    <h4 class="mb-0" style="font-weight: 800; color: #c9d0d6; letter-spacing: -0.5px;">
+                    <h4 class="mb-0" style="font-weight: 800; color: #1f2020; letter-spacing: -0.5px;">
                         Available SMS Services
                     </h4>
                 </div>
@@ -177,28 +177,13 @@ $stmt->close();
                         $selling_price = $s['final_price'];
                     ?>
 
-                        <div class="col-md-6 col-lg-4 service-card"
+                        <div class="col-md-6 col-lg-4 "
                             data-country="<?= htmlspecialchars($s['country']) ?>"
                             data-operator="<?= htmlspecialchars($s['operator']) ?>"
                             data-service="<?= htmlspecialchars($s['service_code']) ?>"
                             style="animation: zoomIn 0.5s ease forwards; animation-delay: <?= $delay ?>s; opacity: 0;">
 
-                            <div class="card h-100 border-0"
-                                style="border-radius: 20px; background: #ffffff;
-                    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-                    transition: all 0.3s cubic-bezier(.25,.8,.25,1);
-                    position: relative; overflow: hidden;"
-                                onmouseover="this.style.transform='translateY(-8px)';
-                                 this.style.boxShadow='0 20px 40px rgba(0,0,0,0.1)';"
-                                onmouseout="this.style.transform='translateY(0)';
-                                this.style.boxShadow='0 10px 25px rgba(0,0,0,0.05)';">
-
-                                <!-- Decorative Circle -->
-                                <div style="position:absolute; top:-20px; right:-20px;
-                        width:100px; height:100px;
-                        background: rgba(13,110,253,0.03);
-                        border-radius:50%;"></div>
-
+                            <div class="service-card">
                                 <div class="card-body p-4" style="position:relative; z-index:1;">
 
                                     <!-- Icon + ID -->
@@ -215,7 +200,7 @@ $stmt->close();
                                     </div>
 
                                     <!-- Country -->
-                                    <h6 class="fw-bold mb-2" style="color:#2c3e50;">
+                                    <h6 class="fw-bold mb-2" style="color:#ffff;">
                                         <?= htmlspecialchars($s['country']) ?>
                                     </h6>
 
@@ -277,6 +262,25 @@ $stmt->close();
             </div>
 
             <style>
+                .service-card {
+                    margin-bottom: 20px;
+                    transition: transform 0.35s ease, box-shadow 0.35s ease;
+                    border-radius: 16px;
+                    overflow: hidden;
+                }
+
+                .service-card:hover {
+                    transform: translateY(-6px) scale(1.04);
+                    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
+                }
+
+                /* Hover zoom effect */
+                .service-card:hover {
+                    transform: scale(1.05);
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+                    z-index: 10;
+                }
+
                 @keyframes zoomIn {
                     from {
                         opacity: 0;

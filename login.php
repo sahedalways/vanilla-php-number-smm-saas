@@ -4,6 +4,7 @@ session_start();
 
 include  'include/config.php';
 
+
 if (isset($_SESSION['token'])) {
     header('location: dashboard');
     exit;

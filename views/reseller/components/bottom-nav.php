@@ -8,10 +8,6 @@
         <i class="fa-solid fa-users"></i>
         <span>Customers</span>
     </a>
-    <a href="/views/reseller/profit/manage" class="nav-item <?= ($active ?? '') === 'profit' ? 'active' : ''; ?>">
-        <i class="fa-solid fa-coins"></i>
-        <span>Profit</span>
-    </a>
 
     <a href="/views/reseller/bank/manage" class="nav-item <?= ($active ?? '') === 'bank' ? 'active' : ''; ?>">
         <i class="fa-solid fa-university"></i>
@@ -24,11 +20,6 @@
         <span>Withdrawals</span>
     </a>
 
-
-    <a href="/views/reseller/services/manage" class="nav-item <?= ($active ?? '') === 'services' ? 'active' : ''; ?>">
-        <i class="fa-solid fa-cogs"></i>
-        <span>Services</span>
-    </a>
 
 
 

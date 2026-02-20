@@ -69,20 +69,35 @@ if ($userId) {
         <div class="container mt-4">
             <div class="d-flex align-items-center mb-4" style="animation: fadeIn 0.8s ease-out;">
                 <div style="width: 5px; height: 30px; background: #0d6efd; border-radius: 10px; margin-right: 15px;"></div>
-                <h4 class="mb-0" style="font-weight: 800; color: #c9d0d6; letter-spacing: -0.5px;">Available SMM Services</h4>
+                <h4 class="mb-0" style="font-weight: 800; color: #3c3e3f; letter-spacing: -0.5px;">Available SMM Services</h4>
+            </div>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text"
+                            id="serviceSearch"
+                            class="form-control"
+                            placeholder="Search service, category, type..."
+                            style="height:48px; font-weight:500;">
+                    </div>
+                </div>
             </div>
             <div class="row g-4">
                 <?php foreach ($services as $index => $s):
                     $delay = $index * 0.05;
                 ?>
-                    <div class="col-md-6 col-lg-4" style="animation: zoomIn 0.5s ease forwards; animation-delay: <?= $delay ?>s; opacity: 0;">
+                    <div class="col-md-6 col-lg-4 service-item" data-name="<?= strtolower(htmlspecialchars($s['name'])) ?>"
+                        data-category="<?= strtolower(htmlspecialchars($s['category'])) ?>"
+                        data-type="<?= strtolower(htmlspecialchars($s['type'])) ?>"
+                        style="animation: zoomIn 0.5s ease forwards; animation-delay: <?= $delay ?>s; opacity: 0;" style="animation: zoomIn 0.5s ease forwards; animation-delay: <?= $delay ?>s; opacity: 0;">
                         <div class="card h-100 border-0"
                             style="border-radius: 20px; background: #ffffff; box-shadow: 0 10px 25px rgba(0,0,0,0.05); transition: all 0.3s cubic-bezier(.25,.8,.25,1); position: relative; overflow: hidden;"
                             onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 20px 40px rgba(0,0,0,0.1)';"
                             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.05)';">
 
-                            <!-- Decorative Circle -->
-                            <div style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: rgba(13, 110, 253, 0.03); border-radius: 50%; z-index: 0;"></div>
 
                             <!-- Card Body -->
                             <div class="card-body p-4" style="position: relative; z-index: 1;">
@@ -278,6 +293,26 @@ if ($userId) {
 
     <script src="/js/customer/manage-smm-services.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.getElementById('serviceSearch').addEventListener('input', function() {
+            const keyword = this.value.toLowerCase().trim();
+            const items = document.querySelectorAll('.service-item');
+
+            items.forEach(item => {
+                const name = item.dataset.name || '';
+                const category = item.dataset.category || '';
+                const type = item.dataset.type || '';
+
+                const match =
+                    name.includes(keyword) ||
+                    category.includes(keyword) ||
+                    type.includes(keyword);
+
+                item.style.display = match ? '' : 'none';
+            });
+        });
+    </script>
 </body>
 
 </html>

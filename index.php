@@ -80,7 +80,7 @@ $userAvatar = '/images/default-avatar.png';
         </div>
         <div class="right-top-nav">
             <?php if (!$loggedIn): ?>
-                <a href="/login-customer" class="btn-clear me-3">Log in</a>
+                <a href="/login" class="btn-clear me-3">Log in</a>
                 <a href="/register" class="btn-color">Register</a>
             <?php else: ?>
 

@@ -43,19 +43,34 @@ require_once __DIR__ . '/../../../../controllers/services/smm/get-services.php';
         <?php include __DIR__ . '/../../components/header.php'; ?>
 
         <input type="hidden" id="csrf_token" value="<?php echo $csrf_token; ?>">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-white">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <input type="text"
+                        id="serviceSearch"
+                        class="form-control"
+                        placeholder="Search service, category, type..."
+                        style="height:48px; font-weight:500;">
+                </div>
+            </div>
+        </div>
+
 
         <div class="container mt-4">
             <div class="d-flex justify-content-between align-items-center mb-4" style="animation: fadeInDown 0.8s ease-out;">
-                <h5 class="mb-0" style="font-weight: 700; font-size: 1.25rem; color: #afbac5; letter-spacing: -0.5px;">
+                <h5 class="mb-0" style="font-weight: 700; font-size: 1.25rem; color: #1b1c1d; letter-spacing: -0.5px;">
                     <i class="fa-solid fa-layer-group text-primary me-2" style="filter: drop-shadow(0 2px 4px rgba(13, 110, 253, 0.3));"></i>
-                    Available Services
+                    Available SMM Services
                 </h5>
                 <div class="badge bg-soft-primary text-primary px-3 py-2" style="background-color: #e7f1ff; border-radius: 8px; font-weight: 600;">
                     Total: <?= count($services) ?>
                 </div>
             </div>
 
-            <div class="row g-4">
+            <div class="row g-4 shadow-sm">
                 <?php if (empty($services)): ?>
                     <div class="col-12 text-center py-5" style="animation: fadeIn 1s;">
                         <div class="mb-3">
@@ -70,7 +85,9 @@ require_once __DIR__ . '/../../../../controllers/services/smm/get-services.php';
                         $resellerIncome = $resellerPrice - $s['base_price'];
                         $delay = $index * 0.1;
                     ?>
-                        <div class="col-md-6 col-lg-4 mb-4" style="animation: fadeInUp 0.6s ease forwards; animation-delay: <?= $delay ?>s; opacity: 0;">
+                        <div class="col-md-6 col-lg-4 service-item" data-name="<?= strtolower(htmlspecialchars($s['name'])) ?>"
+                            data-category="<?= strtolower(htmlspecialchars($s['category'])) ?>"
+                            data-type="<?= strtolower(htmlspecialchars($s['type'])) ?>" style="animation: fadeInUp 0.6s ease forwards; animation-delay: <?= $delay ?>s; opacity: 0;">
                             <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden"
                                 style="transition: transform 0.3s ease, box-shadow 0.3s ease;"
                                 onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 0 25px rgba(0,0,0,0.12)';"
@@ -265,6 +282,27 @@ require_once __DIR__ . '/../../../../controllers/services/smm/get-services.php';
         <script src="/js/reseller/manage-smm-service.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     </div>
+
+
+    <script>
+        document.getElementById('serviceSearch').addEventListener('input', function() {
+            const keyword = this.value.toLowerCase().trim();
+            const items = document.querySelectorAll('.service-item');
+
+            items.forEach(item => {
+                const name = item.dataset.name || '';
+                const category = item.dataset.category || '';
+                const type = item.dataset.type || '';
+
+                const match =
+                    name.includes(keyword) ||
+                    category.includes(keyword) ||
+                    type.includes(keyword);
+
+                item.style.display = match ? '' : 'none';
+            });
+        });
+    </script>
 </body>
 
 </html>

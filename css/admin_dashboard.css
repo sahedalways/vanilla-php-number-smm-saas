@@ -2,13 +2,14 @@
     --primary-blue: #3d6efd;
     --dark-bg: #050a1e; /* Deep dark blue/black background */
     --card-bg: #0f172a; /* Slightly lighter navy for cards */
-    --text-white: #ffffff;
+    --text-white: #fdfdfd;
+    --text-black: #000000;
     --text-muted: #94a3b8;
 }
 
 body {
-    background-color: var(--dark-bg);
-    color: var(--text-white);
+    background-color: var(--text-white);
+    color: var(--text-black);
     font-family: 'Segoe UI', sans-serif;
 }
 

@@ -20,6 +20,7 @@ $res = $stmt->get_result();
 $orders = $res->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 
+$userName = $_SESSION['name'] ?? 'User';
 
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));

@@ -5,6 +5,7 @@ require_once __DIR__ . '/../../../../include/config.php';
 authOnly();
 
 $userId = $_SESSION['user_id'] ?? null;
+$userName = $_SESSION['name'] ?? 'Admin';
 
 // Fetch orders from sms_orders
 $stmt = $conn->prepare("

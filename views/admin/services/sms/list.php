@@ -38,74 +38,158 @@ $stmt->close();
             <?php foreach ($services as $index => $s):
                 $delay = $index * 0.05;
             ?>
-                <div class="col-md-6 col-lg-4" style="animation: zoomIn 0.5s ease forwards; animation-delay: <?= $delay ?>s; opacity: 0;">
-                    <div class="card h-100 border-0 shadow-sm" style="border-radius: 20px;">
+
+
+
+                <div class="col-md-6 col-lg-4 service-item"
+                    data-name="<?= strtolower(htmlspecialchars($s['service_code'])) ?>"
+                    data-country="<?= strtolower(htmlspecialchars($s['country'])) ?>"
+                    data-operator="<?= strtolower(htmlspecialchars($s['operator'])) ?>"
+                    style="animation: zoomIn 0.5s ease forwards; animation-delay: <?= $delay ?>s; opacity: 0;">
+
+                    <div class="card service-card h-100 border-0">
 
                         <div class="card-body p-4">
 
-                            <!-- Icon -->
-                            <div class="mb-3">
-                                <div style="width:45px;height:45px;background:#f0f7ff;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                            <!-- Top -->
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="icon-box">
                                     <i class="fa-solid fa-message text-primary"></i>
                                 </div>
-                            </div>
 
-                            <!-- Service Title -->
-                            <h6 class="fw-bold mb-2">
-                                <?= ucfirst(htmlspecialchars($s['service_code'])) ?> -
-                                <?= ucfirst(htmlspecialchars($s['country'])) ?>
-                            </h6>
-
-                            <!-- Operator Badge -->
-                            <div class="mb-3">
-                                <span class="badge bg-info text-dark">
-                                    Operator: <?= htmlspecialchars($s['operator']) ?>
+                                <span class="badge bg-light text-dark fw-semibold">
+                                    <?= htmlspecialchars($s['operator']) ?>
                                 </span>
                             </div>
 
-                            <!-- Pricing -->
-                            <div class="mb-3">
-                                <small class="text-muted">Base Price</small>
-                                <h5 class="text-success fw-bold">
+                            <!-- Title -->
+                            <h6 class="service-title mb-3">
+                                <?= ucfirst(htmlspecialchars($s['service_code'])) ?> —
+                                <?= ucfirst(htmlspecialchars($s['country'])) ?>
+                            </h6>
+
+                            <!-- Price -->
+                            <div class="price-box mb-3">
+                                <small class="label">Base Price</small>
+                                <h4 class="price mb-0">
                                     ₦ <?= number_format($s['base_price'], 2) ?>
-                                </h5>
+                                </h4>
                             </div>
 
                             <!-- Cost & Profit -->
-                            <div class="row text-center mb-3">
-                                <div class="col-6 border-end">
-                                    <small class="text-muted d-block">Provider Cost</small>
-                                    <span class="fw-semibold">
-                                        ₦ <?= number_format($s['provider_cost'], 2) ?>
-                                    </span>
-                                </div>
-                                <div class="col-6">
-                                    <small class="text-muted d-block">Admin Profit</small>
-                                    <span class="fw-semibold text-primary">
-                                        ₦ <?= number_format($s['admin_profit'], 2) ?>
-                                    </span>
+                            <div class="info-box mb-3">
+                                <div class="row g-0 text-center">
+
+                                    <div class="col-6 border-end">
+                                        <small class="mini-label">Provider Cost</small>
+                                        <div class="value">
+                                            ₦ <?= number_format($s['provider_cost'], 2) ?>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-6">
+                                        <small class="mini-label">Admin Profit</small>
+                                        <div class="value text-primary">
+                                            ₦ <?= number_format($s['admin_profit'], 2) ?>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
 
                             <!-- Stock & Rate -->
-                            <div class="row text-center">
-                                <div class="col-6 border-end">
-                                    <small class="text-muted d-block">Available</small>
-                                    <span class="fw-bold">
-                                        <?= number_format($s['count']) ?>
-                                    </span>
-                                </div>
-                                <div class="col-6">
-                                    <small class="text-muted d-block">Success Rate</small>
-                                    <span class="fw-bold">
-                                        <?= number_format($s['rate'], 2) ?>%
-                                    </span>
+                            <div class="limit-box">
+                                <div class="row g-0 text-center">
+
+                                    <div class="col-6 border-end">
+                                        <small class="mini-label">Available</small>
+                                        <div class="value">
+                                            <?= number_format($s['count']) ?>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-6">
+                                        <small class="mini-label">Success Rate</small>
+                                        <div class="value text-success">
+                                            <?= number_format($s['rate'], 2) ?>%
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
 
                         </div>
                     </div>
                 </div>
+
+                <style>
+                    /* ===== CARD ===== */
+                    .service-card {
+                        border-radius: 18px;
+                        background: #ffffff;
+                        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+                        transition: all .35s cubic-bezier(.25, .8, .25, 1);
+                        overflow: hidden;
+                    }
+
+                    .service-card:hover {
+                        transform: translateY(-8px) scale(1.02);
+                        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12);
+                    }
+
+                    /* ===== ICON ===== */
+                    .icon-box {
+                        width: 46px;
+                        height: 46px;
+                        background: linear-gradient(135deg, #eef5ff, #f5f9ff);
+                        border-radius: 12px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 18px;
+                    }
+
+                    /* ===== TITLE ===== */
+                    .service-title {
+                        font-weight: 700;
+                        color: #1e293b;
+                        line-height: 1.5;
+                    }
+
+                    /* ===== PRICE ===== */
+                    .price-box .label {
+                        font-size: 11px;
+                        color: #94a3b8;
+                        text-transform: uppercase;
+                    }
+
+                    .price-box .price {
+                        font-weight: 800;
+                        color: #16a34a;
+                    }
+
+                    /* ===== INFO BOX ===== */
+                    .info-box,
+                    .limit-box {
+                        background: #f8fafc;
+                        border-radius: 12px;
+                        padding: 10px;
+                    }
+
+                    .mini-label {
+                        font-size: 10px;
+                        color: #94a3b8;
+                        text-transform: uppercase;
+                    }
+
+                    .value {
+                        font-weight: 700;
+                        color: #334155;
+                        font-size: 14px;
+                    }
+                </style>
+
+
             <?php endforeach; ?>
         </div>
     </div>

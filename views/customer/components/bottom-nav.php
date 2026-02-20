@@ -7,7 +7,7 @@
     </a>
 
     <!-- NEW: Phone Numbers -->
-    <a href="/views/customer/numbers/list" class="nav-item <?= ($active ?? '') === 'sms' ? 'active' : ''; ?>">
+    <a href="/views/customer/services/sms/list" class="nav-item <?= ($active ?? '') === 'sms' ? 'active' : ''; ?>">
         <i class="fa-solid fa-phone"></i>
         <span>SMS Services</span>
     </a>

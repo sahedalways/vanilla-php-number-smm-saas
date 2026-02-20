@@ -24,10 +24,7 @@
     </a>
 
 
-    <a href="/views/admin/services/manage" class="nav-item <?= ($active ?? '') === 'services' ? 'active' : ''; ?>">
-        <i class="fa-solid fa-cogs"></i>
-        <span>Services</span>
-    </a>
+
     <a href="/views/admin/logs/manage" class="nav-item <?= ($active ?? '') === 'logs' ? 'active' : ''; ?>">
         <i class="fa-solid fa-file-lines"></i>
         <span>Logs</span>
