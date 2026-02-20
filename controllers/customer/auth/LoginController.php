@@ -1,10 +1,11 @@
-
 <?php
 
 session_start();
 header('Content-Type: application/json');
 include 'include/config.php';
 require_once __DIR__ . '/../../../helpers/session.php';
+
+
 
 
 ini_set('display_errors', 1);
@@ -16,15 +17,12 @@ if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_to
     exit;
 }
 
+
+// get POST data
 $email = $_POST['email'] ?? '';
 $password = $_POST['password'] ?? '';
 $csrf_token = $_POST['csrf_token'] ?? '';
 
-// CSRF token check
-if ($csrf_token !== ($_SESSION['csrf_token'] ?? '')) {
-    echo json_encode(['status' => 'error', 'message' => 'Invalid CSRF token.']);
-    exit;
-}
 
 // validate inputs
 if (!$email || !$password) {

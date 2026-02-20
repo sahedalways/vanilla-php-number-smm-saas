@@ -23,14 +23,13 @@ $parts = explode('.', $host);
 $is_local = ($host == 'localhost' || $host == '127.0.0.1' || strpos($host, '.localhost') !== false);
 
 if (!$is_local) {
-    if (count($parts) > 2) { 
+    if (count($parts) > 2) {
         $subdomain = $parts[0];
         if ($subdomain !== 'www') {
             header("Location: /");
             exit;
         }
     }
-  
 } else {
     if (count($parts) > 1 && $parts[0] !== 'www') {
         header("Location: /");
@@ -136,7 +135,7 @@ $page_title = "Login - " . $site_data['web_name'];
         </p>
     </div>
 
-    <script src="js/signin.js"></script>
+    <script src="js/login-customer.js"></script>
 
 </body>
 
