@@ -2,7 +2,8 @@
 require_once __DIR__ . '/../../include/config.php';
 $email = $_POST["email"];
 
-function sendPasswordResetEmail($userEmail, $resetLink) {
+function sendPasswordResetEmail($userEmail, $resetLink)
+{
     $to = $userEmail;
     $subject = "Password Reset Request";
     $message = '
@@ -17,11 +18,11 @@ function sendPasswordResetEmail($userEmail, $resetLink) {
         <p>If you didn’t make this request, then you can ignore this email 🙂</p>
     </body>
     </html>
-    ';    
+    ';
     $headers  = "MIME-Version: 1.0" . "\r\n";
     $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-    $headers .= 'From: support@allsmsverify.com' . "\r\n";
-    
+    $headers .= 'From: support@Foreign sms.com' . "\r\n";
+
     if (mail($to, $subject, $message, $headers)) {
         return true;
     } else {
@@ -33,15 +34,15 @@ if ($email != "") {
     $email = mysqli_real_escape_string($conn, $_POST["email"]);
     $token = md5(rand());
     $sql = mysqli_query($conn, "SELECT id, email FROM user_data WHERE email='$email'");
-    
-    if (mysqli_num_rows($sql) > 0) {       
+
+    if (mysqli_num_rows($sql) > 0) {
         $row = mysqli_fetch_array($sql);
         $user_id = $row["id"];
         $get_mail = $row["email"];
         $sql2 = mysqli_query($conn, "UPDATE login_token SET token='$token' WHERE user_id='$user_id'");
-        
+
         if ($sql2) {
-            $resetLink = WEBSITE_URL."/new_password?token=".$token;
+            $resetLink = WEBSITE_URL . "/new_password?token=" . $token;
             if (sendPasswordResetEmail($get_mail, $resetLink)) {
                 echo '{"status": "1", "msg": "We Emailed You a Password Reset Link"}';
             } else {
@@ -56,4 +57,3 @@ if ($email != "") {
 } else {
     echo '{"status": "2", "msg": "Something Went Wrong"}';
 }
-?>

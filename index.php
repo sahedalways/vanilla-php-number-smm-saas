@@ -61,7 +61,7 @@ $userAvatar = '/images/default-avatar.png';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Allsmsverify</title>
+    <title>Foreign sms</title>
     <link rel="shortcut icon" href="./images/logo-png.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -75,8 +75,8 @@ $userAvatar = '/images/default-avatar.png';
 <body>
     <nav class="top-nav main-padding dflex-between">
         <div class="logo-div">
-            <img class="logo-img" src="./images/logo-png.png" alt="Allsmsverify logo">
-            <h1 class="logo-text">Allsmsverify</h1>
+            <img class="logo-img" src="./images/logo-png.png" alt="Foreign sms logo">
+            <h1 class="logo-text">Foreign sms</h1>
         </div>
         <div class="right-top-nav">
             <?php if (!$loggedIn): ?>
@@ -100,7 +100,7 @@ $userAvatar = '/images/default-avatar.png';
         <div class="hero-left">
             <h1 class="hero-heading">Your No. 1 <br>SMS Verification Service Online</h1>
             <p class="hero-paragraph mt-2">
-                At Allsmsverify, we offer top-quality SMS verifications using non-VoIP
+                At Foreign sms, we offer top-quality SMS verifications using non-VoIP
                 numbers, ensuring as fast, secure, and one-time-use options to protect
                 your online identity.
             </p>
@@ -122,15 +122,15 @@ $userAvatar = '/images/default-avatar.png';
             </div>
         </div>
         <div class="hero-right mb-4 mb-md-0">
-            <img src="./images/hero-image.png" class="hero-img" alt="Allsmsverify Hero Image">
+            <img src="./images/hero-image.png" class="hero-img" alt="Foreign sms Hero Image">
         </div>
     </header>
 
     <section class="section-1">
         <div class="text-center">
             <h2 class="highlight-header">How it works</h2>
-            <h1 class="my-2 general-heading">How Allsmsverify works?</h1>
-            <p class="first-sect-p mx-auto text-center">Allsmsverify expands your reach with SMS verification in 50+ countries,
+            <h1 class="my-2 general-heading">How Foreign sms works?</h1>
+            <p class="first-sect-p mx-auto text-center">Foreign sms expands your reach with SMS verification in 50+ countries,
                 compatible with 900+ services, ensuring global connectivity and security.
             </p>
         </div>
@@ -296,7 +296,7 @@ $userAvatar = '/images/default-avatar.png';
                             <img src="./images/dpx3.png" alt="Profile 3" class="profile-img">
                             <img src="./images/dpx4.png" alt="Profile 3" class="profile-img">
                         </div>
-                        <a class="btn-color" href="https://t.me/allsmsverifyteam">Contact support</a>
+                        <a class="btn-color" href="https://t.me/Foreign smsteam">Contact support</a>
                     </div>
                 </div>
             </div>
@@ -395,8 +395,8 @@ $userAvatar = '/images/default-avatar.png';
     <footer class="text-center">
         <div class="dflex-between_ mb-5">
             <div class="logo-div-mini_ mb-5 mb-md-0">
-                <img class="logo-img-mini" src="./images/logo-png.png" alt="Allsmsverify logo">
-                <h1 class="logo-text-mini">Allsmsverify</h1>
+                <img class="logo-img-mini" src="./images/logo-png.png" alt="Foreign sms logo">
+                <h1 class="logo-text-mini">Foreign sms</h1>
             </div>
             <div class="dflex-g">
                 <i class="bi bi-facebook"></i>
@@ -407,7 +407,7 @@ $userAvatar = '/images/default-avatar.png';
                 <i class="bi bi-tiktok"></i>
             </div>
         </div>
-        <small class="copy">Copyright &copy; 2024 Allsmsverify</small>
+        <small class="copy">Copyright &copy; 2024 Foreign sms</small>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
