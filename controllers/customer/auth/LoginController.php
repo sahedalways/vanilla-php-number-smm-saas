@@ -3,11 +3,19 @@
 
 session_start();
 header('Content-Type: application/json');
-
 include 'include/config.php';
 require_once __DIR__ . '/../../../helpers/session.php';
 
-// get POST data
+
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+// CSRF check
+if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
+    echo json_encode(['status' => 'error', 'message' => 'Invalid CSRF token']);
+    exit;
+}
+
 $email = $_POST['email'] ?? '';
 $password = $_POST['password'] ?? '';
 $csrf_token = $_POST['csrf_token'] ?? '';
