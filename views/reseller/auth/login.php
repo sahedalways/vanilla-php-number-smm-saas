@@ -64,8 +64,8 @@ $page_title = "Reseller Login - " . $resellerName;
 <body>
     <div class="form-area-div">
         <a href="/" class="logo-div-mini mb-x" style="text-decoration: none;">
-            <img class="logo-img-mini" src="/images/logo-png.png" alt="Allsmsverify logo">
-            <h1 class="logo-text-mini">Allsmsverify</h1>
+            <img class="logo-img-mini" src="/images/logo-png.png" alt="Foreign sms logo">
+            <h1 class="logo-text-mini">Foreign sms</h1>
         </a>
 
         <div class="form-div">
@@ -102,7 +102,7 @@ $page_title = "Reseller Login - " . $resellerName;
 
         </div>
 
-        <p class="text-center small-text mt-4">Protected by the reCAPTCHA and subject to the Allsmsverify
+        <p class="text-center small-text mt-4">Protected by the reCAPTCHA and subject to the Foreign sms
             <br><a href="/privacy-policy.html">Privacy Policy</a> and <a href="/tos.html">Terms of Service</a>
         </p>
     </div>

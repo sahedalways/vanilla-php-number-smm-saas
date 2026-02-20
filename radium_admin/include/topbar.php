@@ -10,14 +10,14 @@
           -->
             </li>
 
-                <div class="topbar-divider d-none d-sm-block"></div>
+            <div class="topbar-divider d-none d-sm-block"></div>
             <li class="nav-item dropdown no-arrow">
               <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">
-                <img class="rounded-circle" src="https://allsmsverify.com/images/logo-png.png" style="width: 40px">
-                <span class="ml-2 d-none d-lg-inline text-blue small">@allsmsverify</span>
+                <img class="rounded-circle" src="https://Foreign sms.com/images/logo-png.png" style="width: 40px">
+                <span class="ml-2 d-none d-lg-inline text-blue small">@Foreign sms</span>
               </a>
-       
+
             </li>
           </ul>
         </nav>

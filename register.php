@@ -28,7 +28,7 @@ $csrf_token = $_SESSION['csrf_token'];
 $page_title = "Register- " . $site_data['web_name'];
 ?>
 <meta charset="UTF-8">
-<title>Register | Allsmsverify</title>
+<title>Register | Foreign sms</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="shortcut icon" href="./images/logo-png.png" type="image/x-icon">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -50,12 +50,12 @@ $page_title = "Register- " . $site_data['web_name'];
 
 <body>
   <div class="main-img-div">
-    <img src="./images/hero-image.png" class="hero-img_" alt="Allsmsverify Hero Image">
+    <img src="./images/hero-image.png" class="hero-img_" alt="Foreign sms Hero Image">
   </div>
   <div class="form-div">
     <a href="/" class="logo-div-mini mb-x" style="text-decoration: none;">
-      <img class="logo-img-mini" src="./images/logo-png.png" alt="Allsmsverify logo">
-      <h1 class="logo-text-mini">Allsmsverify</h1>
+      <img class="logo-img-mini" src="./images/logo-png.png" alt="Foreign sms logo">
+      <h1 class="logo-text-mini">Foreign sms</h1>
     </a>
 
     <h1 class="small-heading fw-600 mb-4">Sign up</h1>

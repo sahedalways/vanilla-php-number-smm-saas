@@ -143,10 +143,10 @@
 <ul class="navbar-nav sidebar sidebar-light accordion" id="accordionSidebar">
   <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
     <div class="sidebar-brand-icon  rounded-circle">
-      <img src="https://allsmsverify.com/images/logo-png.png">
+      <img src="https://Foreign sms.com/images/logo-png.png">
     </div>
     <div class="sidebar-brand-text mx-3">
-      <h1 class="radium"><span>allsmsverify</span></h1>
+      <h1 class="radium"><span>Foreign sms</span></h1>
     </div>
   </a>
   <hr class="sidebar-divider my-0">
@@ -173,7 +173,7 @@
   <li class="nav-item" id="top">
     <a class="nav-link " href="top">
       <i class="fas fa-fw fa-chart-bar"></i>
-       <span>Sell History</span></a>
+      <span>Sell History</span></a>
   </li>
   <li class="nav-item" id="find_user">
     <a class="nav-link " href="find_user">

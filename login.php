@@ -70,7 +70,7 @@ $page_title = "Login - " . $site_data['web_name'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Allsmsverify</title>
+    <title>Login | Foreign sms</title>
 
     <link rel="shortcut icon" href="./images/logo-png.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -89,12 +89,12 @@ $page_title = "Login - " . $site_data['web_name'];
 
 <body>
     <div class="main-img-div">
-        <img src="./images/hero-image.png" class="hero-img_" alt="Allsmsverify Hero Image">
+        <img src="./images/hero-image.png" class="hero-img_" alt="Foreign sms Hero Image">
     </div>
     <div class="form-area-div">
         <a href="/" class="logo-div-mini mb-x" style="text-decoration: none;">
-            <img class="logo-img-mini" src="./images/logo-png.png" alt="Allsmsverify logo">
-            <h1 class="logo-text-mini">Allsmsverify</h1>
+            <img class="logo-img-mini" src="./images/logo-png.png" alt="Foreign sms logo">
+            <h1 class="logo-text-mini">Foreign sms</h1>
         </a>
         <div class="form-div">
             <h1 class="small-heading fw-600 mb-4">Sign in</h1>
@@ -128,7 +128,7 @@ $page_title = "Login - " . $site_data['web_name'];
 
 
 
-        <p class="text-center small-text mt-4">Protected by the reCAPTCHA and subject to the Allsmsverify
+        <p class="text-center small-text mt-4">Protected by the reCAPTCHA and subject to the Foreign sms
             <br><a href="privacy-policy.html">Privacy Policy</a> and <a href="tos.html">Terms of Service</a>
         </p>
     </div>
