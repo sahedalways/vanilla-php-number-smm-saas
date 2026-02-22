@@ -84,8 +84,9 @@ $subdomain = null;
 
 // insert user
 $stmt = $conn->prepare("
-    INSERT INTO user_data (username, name, email, phone, password, type, subdomain, register_date)
-    VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
+    INSERT INTO user_data
+    (username, name, email, phone, password, type, subdomain, balance, register_date)
+    VALUES (?, ?, ?, ?, ?, ?, ?, 0.00, NOW())
 ");
 
 if (!$stmt) {
@@ -94,6 +95,7 @@ if (!$stmt) {
 }
 
 $stmt->bind_param("sssssss", $username, $name, $email, $phone, $hash, $type, $subdomain);
+
 
 if ($stmt->execute()) {
     $customerId = $stmt->insert_id;

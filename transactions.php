@@ -1,93 +1,73 @@
 <?php
 session_start();
-include  'include/config.php';
+
+
+require_once 'helpers/session.php';
+require_once 'include/config.php';
 require __DIR__ . '/class/class.control.php';
-if(!isset($_SESSION['token'])){
-	if(isset($_COOKIE['remember_me'])) {
-		$radium_token = $_COOKIE['remember_me'];
-		$_SESSION['token'] = $radium_token;
-	}else{
-		header('location: login');	
-		exit;
-	}
+if (!isset($_SESSION['type']) || $_SESSION['type'] !== 'customer') {
+    $back = $_SERVER['HTTP_REFERER'] ?? '/';
+    header("Location: $back");
+    exit;
 }
+
+authOnly();
+
+
+
 $wallet = new radiumsahil();
 $userdata = $wallet->userdata();
 $userwallet = $wallet->userwallet();
-if($userdata===false){
-	unset($_SESSION['token']);
-	session_destroy();
-	if(isset($_COOKIE['remember_me'])) {
-		unset($_COOKIE['remember_me']);
-		setcookie('remember_me', $token, [
-			'expires' => time() - 3600,
-			'path' => '/',
-			'domain' => $_SERVER['HTTP_HOST'],
-			'secure' => true,
-			'httponly' => true,
-			'samesite' => 'radium'
-		]);
-		
-	}
-		header('location: login');	
-	exit;	
-}
+
 $transactions = $wallet->transaction_history();
-                             
+
 $wallet->closeConnection();
 // include 'theam/' . THEAM . '/transactions.php';
 ?>
 <?php
 $page_title = "Recharge History - " . $site_data['web_name'];
 ?>
-<?php include ('partial/header.php'); ?>
+<?php include('partial/header.php'); ?>
 <link rel="stylesheet" href="https://cdn.datatables.net/2.0.5/css/dataTables.dataTables.min.css">
 <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
-<?php include ('partial/loader.php'); ?>
+<?php include('partial/loader.php'); ?>
 
 <div class="page-wrapper compact-wrapper" id="pageWrapper">
     <!-- Page Header Start-->
-    <?php include ('partial/topbar.php'); ?>
+    <?php include('partial/topbar.php'); ?>
     <!-- Page Header Ends -->
     <!-- Page Body Start-->
     <div class="page-body-wrapper">
         <!-- Page Sidebar Start-->
-        <?php include ('partial/sidebar.php'); ?>
+        <?php include('partial/sidebar.php'); ?>
         <!-- Page Sidebar Ends-->
         <div class="page-body">
-            <!-- <?php include ('partial/breadcrumb.php'); ?> -->
+            <!-- <?php include('partial/breadcrumb.php'); ?> -->
             <!-- Container-fluid starts-->
             <br><br>
             <div class="container-fluid mt-6">
                 <?php
                 if (!$transactions) {
-                    ?>
+                ?>
                     <div class="fixed  inset-0 grid  place-content-center" ">
                                     <center>             <lottie-player
                                                                     src="
-                    https://lottie.host/e4335069-53e2-40d0-96cc-bbf637a9230b/0x53YL3QsZ.json" background="transparent"
+                        https://lottie.host/e4335069-53e2-40d0-96cc-bbf637a9230b/0x53YL3QsZ.json" background="transparent"
                         speed="1" style="width: 250px; margin-top:35px" direction="1" mode="normal" loop autoplay>
                         </lottie-player>
                         </center>
                         <p class="text-center" style="font-weight:bold; font-size:20px">Transactions History Empty</p>
                     </div>
-                    <?php
+                <?php
                 } else {
-                    ?>
+                ?>
                     <div class="card recent-order">
                         <div class="card-header card-no-border">
                             <div class="header-top">
                                 <h5 class="m-0">Recharge History</h5>
                                 <div class="card-header-right-icon">
-                                    <!-- <div class="dropdown icon-dropdown">
-                                        <button class="btn dropdown-toggle" id="recentButton" type="button"
-                                            data-bs-toggle="dropdown" aria-expanded="false"><i
-                                                class="icon-more-alt"></i></button>
-                                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="recentButton"><a
-                                                class="dropdown-item" href="#">Today</a><a class="dropdown-item"
-                                                href="#">Tomorrow</a><a class="dropdown-item" href="#">Yesterday</a></div>
-                                    </div> -->
+
                                 </div>
                             </div>
                         </div>
@@ -113,13 +93,12 @@ $page_title = "Recharge History - " . $site_data['web_name'];
                                                 $count = 0;
                                                 foreach ($transactions as $transaction) {
                                                     $count++;
-                                                    if($transaction['status'] == 1){
-                                                        $status ='<span class="badge rounded-pill badge-success">Success</span>';
-                                                    }else{
-                                                        $status ='<span class="badge rounded-pill badge-danger">Failed</span>';
-
+                                                    if ($transaction['status'] == 1) {
+                                                        $status = '<span class="badge rounded-pill badge-success">Success</span>';
+                                                    } else {
+                                                        $status = '<span class="badge rounded-pill badge-danger">Failed</span>';
                                                     }
-                                                    ?>
+                                                ?>
                                                     <tr class="hr hr-blurry">
 
                                                         <td class="col"><?php echo $count; ?></td>
@@ -129,7 +108,7 @@ $page_title = "Recharge History - " . $site_data['web_name'];
                                                         <td><?php echo $status; ?></td>
 
                                                     </tr>
-                                                    <?php
+                                                <?php
                                                 }
                                                 ?>
                                             </tbody>
@@ -139,30 +118,30 @@ $page_title = "Recharge History - " . $site_data['web_name'];
                             </div>
 
 
-                    
-                   
-               
-                <?php
-                }
-                ?>
 
+
+
+                        <?php
+                    }
+                        ?>
+
+                        </div>
+
+                        <!-- Container-fluid Ends-->
+                    </div>
+            </div>
         </div>
-        
-        <!-- Container-fluid Ends-->
+        <!-- <?php include('partial/footer.php'); ?> -->
     </div>
 </div>
-</div>
-<!-- <?php include ('partial/footer.php'); ?> -->
-</div>
-</div>
 
-<?php include ('partial/scripts.php'); ?>
+<?php include('partial/scripts.php'); ?>
 <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 <script src="assets/js/notiflix-aio-3.2.7.min.js"></script>
 <script src="https://cdn.datatables.net/2.0.5/js/dataTables.min.js"></script>
 <!-- <script src="https://cdn.datatables.net/2.0.5/js/dataTables.js"></script> -->
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         $('#myTable').DataTable({
             ordering: false,
             autoWidth: true
@@ -172,4 +151,4 @@ $page_title = "Recharge History - " . $site_data['web_name'];
 
 
 
-<?php include ('partial/footer-end.php'); ?>
+<?php include('partial/footer-end.php'); ?>

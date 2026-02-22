@@ -60,10 +60,14 @@ if ($userId) {
             <div class="balance-amount text-white"> ₦<?php echo number_format($balance, 2); ?></div>
             <div class="row g-2">
                 <div class="col-6">
-                    <button class="btn btn-light w-100 py-2 fw-bold text-primary"><i class="fa-solid fa-plus me-1"></i> Top Up</button>
+                    <a href="/recharge" class="btn btn-light w-100 py-2 fw-bold text-primary">
+                        <i class="fa-solid fa-plus me-1"></i> Top Up
+                    </a>
                 </div>
                 <div class="col-6">
-                    <button class="btn btn-primary w-100 py-2 border-0" style="background: rgba(255,255,255,0.2);"><i class="fa-solid fa-clock-rotate-left me-1"></i> History</button>
+                    <a href="/transactions" class="btn btn-primary w-100 py-2 border-0" style="background: rgba(255,255,255,0.2);">
+                        <i class="fa-solid fa-clock-rotate-left me-1"></i> History
+                    </a>
                 </div>
             </div>
         </div>

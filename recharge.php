@@ -1,96 +1,80 @@
 <?php
-session_start();
-include  'include/config.php';
+require_once 'helpers/session.php';
+require_once 'include/config.php';
 require __DIR__ . '/class/class.control.php';
-if(!isset($_SESSION['token'])){
-	if(isset($_COOKIE['remember_me'])) {
-		$radium_token = $_COOKIE['remember_me'];
-		$_SESSION['token'] = $radium_token;
-	}else{
-	header('location: login');
-	exit;
-	}
+if (!isset($_SESSION['type']) || $_SESSION['type'] !== 'customer') {
+    $back = $_SERVER['HTTP_REFERER'] ?? '/';
+    header("Location: $back");
+    exit;
 }
+
+authOnly();
+
 $wallet = new radiumsahil();
 $userdata = $wallet->userdata();
 $userwallet = $wallet->userwallet();
 $referwallet = $wallet->refer_data();
-if($userdata===false){
-	unset($_SESSION['token']);
-	session_destroy();
-	if(isset($_COOKIE['remember_me'])) {
-		unset($_COOKIE['remember_me']);
-		setcookie('remember_me', $token, [
-			'expires' => time() - 3600,
-			'path' => '/',
-			'domain' => $_SERVER['HTTP_HOST'],
-			'secure' => true,
-			'httponly' => true,
-			'samesite' => 'radium'
-		]);
-		
 
-	}
-		header('location: login');	
-	exit;	
-}
 $wallet->closeConnection();
 // include 'theam/' . THEAM . '/recharge.php';
 ?>
 <?php
 $page_title = "Recharge - " . $site_data['web_name'];
 ?>
-<?php include ('partial/header.php'); ?>
-<?php 
-if(isset($_POST['pay'])) {    
+
+
+<?php include('partial/header.php'); ?>
+<?php
+if (isset($_POST['pay'])) {
     $amount = $_POST['amount'];
-    if($amount >= 100){
-    $request = [
-        'tx_ref' => 'FCTG'.strtoupper(uniqid()),
-        'amount' => $amount,
-        'currency' => 'NGN',
-        'payment_options' => 'banktransfer',
-        'bank_transfer_options' => [
-            'expires' => 3600
-        ],
-        'redirect_url' => WEBSITE_URL.'/success',
-        'customer' => [
-            'email' => $userdata['email'],
-            'name' => $userdata['name']
-        ],
-        'meta' => [
-            'price' => $amount
-        ],        
-    ];
+    if ($amount >= 100) {
+        $request = [
+            'tx_ref' => 'FCTG' . strtoupper(uniqid()),
+            'amount' => $amount,
+            'currency' => 'NGN',
+            'payment_options' => 'banktransfer',
+            'bank_transfer_options' => [
+                'expires' => 3600
+            ],
+            'redirect_url' => WEBSITE_URL . '/success',
+            'customer' => [
+                'email' => $userdata['email'],
+                'name' => $userdata['name']
+            ],
+            'meta' => [
+                'price' => $amount
+            ],
+        ];
 
-    $curl = curl_init();
-    curl_setopt_array($curl, array(
-        CURLOPT_URL => 'https://api.flutterwave.com/v3/payments',
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 0,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'POST',
-        CURLOPT_POSTFIELDS => json_encode($request),
-        CURLOPT_HTTPHEADER => array(
-            'Authorization: Bearer '.SECRET_KEY,
-            'Content-Type: application/json'
-        ),
-    ));
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://api.flutterwave.com/v3/payments',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => json_encode($request),
+            CURLOPT_HTTPHEADER => array(
+                'Authorization: Bearer ' . SECRET_KEY,
+                'Content-Type: application/json'
+            ),
+        ));
 
-    $response = curl_exec($curl);    
-    curl_close($curl);
+        $response = curl_exec($curl);
+        curl_close($curl);
 
-    $res = json_decode($response);
-    if(isset($res->status) && $res->status == 'success') {
-        $url = $res->data->link;
-        echo '<script>
-                window.location.href = "'.$url.'";
+        $res = json_decode($response);
+        if (isset($res->status) && $res->status == 'success') {
+            $url = $res->data->link;
+            echo '<script>
+                window.location.href = "' . $url . '";
             </script>';
+        }
     }
-}}
+}
 ?>
 
 <style>
@@ -107,19 +91,19 @@ if(isset($_POST['pay'])) {
     }
 </style>
 <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-<?php include ('partial/loader.php'); ?>
+<?php include('partial/loader.php'); ?>
 
 <div class="page-wrapper compact-wrapper" id="pageWrapper">
     <!-- Page Header Start-->
-    <?php include ('partial/topbar.php'); ?>
+    <?php include('partial/topbar.php'); ?>
     <!-- Page Header Ends -->
     <!-- Page Body Start-->
     <div class="page-body-wrapper">
         <!-- Page Sidebar Start-->
-        <?php include ('partial/sidebar.php'); ?>
+        <?php include('partial/sidebar.php'); ?>
         <!-- Page Sidebar Ends-->
         <div class="page-body">
-            <!-- <?php include ('partial/breadcrumb.php'); ?> -->
+            <!-- <?php include('partial/breadcrumb.php'); ?> -->
             <!-- Container-fluid starts-->
             <br><br>
             <div class="container-fluid mt-6">
@@ -131,41 +115,41 @@ if(isset($_POST['pay'])) {
                             <div class="card-body">
                                 <div id="card_page">
 
-                               
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-            </div>
-            <!-- modal start -->
-            <div class="modal fade ml-3 mr-3" tabindex="-1" role="dialog" id="successModal">
-                <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-body text-center">
-                            <div id="checkIcon">
-                                <img src="https://cdn-icons-png.flaticon.com/512/7518/7518748.png">
+                                </div>
                             </div>
-                            <div class="mt-4 py-2">
-                                <p class="px-4 pb-0 mb-2 text-success" style="font-weight:bold">Congratulations</p>
-                                <h4 class="h5" id="model_message">₦10 Added Successfully</h4>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- modal start -->
+                <div class="modal fade ml-3 mr-3" tabindex="-1" role="dialog" id="successModal">
+                    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-body text-center">
+                                <div id="checkIcon">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/7518/7518748.png">
+                                </div>
+                                <div class="mt-4 py-2">
+                                    <p class="px-4 pb-0 mb-2 text-success" style="font-weight:bold">Congratulations</p>
+                                    <h4 class="h5" id="model_message">₦10 Added Successfully</h4>
+                                </div>
+                                <div class="py-1"><button type="button" class="btn  btn-outline-success rounded-pill px-5"
+                                        data-bs-dismiss="modal">OK</button></div>
                             </div>
-                            <div class="py-1"><button type="button" class="btn  btn-outline-success rounded-pill px-5"
-                                    data-bs-dismiss="modal">OK</button></div>
                         </div>
                     </div>
                 </div>
+                <!-- modal end -->
             </div>
-            <!-- modal end -->
+            <!-- Container-fluid Ends-->
         </div>
-        <!-- Container-fluid Ends-->
+
+        <?php include('partial/footer.php'); ?>
     </div>
-
-    <?php include ('partial/footer.php'); ?>
-</div>
 </div>
 
-<?php include ('partial/scripts.php'); ?>
+<?php include('partial/scripts.php'); ?>
 <script src="assets/js/notiflix-aio-3.2.7.min.js"></script>
 <script src="js/confetti.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tsparticles/confetti@3.0.3/tsparticles.confetti.bundle.min.js"></script>
@@ -173,16 +157,16 @@ if(isset($_POST['pay'])) {
 <script>
     back();
     const startit = () => {
-        setTimeout(function () {
+        setTimeout(function() {
             confetti.start();
         }, 100);
     };
     const stopit = () => {
-        setTimeout(function () {
+        setTimeout(function() {
             confetti.stop();
         }, 3000);
     };
-    // startit(); 
+    // startit();
 
 
     function copy(text) {
@@ -223,6 +207,7 @@ if(isset($_POST['pay'])) {
             }, 1000);
         }
     }
+
     function back() {
         document.getElementById("card_page").innerHTML = `
     <div class="text-center">
@@ -240,7 +225,7 @@ if(isset($_POST['pay'])) {
                         Phonepe,Paytm,Gpay
                     </div>
                 </div>
-            </div>  
+            </div>
             <div style="margin-left: auto; width: 25px"><i class="fa fa-arrow-right fa-lg"></i></div>
         </div>
         <div onclick="trx()" class="clearfix  shadow-showcase point"
@@ -334,7 +319,8 @@ if(isset($_POST['pay'])) {
 </div>
     `;
     }
-function flutterwave() {
+
+    function flutterwave() {
         document.getElementById("card_page").innerHTML = `
 
         <div class="card-text space-y-2">
@@ -364,7 +350,7 @@ function flutterwave() {
                                         <div class="">
                                             <div class="text-center mt-3 d-flex justify-content-between">
                                                 <button name="pay" class="btn btn-dark">
-                                                    Pay                                                   
+                                                    Pay
                                                 </button>
                                                 </form>
                                                 <button id="back" onclick="back();" class="btn btn-danger">
@@ -377,7 +363,7 @@ function flutterwave() {
                                 </div>
 
 `;
-    }            
+    }
 
     function trx() {
 
@@ -385,14 +371,14 @@ function flutterwave() {
         $.ajax({
             type: "GET",
             url: "api/recharge/crypto/getPrice",
-            error: function (e) {
+            error: function(e) {
                 console.log(e);
                 Notiflix.Notify.failure("Connection Failed", {
                     showOnlyTheLastOne: true,
                 });
                 Notiflix.Block.remove('#card_page');
             },
-            success: function (data) {
+            success: function(data) {
                 var json = JSON.parse(data);
                 var token = $("#tokens").val();
                 var params = {
@@ -402,18 +388,18 @@ function flutterwave() {
                     type: "GET",
                     data: params,
                     url: "api/recharge/crypto/getAddress/trx",
-                    error: function (e) {
+                    error: function(e) {
                         console.log(e);
                         Notiflix.Notify.failure("Connection Failed", {
                             showOnlyTheLastOne: true,
                         });
                         Notiflix.Block.remove('#card_page');
                     },
-                    success: function (data2) {
+                    success: function(data2) {
                         Notiflix.Block.remove('#card_page');
                         var json2 = JSON.parse(data2);
                         if (json2.ok !== true) {
-                            document.getElementById("card_page").innerHTML = `   
+                            document.getElementById("card_page").innerHTML = `
                             <div class="card-text space-y-2">
                                     <div class="d-flex align-items-center">
                                         <img class="rounded-circle user-image"
@@ -430,7 +416,7 @@ function flutterwave() {
 
                                     <div class="text-center">
                                         <img src="upload/trx.png" height="200"
-                                            width="200" style="margin-top: 16px;"><br>                                   
+                                            width="200" style="margin-top: 16px;"><br>
                                <span class="badge rounded-pill badge-secondary" style="margin-top:15px; margin-bottom:10px">Minimum Recharge is <?php echo $site_data['trx_minimum']; ?> TRX (TRC20)</span>
                                     </div>
 
@@ -459,7 +445,7 @@ function flutterwave() {
                             </div>
    `;
                         } else {
-                            document.getElementById("card_page").innerHTML = ` 
+                            document.getElementById("card_page").innerHTML = `
                             <div class="card-text space-y-2">
                                     <div class="d-flex align-items-center">
                                         <img class="rounded-circle user-image"
@@ -482,8 +468,8 @@ function flutterwave() {
 
                                     <div class="position-relative">
                                     <div class="mb-3 mt-2 text-center">
-                  <span id="trx_time" style="padding: 5px 10px; border-radius: 20px; background: #e1e3e5; font-size:16px; "><i class="fa fa-clock-o" style="margin-bottom:1px"></i> 20:00</span> 
-                    </div>    
+                  <span id="trx_time" style="padding: 5px 10px; border-radius: 20px; background: #e1e3e5; font-size:16px; "><i class="fa fa-clock-o" style="margin-bottom:1px"></i> 20:00</span>
+                    </div>
                                         <center><span class="badge rounded-pill badge-primary "
                                                 style="font-size:13px; margin-bottom:5px">1 TRX = ₦${json.trx}</span></center>
                                         <div class="position-relative mt-2">
@@ -528,14 +514,14 @@ function flutterwave() {
         $.ajax({
             type: "GET",
             url: "api/recharge/crypto/getPrice",
-            error: function (e) {
+            error: function(e) {
                 console.log(e);
                 Notiflix.Notify.failure("Connection Failed", {
                     showOnlyTheLastOne: true,
                 });
                 Notiflix.Block.remove('#card_page');
             },
-            success: function (data) {
+            success: function(data) {
                 var json = JSON.parse(data);
                 var token = $("#tokens").val();
                 var params = {
@@ -545,18 +531,18 @@ function flutterwave() {
                     type: "GET",
                     data: params,
                     url: "api/recharge/crypto/getAddress/usdt",
-                    error: function (e) {
+                    error: function(e) {
                         console.log(e);
                         Notiflix.Notify.failure("Connection Failed", {
                             showOnlyTheLastOne: true,
                         });
                         Notiflix.Block.remove('#card_page');
                     },
-                    success: function (data2) {
+                    success: function(data2) {
                         Notiflix.Block.remove('#card_page');
                         var json2 = JSON.parse(data2);
                         if (json2.ok !== true) {
-                            document.getElementById("card_page").innerHTML = `   
+                            document.getElementById("card_page").innerHTML = `
       <div class="card-text space-y-2">
                                     <div class="d-flex align-items-center">
                                         <img class="rounded-circle user-image"
@@ -573,7 +559,7 @@ function flutterwave() {
 
                                     <div class="text-center">
                                         <img src="upload/usdt.png"
-                                            width="200" style="margin-top: 16px;"> <br>                                   
+                                            width="200" style="margin-top: 16px;"> <br>
                                             <span class="badge rounded-pill badge-secondary" style="margin-top:15px; margin-bottom:10px">Minimum Recharge is <?php echo $site_data['usdt_minimum']; ?> USDT (SOL)</span>
                                     </div>
 
@@ -602,7 +588,7 @@ function flutterwave() {
                             </div>
   `;
                         } else {
-                            document.getElementById("card_page").innerHTML = `  
+                            document.getElementById("card_page").innerHTML = `
 <div class="card-text space-y-2">
                                     <div class="d-flex align-items-center">
                                         <img class="rounded-circle user-image"
@@ -625,8 +611,8 @@ function flutterwave() {
 
                                     <div class="position-relative">
                                     <div class="mb-3 mt-2 text-center">
-                  <span id="usdt_time" style="padding: 5px 10px; border-radius: 20px; background: #e1e3e5; font-size:16px; "><i class="fa fa-clock-o" style="margin-bottom:1px"></i> 20:00</span> 
-                    </div>    
+                  <span id="usdt_time" style="padding: 5px 10px; border-radius: 20px; background: #e1e3e5; font-size:16px; "><i class="fa fa-clock-o" style="margin-bottom:1px"></i> 20:00</span>
+                    </div>
                                         <center><span class="badge rounded-pill badge-primary "
                                                 style="font-size:13px; margin-bottom:5px">1 USDT = ₦${json.usdt}</span></center>
                                         <div class="position-relative mt-2">
@@ -663,6 +649,7 @@ function flutterwave() {
             }
         });
     }
+
     function promo() {
         document.getElementById("card_page").innerHTML = `
 
@@ -746,6 +733,7 @@ function flutterwave() {
 
 `;
     }
+
     function add_upi() {
         var txn_id = $("#ref_id").val();
         var token = $("#tokens").val();
@@ -769,7 +757,7 @@ function flutterwave() {
             type: "GET",
             url: "api/recharge/upi",
             data: params,
-            error: function (e) {
+            error: function(e) {
                 console.log(e);
                 Notiflix.Notify.failure("Connection Failed", {
                     showOnlyTheLastOne: true,
@@ -777,12 +765,14 @@ function flutterwave() {
                 $('#recharges').html("Add Money");
                 $('#recharges').prop("disabled", false);
             },
-            success: function (data) {
+            success: function(data) {
                 $('#recharges').html("Add Money");
                 $('#recharges').prop("disabled", false);
                 var json = JSON.parse(data);
                 if (json.status === "200") {
-                    var params = { token: token };
+                    var params = {
+                        token: token
+                    };
                     startit();
                     stopit();
                     document.getElementById("model_message").textContent = json.message;
@@ -791,10 +781,10 @@ function flutterwave() {
                         type: "POST",
                         url: "api/auth/session",
                         data: params,
-                        error: function (e) {
+                        error: function(e) {
                             console.log(e);
                         },
-                        success: function (data) {
+                        success: function(data) {
                             var jsons = JSON.parse(data);
                             var spanElement = document.getElementById("current_balance");
 
@@ -814,6 +804,7 @@ function flutterwave() {
             }
         });
     }
+
     function trx_address() {
         var token = $("#tokens").val();
 
@@ -828,7 +819,7 @@ function flutterwave() {
             type: "GET",
             url: "api/recharge/crypto/generateAddress/trx",
             data: params,
-            error: function (e) {
+            error: function(e) {
                 console.log(e);
                 Notiflix.Notify.failure("Connection Failed", {
                     showOnlyTheLastOne: true,
@@ -836,7 +827,7 @@ function flutterwave() {
                 $('#trx_btn').html("Generate Address");
                 $('#trx_btn').prop("disabled", false);
             },
-            success: function (data) {
+            success: function(data) {
                 $('#trx_btn').html("Generate Address");
                 $('#trx_btn').prop("disabled", false);
                 var json = JSON.parse(data);
@@ -850,6 +841,7 @@ function flutterwave() {
             }
         });
     }
+
     function trx_cancle_address() {
         var token = $("#tokens").val();
 
@@ -864,7 +856,7 @@ function flutterwave() {
             type: "GET",
             url: "api/recharge/crypto/cancelAddress/trx",
             data: params,
-            error: function (e) {
+            error: function(e) {
                 console.log(e);
                 Notiflix.Notify.failure("Connection Failed", {
                     showOnlyTheLastOne: true,
@@ -872,7 +864,7 @@ function flutterwave() {
                 $('#cancle_btn_trx').html("Delete Address");
                 $('#cancle_btn_trx').prop("disabled", false);
             },
-            success: function (data) {
+            success: function(data) {
                 $('#cancle_btn_trx').html("Delete Address");
                 $('#cancle_btn_trx').prop("disabled", false);
                 var json = JSON.parse(data);
@@ -886,6 +878,7 @@ function flutterwave() {
             }
         });
     }
+
     function usdt_address() {
         var token = $("#tokens").val();
 
@@ -900,7 +893,7 @@ function flutterwave() {
             type: "GET",
             url: "api/recharge/crypto/generateAddress/usdt",
             data: params,
-            error: function (e) {
+            error: function(e) {
                 console.log(e);
                 Notiflix.Notify.failure("Connection Failed", {
                     showOnlyTheLastOne: true,
@@ -908,7 +901,7 @@ function flutterwave() {
                 $('#usdt_btn').html("Generate Address");
                 $('#usdt_btn').prop("disabled", false);
             },
-            success: function (data) {
+            success: function(data) {
                 $('#usdt_btn').html("Generate Address");
                 $('#usdt_btn').prop("disabled", false);
                 var json = JSON.parse(data);
@@ -922,6 +915,7 @@ function flutterwave() {
             }
         });
     }
+
     function usdt_cancle_address() {
         var token = $("#tokens").val();
 
@@ -936,7 +930,7 @@ function flutterwave() {
             type: "GET",
             url: "api/recharge/crypto/cancelAddress/usdt",
             data: params,
-            error: function (e) {
+            error: function(e) {
                 console.log(e);
                 Notiflix.Notify.failure("Connection Failed", {
                     showOnlyTheLastOne: true,
@@ -944,7 +938,7 @@ function flutterwave() {
                 $('#cancle_btn_usdt').html("Delete Address");
                 $('#cancle_btn_usdt').prop("disabled", false);
             },
-            success: function (data) {
+            success: function(data) {
                 $('#cancle_btn_usdt').html("Delete Address");
                 $('#cancle_btn_usdt').prop("disabled", false);
                 var json = JSON.parse(data);
@@ -958,6 +952,7 @@ function flutterwave() {
             }
         });
     }
+
     function add_promo() {
         var txn_id = $("#redeem_id").val();
         var token = $("#tokens").val();
@@ -981,13 +976,13 @@ function flutterwave() {
             type: "POST",
             url: "api/recharge/promocode",
             data: params,
-            error: function (e) {
+            error: function(e) {
                 console.log(e);
                 Notiflix.Notify.failure('An error occurred during Connection.');
                 $('#recharges1').html("Redeem");
                 $('#recharges1').prop("disabled", false);
             },
-            success: function (data) {
+            success: function(data) {
                 $('#recharges1').html("Redeem");
                 $('#recharges1').prop("disabled", false);
                 var json = JSON.parse(data);
@@ -996,39 +991,45 @@ function flutterwave() {
                     // $('#successModal').modal('show');
                     done_promo(json.message);
                     const end = Date.now() + 2 * 1000;
-const colors = ["#bb0000", "#ffffff"];
+                    const colors = ["#bb0000", "#ffffff"];
 
-(function frame() {
-    confetti({
-        particleCount: 2,
-        angle: 60,
-        spread: 55,
-        origin: { x: 0 },
-        colors: colors,
-    });
+                    (function frame() {
+                        confetti({
+                            particleCount: 2,
+                            angle: 60,
+                            spread: 55,
+                            origin: {
+                                x: 0
+                            },
+                            colors: colors,
+                        });
 
-    confetti({
-        particleCount: 2,
-        angle: 120,
-        spread: 55,
-        origin: { x: 1 },
-        colors: colors,
-    });
+                        confetti({
+                            particleCount: 2,
+                            angle: 120,
+                            spread: 55,
+                            origin: {
+                                x: 1
+                            },
+                            colors: colors,
+                        });
 
-    if (Date.now() < end) {
-        requestAnimationFrame(frame);
-    }
-})();
-                    var params = { token: token };
+                        if (Date.now() < end) {
+                            requestAnimationFrame(frame);
+                        }
+                    })();
+                    var params = {
+                        token: token
+                    };
 
                     $.ajax({
                         type: "POST",
                         url: "api/auth/session",
                         data: params,
-                        error: function (e) {
+                        error: function(e) {
                             console.log(e);
                         },
-                        success: function (data) {
+                        success: function(data) {
                             var jsons = JSON.parse(data);
                             var spanElement = document.getElementById("current_balance");
 
@@ -1043,7 +1044,6 @@ const colors = ["#bb0000", "#ffffff"];
             }
         });
     }
-
 </script>
 
-<?php include ('partial/footer-end.php'); ?>
+<?php include('partial/footer-end.php'); ?>

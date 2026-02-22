@@ -97,10 +97,10 @@ $type = 'customer';
 
 
 
-// insert user
 $stmt = $conn->prepare("
-    INSERT INTO user_data (username, name, email, phone, password, type, register_date)
-    VALUES (?, ?, ?, ?, ?, ?, NOW())
+    INSERT INTO user_data
+    (username, name, email, phone, password, type, balance, register_date)
+    VALUES (?, ?, ?, ?, ?, ?, 0.00, NOW())
 ");
 
 if (!$stmt) {
