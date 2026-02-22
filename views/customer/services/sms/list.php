@@ -81,9 +81,6 @@ while ($row = $result->fetch_assoc()) {
 $stmt->close();
 
 
-
-
-
 ?>
 
 <!DOCTYPE html>
@@ -91,8 +88,9 @@ $stmt->close();
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SMS Services | Customers</title>
-    <link rel="shortcut icon" href="./../../images/logo-png.png" type="image/x-icon">
+    <link rel="shortcut icon" href="/images/logo-png.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/admin_dashboard.css">
@@ -104,7 +102,10 @@ $stmt->close();
 </head>
 
 <body>
-    <div class="container mt-4">
+
+
+    <div class="main-wrapper p-3">
+
         <?php include __DIR__ . '/../../components/header.php'; ?>
 
         <input type="hidden" id="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
@@ -115,203 +116,211 @@ $stmt->close();
         </div>
 
 
-        <input type="hidden" id="userBalance" value="<?= $balance ?? 0 ?>">
+
+        <div class="container mt-4">
+
+            <input type="hidden" id="userBalance" value="<?= $balance ?? 0 ?>">
 
 
-        <h4 class="mb-4">Manage SMS Services</h4>
-        <input type="hidden" id="csrf_token" value="<?php echo $csrf_token; ?>">
-        <!-- Filter Section -->
-        <div class="row mb-3 g-2">
-            <div class="col-md-3">
-                <select id="filterCountry" class="form-select">
-                    <option value="">All Countries</option>
-                    <?php
-                    $countries = array_unique(array_column($services, 'country'));
-                    foreach ($countries as $c): ?>
-                        <option value="<?= htmlspecialchars($c) ?>"><?= htmlspecialchars(ucfirst($c)) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <select id="filterOperator" class="form-select">
-                    <option value="">All Operators</option>
-                    <?php
-                    $operators = array_unique(array_column($services, 'operator'));
-                    foreach ($operators as $o): ?>
-                        <option value="<?= htmlspecialchars($o) ?>"><?= htmlspecialchars($o) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <select id="filterService" class="form-select">
-                    <option value="">All Services</option>
-                    <?php
-                    $serviceCodes = array_unique(array_column($services, 'service_code'));
-                    foreach ($serviceCodes as $sc): ?>
-                        <option value="<?= htmlspecialchars($sc) ?>"><?= htmlspecialchars($sc) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <button id="resetFilters" class="btn btn-secondary w-100">Reset Filters</button>
-            </div>
-        </div>
-
-        <!-- Services Table -->
-        <div class="table-responsive">
-            <div class="container mt-4">
-
-                <!-- Section Title -->
-                <div class="d-flex align-items-center mb-4" style="animation: fadeIn 0.8s ease-out;">
-                    <div style="width: 5px; height: 30px; background: #0d6efd; border-radius: 10px; margin-right: 15px;"></div>
-                    <h4 class="mb-0" style="font-weight: 800; color: #1f2020; letter-spacing: -0.5px;">
-                        Available SMS Services
-                    </h4>
+            <h4 class="mb-4">Manage SMS Services</h4>
+            <input type="hidden" id="csrf_token" value="<?php echo $csrf_token; ?>">
+            <!-- Filter Section -->
+            <div class="row mb-3 g-2">
+                <div class="col-md-3">
+                    <select id="filterCountry" class="form-select">
+                        <option value="">All Countries</option>
+                        <?php
+                        $countries = array_unique(array_column($services, 'country'));
+                        foreach ($countries as $c): ?>
+                            <option value="<?= htmlspecialchars($c) ?>"><?= htmlspecialchars(ucfirst($c)) ?></option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
+                <div class="col-md-3">
+                    <select id="filterOperator" class="form-select">
+                        <option value="">All Operators</option>
+                        <?php
+                        $operators = array_unique(array_column($services, 'operator'));
+                        foreach ($operators as $o): ?>
+                            <option value="<?= htmlspecialchars($o) ?>"><?= htmlspecialchars($o) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select id="filterService" class="form-select">
+                        <option value="">All Services</option>
+                        <?php
+                        $serviceCodes = array_unique(array_column($services, 'service_code'));
+                        foreach ($serviceCodes as $sc): ?>
+                            <option value="<?= htmlspecialchars($sc) ?>"><?= htmlspecialchars($sc) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button id="resetFilters" class="btn btn-secondary w-100">Reset Filters</button>
+                </div>
+            </div>
 
-                <div id="buyError" class="text-danger small mt-2 d-flex align-items-center" style="font-weight: 500;"></div>
+            <!-- Services Table -->
+            <div class="table-responsive">
+                <div class="container mt-4">
 
-                <div class="row g-4">
-                    <?php foreach ($services as $index => $s):
-                        $delay = $index * 0.05;
-                        $selling_price = $s['final_price'];
-                    ?>
+                    <!-- Section Title -->
+                    <div class="d-flex align-items-center mb-4" style="animation: fadeIn 0.8s ease-out;">
+                        <div style="width: 5px; height: 30px; background: #0d6efd; border-radius: 10px; margin-right: 15px;"></div>
+                        <h4 class="mb-0" style="font-weight: 800; color: #1f2020; letter-spacing: -0.5px;">
+                            Available SMS Services
+                        </h4>
+                    </div>
 
-                        <div class="col-md-6 col-lg-4 "
-                            data-country="<?= htmlspecialchars($s['country']) ?>"
-                            data-operator="<?= htmlspecialchars($s['operator']) ?>"
-                            data-service="<?= htmlspecialchars($s['service_code']) ?>"
-                            style="animation: zoomIn 0.5s ease forwards; animation-delay: <?= $delay ?>s; opacity: 0;">
+                    <div id="buyError" class="text-danger small mt-2 d-flex align-items-center" style="font-weight: 500;"></div>
 
-                            <div class="service-card">
-                                <div class="card-body p-4" style="position:relative; z-index:1;">
+                    <div class="row g-4">
+                        <?php foreach ($services as $index => $s):
+                            $delay = $index * 0.05;
+                            $selling_price = $s['final_price'];
+                        ?>
 
-                                    <!-- Icon + ID -->
-                                    <div class="d-flex justify-content-between align-items-start mb-3">
-                                        <div style="width:45px; height:45px;
+                            <div class="col-12 col-md-6 col-lg-4"
+                                data-country="<?= htmlspecialchars($s['country']) ?>"
+                                data-operator="<?= htmlspecialchars($s['operator']) ?>"
+                                data-service="<?= htmlspecialchars($s['service_code']) ?>"
+                                style="animation: zoomIn 0.5s ease forwards; animation-delay: <?= $delay ?>s; opacity: 0;">
+
+                                <div class="service-card">
+                                    <div class="card-body p-4" style="position:relative; z-index:1;">
+
+                                        <!-- Icon + ID -->
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <div style="width:45px; height:45px;
                                 background:#f0f7ff;
                                 border-radius:12px;
                                 display:flex;
                                 align-items:center;
                                 justify-content:center;">
-                                            <i class="fa-solid fa-sim-card text-primary"></i>
+                                                <i class="fa-solid fa-sim-card text-primary"></i>
+                                            </div>
+                                            <span class="badge bg-dark">ID: <?= $s['id'] ?></span>
                                         </div>
-                                        <span class="badge bg-dark">ID: <?= $s['id'] ?></span>
-                                    </div>
 
-                                    <!-- Country -->
-                                    <h6 class="fw-bold mb-2" style="color:#ffff;">
-                                        <?= htmlspecialchars($s['country']) ?>
-                                    </h6>
+                                        <!-- Country -->
+                                        <h6 class="fw-bold mb-2" style="color:#ffff;">
+                                            <?= htmlspecialchars($s['country']) ?>
+                                        </h6>
 
-                                    <!-- Service Code & Operator -->
-                                    <div class="mb-3">
-                                        <span class="badge bg-info text-dark me-1">
-                                            <?= htmlspecialchars($s['service_code']) ?>
-                                        </span>
-                                        <span class="badge bg-secondary">
-                                            <?= htmlspecialchars($s['operator']) ?>
-                                        </span>
-                                    </div>
+                                        <!-- Service Code & Operator -->
+                                        <div class="mb-3">
+                                            <span class="badge bg-info text-dark me-1">
+                                                <?= htmlspecialchars($s['service_code']) ?>
+                                            </span>
+                                            <span class="badge bg-secondary">
+                                                <?= htmlspecialchars($s['operator']) ?>
+                                            </span>
+                                        </div>
 
-                                    <!-- Price Section -->
-                                    <div class="mb-3">
-                                        <small style="color:#95a5a6;">Service Price</small>
-                                        <h5 style="font-weight:800; color:#2ecc71; margin:0;">
-                                            ₦ <?= number_format($s['final_price'], 2) ?>
-                                        </h5>
-                                    </div>
+                                        <!-- Price Section -->
+                                        <div class="mb-3">
+                                            <small style="color:#95a5a6;">Service Price</small>
+                                            <h5 style="font-weight:800; color:#2ecc71; margin:0;">
+                                                ₦ <?= number_format($s['final_price'], 2) ?>
+                                            </h5>
+                                        </div>
 
-                                    <!-- Available Count -->
-                                    <div class="py-2 px-3 mb-3"
-                                        style="background:#f8f9fa; border-radius:12px;">
-                                        <small style="color:#7f8c8d;">Available Numbers</small>
-                                        <div style="font-weight:700; color:#34495e;">
-                                            <?= number_format($s['count']) ?>
+                                        <!-- Available Count -->
+                                        <div class="py-2 px-3 mb-3"
+                                            style="background:#f8f9fa; border-radius:12px;">
+                                            <small style="color:#7f8c8d;">Available Numbers</small>
+                                            <div style="font-weight:700; color:#34495e;">
+                                                <?= number_format($s['count']) ?>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <!-- Order Button -->
-                                <div class="card-footer bg-transparent border-0 p-4 pt-0">
-                                    <button class="btn btn-primary w-100 buy-service-btn"
-                                        style="border-radius:12px; padding:12px; font-weight:700;
+                                    <!-- Order Button -->
+                                    <div class="card-footer bg-transparent border-0 p-4 pt-0">
+                                        <button class="btn btn-primary w-100 buy-service-btn"
+                                            style="border-radius:12px; padding:12px; font-weight:700;
     background: linear-gradient(135deg,#0d6efd 0%,#0052cc 100%);
     border:none; box-shadow:0 4px 15px rgba(13,110,253,0.2);
     transition: all 0.3s;"
-                                        data-service-id="<?= $s['id'] ?>"
-                                        data-country="<?= htmlspecialchars($s['country']) ?>"
-                                        data-operator="<?= htmlspecialchars($s['operator']) ?>"
-                                        data-service="<?= htmlspecialchars($s['service_code']) ?>"
-                                        data-price="<?= htmlspecialchars($s['final_price']) ?>">
+                                            data-service-id="<?= $s['id'] ?>"
+                                            data-country="<?= htmlspecialchars($s['country']) ?>"
+                                            data-operator="<?= htmlspecialchars($s['operator']) ?>"
+                                            data-service="<?= htmlspecialchars($s['service_code']) ?>"
+                                            data-price="<?= htmlspecialchars($s['final_price']) ?>">
 
-                                        <span class="btn-text">
-                                            <i class="fa-solid fa-basket-shopping me-2"></i> Order Now
-                                        </span>
+                                            <span class="btn-text">
+                                                <i class="fa-solid fa-basket-shopping me-2"></i> Order Now
+                                            </span>
 
-                                        <span class="spinner-border spinner-border-sm d-none"></span>
-                                    </button>
+                                            <span class="spinner-border spinner-border-sm d-none"></span>
+                                        </button>
+
+                                    </div>
 
                                 </div>
-
                             </div>
-                        </div>
 
-                    <?php endforeach; ?>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
+
+                <style>
+                    .service-card {
+                        margin-bottom: 20px;
+                        transition: transform 0.35s ease, box-shadow 0.35s ease;
+                        border-radius: 16px;
+                        overflow: hidden;
+                    }
+
+                    .service-card:hover {
+                        transform: translateY(-6px) scale(1.04);
+                        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
+                    }
+
+                    /* Hover zoom effect */
+                    .service-card:hover {
+                        transform: scale(1.05);
+                        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+                        z-index: 10;
+                    }
+
+                    @keyframes zoomIn {
+                        from {
+                            opacity: 0;
+                            transform: scale(0.95);
+                        }
+
+                        to {
+                            opacity: 1;
+                            transform: scale(1);
+                        }
+                    }
+
+                    @keyframes fadeIn {
+                        from {
+                            opacity: 0;
+                        }
+
+                        to {
+                            opacity: 1;
+                        }
+                    }
+                </style>
+
             </div>
-
-            <style>
-                .service-card {
-                    margin-bottom: 20px;
-                    transition: transform 0.35s ease, box-shadow 0.35s ease;
-                    border-radius: 16px;
-                    overflow: hidden;
-                }
-
-                .service-card:hover {
-                    transform: translateY(-6px) scale(1.04);
-                    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
-                }
-
-                /* Hover zoom effect */
-                .service-card:hover {
-                    transform: scale(1.05);
-                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-                    z-index: 10;
-                }
-
-                @keyframes zoomIn {
-                    from {
-                        opacity: 0;
-                        transform: scale(0.95);
-                    }
-
-                    to {
-                        opacity: 1;
-                        transform: scale(1);
-                    }
-                }
-
-                @keyframes fadeIn {
-                    from {
-                        opacity: 0;
-                    }
-
-                    to {
-                        opacity: 1;
-                    }
-                }
-            </style>
-
         </div>
+
+
+
+        <?php
+        $active = 'sms';
+        include __DIR__ . '/../../components/bottom-nav.php';
+        ?>
+
+        <script src="/js/customer/manage-sms.js"></script>
+
     </div>
+</body>
 
-
-
-    <?php
-    $active = 'sms';
-    include __DIR__ . '/../../components/bottom-nav.php';
-    ?>
-
-    <script src="/js/customer/manage-sms.js"></script>
+</html>
