@@ -5,7 +5,7 @@ session_start();
 require_once 'helpers/session.php';
 require_once 'include/config.php';
 require __DIR__ . '/class/class.control.php';
-if (!isset($_SESSION['type']) || $_SESSION['type'] !== 'customer') {
+if (!isset($_SESSION['type']) || !in_array($_SESSION['type'], ['customer', 'reseller'])) {
     $back = $_SERVER['HTTP_REFERER'] ?? '/';
     header("Location: $back");
     exit;

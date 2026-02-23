@@ -65,6 +65,34 @@ $stmt->close();
         <?php
         include __DIR__ . '/components/header.php';
         ?>
+
+
+
+        <div class="wallet-card mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="text-white"><i class="fa-solid fa-wallet me-2 text-white"></i> Main Balance</span>
+                <div class="bg-dark bg-opacity-50 rounded-pill p-1 d-flex gap-1" style="font-size: 0.8rem;">
+
+                    <span class="px-3 py-1 text-white">NGN</span>
+                </div>
+            </div>
+            <div class="balance-amount text-white"> ₦<?php echo number_format($balance, 2); ?></div>
+            <div class="row g-2">
+                <div class="col-6">
+                    <a href="/recharge" class="btn btn-light w-100 py-2 fw-bold text-primary">
+                        <i class="fa-solid fa-plus me-1"></i> Top Up
+                    </a>
+                </div>
+                <div class="col-6">
+                    <a href="/transactions" class="btn btn-primary w-100 py-2 border-0" style="background: rgba(255,255,255,0.2);">
+                        <i class="fa-solid fa-clock-rotate-left me-1"></i> History
+                    </a>
+                </div>
+            </div>
+        </div>
+
+
+
         <!-- Stats Cards -->
         <div class="row g-3">
             <div class="col-md-3">
@@ -75,13 +103,6 @@ $stmt->close();
                 </div>
             </div>
 
-            <div class="col-md-3">
-                <div class="card text-center p-3 shadow-sm">
-                    <i class="fa-solid fa-money-bill-wave text-success fa-2x mb-2"></i>
-                    <h6>Wallet Balance</h6>
-                    <h4>₦<?php echo number_format($balance, 2); ?></h4>
-                </div>
-            </div>
 
             <div class="col-md-3">
                 <div class="card text-center p-3 shadow-sm">

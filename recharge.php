@@ -2,7 +2,7 @@
 require_once 'helpers/session.php';
 require_once 'include/config.php';
 require __DIR__ . '/class/class.control.php';
-if (!isset($_SESSION['type']) || $_SESSION['type'] !== 'customer') {
+if (!isset($_SESSION['type']) || !in_array($_SESSION['type'], ['customer', 'reseller'])) {
     $back = $_SERVER['HTTP_REFERER'] ?? '/';
     header("Location: $back");
     exit;
@@ -109,7 +109,7 @@ if (isset($_POST['pay'])) {
             <div class="container-fluid mt-6">
                 <div class="row">
                     <div class="">
-                        <input type="hidden" name="tokens" id="tokens" value="<?php echo $_SESSION['token']; ?>">
+                        <input type="hidden" name="tokens" id="tokens" value="<?php echo $_SESSION['auth_token']; ?>">
 
                         <div class="card" id="radiumsahil">
                             <div class="card-body">
