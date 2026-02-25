@@ -4,8 +4,7 @@ if (preg_match('/\.(?:png|jpg|css|js)$/', $_SERVER["REQUEST_URI"])) {
     return false;
 }
 
-
-$uri = trim($_SERVER['REQUEST_URI'], '/');
+$uri = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
 
 if ($uri === '') {
     include 'index.php';

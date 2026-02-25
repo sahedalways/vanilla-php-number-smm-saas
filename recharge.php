@@ -2,6 +2,7 @@
 require_once 'helpers/session.php';
 require_once 'include/config.php';
 require __DIR__ . '/class/class.control.php';
+
 if (!isset($_SESSION['type']) || !in_array($_SESSION['type'], ['customer', 'reseller'])) {
     $back = $_SERVER['HTTP_REFERER'] ?? '/';
     header("Location: $back");
@@ -15,8 +16,9 @@ $userdata = $wallet->userdata();
 $userwallet = $wallet->userwallet();
 $referwallet = $wallet->refer_data();
 
+
 $wallet->closeConnection();
-// include 'theam/' . THEAM . '/recharge.php';
+
 ?>
 <?php
 $page_title = "Recharge - " . $site_data['web_name'];
@@ -25,56 +27,55 @@ $page_title = "Recharge - " . $site_data['web_name'];
 
 <?php include('partial/header.php'); ?>
 <?php
+
 if (isset($_POST['pay'])) {
     $amount = $_POST['amount'];
+
     if ($amount >= 100) {
+
+        $amount_kobo = $amount * 100;
+        $reference = 'FCTG' . strtoupper(uniqid());
+
         $request = [
-            'tx_ref' => 'FCTG' . strtoupper(uniqid()),
-            'amount' => $amount,
+            'email' => $userdata['email'],
+            'amount' => $amount_kobo,
             'currency' => 'NGN',
-            'payment_options' => 'banktransfer',
-            'bank_transfer_options' => [
-                'expires' => 3600
-            ],
-            'redirect_url' => WEBSITE_URL . '/success',
-            'customer' => [
-                'email' => $userdata['email'],
-                'name' => $userdata['name']
-            ],
-            'meta' => [
+            'reference' => $reference,
+            'callback_url' => WEBSITE_URL . '/success',
+            'metadata' => [
+                'name' => $userdata['name'],
                 'price' => $amount
             ],
         ];
 
         $curl = curl_init();
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://api.flutterwave.com/v3/payments',
+        curl_setopt_array($curl, [
+            CURLOPT_URL => "https://api.paystack.co/transaction/initialize",
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_CUSTOMREQUEST => "POST",
             CURLOPT_POSTFIELDS => json_encode($request),
-            CURLOPT_HTTPHEADER => array(
-                'Authorization: Bearer ' . SECRET_KEY,
-                'Content-Type: application/json'
-            ),
-        ));
+            CURLOPT_HTTPHEADER => [
+                "Authorization: Bearer " . PAYSTACK_SECRET_KEY,
+                "Content-Type: application/json"
+            ],
+        ]);
 
         $response = curl_exec($curl);
         curl_close($curl);
 
-        $res = json_decode($response);
-        if (isset($res->status) && $res->status == 'success') {
-            $url = $res->data->link;
-            echo '<script>
-                window.location.href = "' . $url . '";
-            </script>';
+        $res = json_decode($response, true);
+
+        if (isset($res['status']) && $res['status'] === true) {
+            $url = $res['data']['authorization_url'];
+            echo "<script>window.location.href = '$url';</script>";
+        } else {
+            echo "<p style='color:red'>Payment initialization failed. Try again.</p>";
         }
+    } else {
+        echo "<p style='color:red'>Minimum recharge amount is ₦100</p>";
     }
 }
+
 ?>
 
 <style>
@@ -262,10 +263,10 @@ if (isset($_POST['pay'])) {
              style="border: 1px solid gray; padding: 5px; margin-bottom: 12px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; cursor:pointer;">
             <div style="display: flex; align-items: center;">
                 <img class="rounded-circle user-image"
-                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSL1eJCezNB-KM9Exk7Pwri7EBDcNP0vbDhsw&s"
+                    src="https://logosandtypes.com/wp-content/uploads/2024/02/Paystack.png"
                     width="50" alt="">
                 <div class="about" style="margin-left: 10px;">
-                    <div class="name" style="font-weight:bold; font-size:20px">FLUTTERWAVE</div>
+                    <div class="name" style="font-weight:bold; font-size:20px">Paystack</div>
                     <div class="status" style="font=size:10px">
                     RAVE
                     </div>
@@ -326,10 +327,10 @@ if (isset($_POST['pay'])) {
         <div class="card-text space-y-2">
                                 <div class="d-flex align-items-center">
                                             <img class="rounded-circle user-image"
-                                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSL1eJCezNB-KM9Exk7Pwri7EBDcNP0vbDhsw&s" width="50"
+                                                src="https://logosandtypes.com/wp-content/uploads/2024/02/Paystack.png" width="50"
                                                 alt="">
                                             <div class="about ms-3">
-                                                <div class="name fw-bold fs-5">FLUTTERWAVE</div>
+                                                <div class="name fw-bold fs-5">Paystack</div>
                                                 <div class="status fs-7">
                                                     RAVE
                                                 </div>

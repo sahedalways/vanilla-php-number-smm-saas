@@ -28,6 +28,8 @@ $theam = $site_data['theam'];
 $protocol = 'https';
 $host = $_SERVER['HTTP_HOST'] ?? getenv('SITE_HOST') ?? 'localhost';
 $website_url = getenv('BASE_URL');
+$PAYSTACK_PUBLIC_KEY = getenv('PAYSTACK_PUBLIC_KEY');
+$PAYSTACK_SECRET_KEY = getenv('PAYSTACK_SECRET_KEY');
 
 
 $web_name = $site_data['web_name'];
@@ -35,6 +37,8 @@ $web_name = $site_data['web_name'];
 define("THEAM", $theam);
 define("WEBSITE_URL", $website_url);
 define('SECRET_KEY', getenv('SECRET_KEY'));
+define('PAYSTACK_PUBLIC_KEY', $PAYSTACK_PUBLIC_KEY);
+define('PAYSTACK_SECRET_KEY', $PAYSTACK_SECRET_KEY);
 
 
 function check_token($token, $conn)

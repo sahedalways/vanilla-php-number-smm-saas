@@ -25,6 +25,10 @@ if ($userId) {
     $stmt->fetch();
     $stmt->close();
 }
+
+
+$toast_msg = $_SESSION['success_msg'] ?? $_SESSION['error_msg'] ?? null;
+unset($_SESSION['success_msg'], $_SESSION['error_msg']);
 ?>
 
 
@@ -43,6 +47,20 @@ if ($userId) {
 </head>
 
 <body>
+    <?php if ($toast_msg): ?>
+        <script>
+            Toastify({
+                text: "<?php echo addslashes($toast_msg); ?>",
+                duration: 5000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "<?php echo isset($_SESSION['success_msg']) ? '#4CAF50' : '#F44336'; ?>",
+                stopOnFocus: true
+            }).showToast();
+        </script>
+    <?php endif; ?>
+
     <div class="main-wrapper p-3">
 
         <?php
