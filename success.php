@@ -1,5 +1,8 @@
 <?php
 
+session_start();
+
+
 require_once __DIR__ . "/include/config.php";
 
 $current_time_in_ist = date('Y-m-d H:i:s');
@@ -93,8 +96,12 @@ if (
             ('$user_id', '$amountPaid', '$current_time_in_ist', 'Paystack Recharge', '$txn_id', '1')");
     }
 
-    session_start();
-    $_SESSION['success_msg'] = "Payment of ₦$amountPaid was successful";
-    header('Location: dashboard');
+
+
+
+
+    $_SESSION['payment_user'] = $user_data;
+
+    header("Location: /payment-success");
     exit;
 }
