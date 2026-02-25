@@ -54,18 +54,9 @@
 session_start();
 require_once 'helpers/session.php';
 require_once 'include/config.php';
-
-// Restrict access to resellers only
-if (!isset($_SESSION['type']) || $_SESSION['type'] !== 'reseller') {
-$back = $_SERVER['HTTP_REFERER'] ?? '/';
-header("Location: $back");
-exit;
-}
-
 authOnly();
 
-$userId = $_SESSION['user_id'] ?? null;
-var_dump($userId);
+
 @endphp
 
 

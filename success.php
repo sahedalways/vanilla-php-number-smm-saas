@@ -94,9 +94,9 @@ if (
             (user_id, amount, date, type, txn_id, status)
             VALUES
             ('$user_id', '$amountPaid', '$current_time_in_ist', 'Paystack Recharge', '$txn_id', '1')");
+
+        mysqli_query($conn, "UPDATE user_data SET balance = balance + $amountPaid WHERE id = '$user_id'");
     }
-
-
 
 
 

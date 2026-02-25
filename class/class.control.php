@@ -18,7 +18,7 @@ class radiumsahil
 
     public function get_token()
     {
-        return $_SESSION['token'];
+        return $_SESSION['auth_token'];
     }
     public function check_token($token)
     {

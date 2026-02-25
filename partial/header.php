@@ -8,7 +8,6 @@
   <meta name="description" content="" Discover the power of seamless communication with our virtual number service! Enhance your business's accessibility and professionalism with virtual numbers that effortlessly connect you with clients worldwide. Our user-friendly platform ensures easy setup and management, empowering you to streamline communication and boost productivity. Explore our range of customizable virtual number solutions today and elevate your business's presence online!">
   <meta name="keywords" content="Virtual numbers, Virtual phone numbers, Virtual telephony, Virtual communication solutions">
   <meta name="author" content="Foreign sms">
-  <link rel="icon" href="./images/logo-png.png" type="image/x-icon">
-  <link rel="shortcut icon" href="./images/logo-png.png" type="image/x-icon">
+  <link rel="shortcut icon" href="/images/logo-png.png" type="image/x-icon">
   <title><?php echo $page_title; ?></title>
   <?php include('style.php'); ?>
