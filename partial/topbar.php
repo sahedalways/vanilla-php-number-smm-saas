@@ -38,22 +38,7 @@
                     </div>
                 </li>
 
-                <li class="onhover-dropdown">
-                    <div class="notification-box">
-                        <svg>
-                            <use href="assets/svg/icon-sprite.svg#notification"></use>
-                        </svg><span class="badge rounded-pill badge-secondary">0</span>
-                    </div>
-                    <div class="onhover-show-div notification-dropdown">
-                        <h6 class="f-18 mb-0 dropdown-title">Notitications </h6>
-                        <ul>
-                            <li class="b-l-primary border-4">
-                                <p>Design By Getallscripts <span class="font-danger"></span></p>
-                            </li>
 
-                        </ul>
-                    </div>
-                </li>
                 <?php
                 if ($userdata['image_url'] == "") {
                     $img_url = 'https://Foreign sms.com/images/dpt1.png';
@@ -64,15 +49,12 @@
                 ?>
                 <li class="profile-nav onhover-dropdown pe-0 py-0">
                     <div class="media profile-media">
-                        <div class="avatar"><img class="img-40 rounded-circle" id="profile-imgs" src="<?php echo $img_url; ?>" width="40" height="40" alt="#"></div>
+                        <div class="avatar"><img class="img-40 rounded-circle" id="profile-imgs" src="https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_user_personalization&w=740&q=80" width="40" height="40" alt="#"></div>
                         <div class="media-body"><span><?php echo $userdata['name']; ?></span>
                             <p class="mb-0 font-roboto"><?php echo $userdata['type']; ?><i class="middle fa fa-angle-down"></i></p>
                         </div>
                     </div>
-                    <ul class="profile-dropdown onhover-show-div">
-                        <li><a href="profile"><i data-feather="user"></i><span>Account </span></a></li>
-                        <li><a href="logout"><i data-feather="log-in"> </i><span>Log Out</span></a></li>
-                    </ul>
+
                 </li>
             </ul>
         </div>

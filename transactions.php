@@ -22,7 +22,9 @@ $userwallet = $wallet->userwallet();
 $transactions = $wallet->transaction_history();
 
 $wallet->closeConnection();
-// include 'theam/' . THEAM . '/transactions.php';
+
+
+$userType = $_SESSION['type'];
 ?>
 <?php
 $page_title = "Recharge History - " . $site_data['web_name'];

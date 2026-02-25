@@ -68,7 +68,7 @@ $dashboardURL = ($_SESSION['type'] === 'reseller')
         <p class="text-muted">Thank you, <strong><?= htmlspecialchars($userName) ?></strong>! Your payment has been processed.</p>
 
         <div class="d-flex justify-content-center gap-3 mt-4">
-            <a href="<?= $dashboardURL ?>" class="btn btn-success btn-custom">Go to Dashboard</a>
+            <a href="dashboard" class="btn btn-success btn-custom">Go to Dashboard</a>
             <a href="/recharge" class="btn btn-primary btn-custom">Deposit More</a>
         </div>
     </div>

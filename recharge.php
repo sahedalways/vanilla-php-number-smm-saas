@@ -18,7 +18,7 @@ $referwallet = $wallet->refer_data();
 
 
 $wallet->closeConnection();
-
+$userType = $_SESSION['type'];
 ?>
 <?php
 $page_title = "Recharge - " . $site_data['web_name'];
