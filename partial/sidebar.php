@@ -88,16 +88,13 @@ authOnly();
               </svg><span>Dashboard</span></a>
           </li>
 
-
           <?php if ($userType === 'reseller'): ?>
 
             <li class="sidebar-list">
               <a class="sidebar-link sidebar-title link-nav" href="/views/reseller/services/smm/manage">
-                <svg class="stroke-icon">
-                  <use href="assets/svg/icon-sprite.svg#stroke-home"></use>
-                </svg>
-                <svg class="fill-icon">
-                  <use href="assets/svg/icon-sprite.svg#fill-home"></use>
+                <!-- SMM icon -->
+                <svg class="stroke-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 4h16v16H4z"></path> <!-- Replace with your SMM path -->
                 </svg>
                 <span>Manage SMM Services</span>
               </a>
@@ -105,11 +102,9 @@ authOnly();
 
             <li class="sidebar-list">
               <a class="sidebar-link sidebar-title link-nav" href="/views/reseller/services/sms/manage">
-                <svg class="stroke-icon">
-                  <use href="assets/svg/icon-sprite.svg#stroke-home"></use>
-                </svg>
-                <svg class="fill-icon">
-                  <use href="assets/svg/icon-sprite.svg#fill-home"></use>
+                <!-- SMS icon -->
+                <svg class="stroke-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 2H2v20l4-4h16V2z"></path>
                 </svg>
                 <span>Manage SMS Services</span>
               </a>
@@ -119,25 +114,21 @@ authOnly();
 
             <li class="sidebar-list">
               <a class="sidebar-link sidebar-title link-nav" href="/views/customer/services/smm/manage">
-                <svg class="stroke-icon">
-                  <use href="assets/svg/icon-sprite.svg#stroke-home"></use>
+                <!-- SMM icon -->
+                <svg class="stroke-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 4h16v16H4z"></path>
                 </svg>
-                <svg class="fill-icon">
-                  <use href="assets/svg/icon-sprite.svg#fill-home"></use>
-                </svg>
-                <span> SMM Services</span>
+                <span>SMM Services</span>
               </a>
             </li>
 
             <li class="sidebar-list">
               <a class="sidebar-link sidebar-title link-nav" href="/views/customer/services/sms/list">
-                <svg class="stroke-icon">
-                  <use href="assets/svg/icon-sprite.svg#stroke-home"></use>
+                <!-- SMS icon -->
+                <svg class="stroke-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 2H2v20l4-4h16V2z"></path>
                 </svg>
-                <svg class="fill-icon">
-                  <use href="assets/svg/icon-sprite.svg#fill-home"></use>
-                </svg>
-                <span> SMS Services</span>
+                <span>SMS Services</span>
               </a>
             </li>
 
