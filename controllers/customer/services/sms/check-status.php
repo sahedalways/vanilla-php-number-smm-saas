@@ -94,7 +94,7 @@ try {
         $expiryUpdate = date('Y-m-d H:i:s');
     }
 
-    // Prepare query dynamically
+
     if ($expiryUpdate) {
         $updateStmt = $conn->prepare("
         UPDATE sms_orders

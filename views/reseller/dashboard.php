@@ -179,11 +179,22 @@ $stmt->close();
                         <div class="icon-box text-white mb-2">
                             <i class="fa-solid fa-sms"></i>
                         </div>
-                        <div class="text-white">Manage SMS Services</div>
+                        <div class="text-white"> SMS Services</div>
                     </div>
                 </a>
             </div>
 
+
+            <div class="col-md-4 text-center">
+                <a href="/views/reseller/services/sms/profit/manage" class="text-decoration-none">
+                    <div class="service-card p-3 bg-gradient rounded shadow-sm">
+                        <div class="icon-box text-white mb-2">
+                            <i class="fa-solid fa-percent fa-2x"></i>
+                        </div>
+                        <div class="text-white">Manage SMS Profit</div>
+                    </div>
+                </a>
+            </div>
 
 
 

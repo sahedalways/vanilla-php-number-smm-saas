@@ -8,7 +8,7 @@ $userId = $_SESSION['user_id'] ?? null;
 
 // Fetch orders from sms_orders
 $stmt = $conn->prepare("
-    SELECT o.id, o.service_id, o.user_id, o.reseller_id, o.cost, o.admin_profit, o.reseller_profit,o.order_id,o.otp,
+    SELECT o.id,o.order_id, o.user_id, o.reseller_id, o.cost, o.admin_profit, o.reseller_profit,o.order_id,o.otp,
            o.country, o.operator, o.phone_no, o.service, o.expiry_time, o.status, o.created_at, o.updated_at
     FROM sms_orders o
     WHERE o.user_id = ?
@@ -129,14 +129,6 @@ $csrf_token = $_SESSION['csrf_token'];
     $active = 'orders';
     include __DIR__ . '/../../components/bottom-nav.php';
     ?>
-
-
-
-
-
-
-
-
 
 
 

@@ -114,7 +114,7 @@ unset($_SESSION['success_msg'], $_SESSION['error_msg']);
                         </div>
                         <div class="fw-semibold small">SMS Services</div>
                         <div class="text-secondary" style="font-size: 0.65rem;">
-                            View & manage SMS
+                            View SMS
                         </div>
                     </div>
                 </a>

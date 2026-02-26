@@ -22,167 +22,209 @@ if ($csrf_token !== ($_SESSION['csrf_token'] ?? '')) {
 }
 
 
-$serviceId = intval($_POST['service_id'] ?? 0);
-$country   = trim($_POST['country'] ?? '');
-$operator  = trim($_POST['operator'] ?? 'any');
-$product   = trim($_POST['product'] ?? '');
-$price     = floatval($_POST['price'] ?? 0);
+$country  = strtolower(trim($_POST['country'] ?? ''));
+$operator = strtolower(trim($_POST['operator'] ?? 'any'));
+$product  = strtolower(trim($_POST['product'] ?? ''));
+$price    = floatval($_POST['price'] ?? 0);
 
-if (!$serviceId || !$country || !$product || $price <= 0) {
-    echo json_encode(['status' => 'error', 'message' => 'Invalid service data.']);
+
+if (empty($country)) {
+    echo json_encode(['status' => 'error', 'message' => 'Country is required.']);
     exit;
 }
 
-
-$stmt = $conn->prepare("
-    SELECT id, service_code, country, operator, provider_cost, admin_profit, base_price, count, rate, created_at
-    FROM sms_provider_services
-    WHERE id = ?
-");
-$stmt->bind_param("i", $serviceId);
-$stmt->execute();
-$res = $stmt->get_result();
-$service = $res->fetch_assoc();
-$stmt->close();
-
-if (!$service) {
-    echo json_encode(['status' => 'error', 'message' => 'Service not found.']);
+if (empty($product)) {
+    echo json_encode(['status' => 'error', 'message' => 'Product is required.']);
     exit;
 }
 
-
-
-$basePrice = floatval($service['base_price']);
-$apiCost = floatval($service['provider_cost']);
-
-
-$totalPriceUSD = nairaToUsd($price);
-$apiBalanceObj = $api->getBalance();
-$apiBalance = floatval($apiBalanceObj['balance'] ?? 0);
-
-if ($totalPriceUSD > $apiBalance) {
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'An error occurred, please try again later.'
-    ]);
+if ($price <= 0) {
+    echo json_encode(['status' => 'error', 'message' => 'Invalid price.']);
     exit;
 }
 
+if (!$userId) {
+    echo json_encode(['status' => 'error', 'message' => 'Unauthorized user.']);
+    exit;
+}
 
-$stmt = $conn->prepare("SELECT balance FROM user_data WHERE id = ?");
-$stmt->bind_param("i", $userId);
-$stmt->execute();
-$res = $stmt->get_result();
-$user = $res->fetch_assoc();
-$stmt->close();
+$userRow = $conn->query("
+    SELECT balance
+    FROM user_data
+    WHERE id = {$userId}
+    LIMIT 1
+")->fetch_assoc();
 
-$userBalance = floatval($user['balance'] ?? 0);
-if ($price > $userBalance) {
+if (!$userRow) {
+    echo json_encode(['status' => 'error', 'message' => 'User not found.']);
+    exit;
+}
+
+$userBalance = floatval($userRow['balance'] ?? 0);
+
+
+if ($userBalance < $price) {
     echo json_encode(['status' => 'error', 'message' => 'Insufficient balance.']);
     exit;
 }
 
 
-$order = $api->buyNumber($country, $operator, $product);
 
-// Check if order returned correctly
-if (!$order || !isset($order['id'], $order['phone'])) {
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Failed to buy number. Please try again.'
-    ]);
-    exit;
+
+$profitRow = $conn->query("SELECT profit_percentage FROM profit_settings ORDER BY id DESC LIMIT 1")->fetch_assoc();
+$adminProfitPercent = floatval($profitRow['profit_percentage'] ?? 0);
+
+
+$resellerRow = $conn->query("
+    SELECT r.profit_percentage AS reseller_profit_percentage, rc.reseller_id
+    FROM reseller_customers rc
+    JOIN reseller_sms_profit_settings r
+        ON rc.reseller_id = r.user_id
+    WHERE rc.customer_id = {$userId}
+    ORDER BY r.id DESC
+    LIMIT 1
+")->fetch_assoc();
+
+$resellerProfitPercent = floatval($resellerRow['profit_percentage'] ?? 0);
+
+
+$adminMultiplier = 1 + ($adminProfitPercent / 100);
+$resellerMultiplier = 1 + ($resellerProfitPercent / 100);
+
+$totalMultiplier = $adminMultiplier * $resellerMultiplier;
+
+$basePrice = $price;
+
+if ($totalMultiplier > 0) {
+    $basePrice = $price / $totalMultiplier;
 }
 
 
-$resellerId = null;
-$stmt = $conn->prepare("SELECT reseller_id FROM reseller_customers WHERE customer_id = ?");
-$stmt->bind_param("i", $userId);
-$stmt->execute();
-$res = $stmt->get_result();
-if ($row = $res->fetch_assoc()) {
-    $resellerId = $row['reseller_id'];
-}
-$stmt->close();
+$adminProfit = round($basePrice * ($adminProfitPercent / 100), 2);
+$resellerProfit = round(($basePrice + $adminProfit) * ($resellerProfitPercent / 100), 2);
+
+$basePrice = round($basePrice, 4);
+$basePrice = nairaToUsd($basePrice);
+
+
+// $isApiBalanceAvailable = $api->getBalance();
+
+// $frozenBalance = floatval($isApiBalanceAvailable['data']['frozen_balance'] ?? 0);
+// $availableBalance = $apiBalance - $frozenBalance;
 
 
 
-
-// Calculate profit
-$adminProfit = 0;
-$resellerProfit = 0;
-
-if ($resellerId) {
-    // Reseller customer: calculate profits
-    $stmt = $conn->prepare("SELECT reseller_price FROM reseller_sms_services_prices WHERE reseller_id = ? AND service_id = ?");
-    $stmt->bind_param("ii", $resellerId, $serviceId);
-    $stmt->execute();
-    $res = $stmt->get_result();
-    $resellerPriceRow = $res->fetch_assoc();
-    $stmt->close();
-
-    $resellerPrice = floatval($resellerPriceRow['reseller_price'] ?? $basePrice);
+// echo json_encode([
+//     'status' => 'error',
+//     'message' => $isApiBalanceAvailable
+// ]);
+// exit;
 
 
-    $adminProfit = $basePrice - $apiCost;
-    $resellerProfit = max(0, $resellerPrice - $basePrice);
-} else {
-    $adminProfit = ($basePrice - $apiCost) * $quantity;
-    $resellerProfit = 0;
-}
+// $buyData = $api->buyNumber($country, $operator, $product);
 
 
 
-// Prepare order data for insertion
-$phoneNo   = $order['phone'] ?? null;
-$serviceName = $product;
-$expiryTime = date('Y-m-d H:i:s', strtotime('+5 minutes'));
-$status      = $order['status'] ?? 'PENDING';
-$cost        = $price;
+// if (!$buyData) {
+//     echo json_encode([
+//         'status' => 'error',
+//         'message' => 'Failed to purchase number',
+//     ]);
+//     exit;
+// }
+
+
+// // Send response to frontend
+// echo json_encode([
+//     'status' => 'success',
+//     'message' => 'Number purchased successfully',
+//     'data' => $buyData
+// ]);
+// exit;
+
+$resellerId = $resellerRow['reseller_id'] ?? null;
+
+$buyData = [
+    'id' => 12345678,
+    'phone' => '+447350690992',
+    'operator' => 'vodafone',
+    'product' => 'facebook',
+    'price' => 21.00,
+    'status' => 'PENDING',
+    'country' => 'england',
+    'sms' => null,
+    'forwarding' => false,
+    'forwarding_number' => '',
+    'created_at' => '2026-02-26T09:00:00Z'
+];
+
+
+
+$otp = '';
+
+$orderId = $buyData['id'] ?? null;
+$phoneNo = $buyData['phone'] ?? null;
+$operatorName = $buyData['operator'] ?? $operator;
+$productName = $buyData['product'] ?? $product;
+$price = $price ?? 0;
+$status = $buyData['status'] ?? 'PENDING';
+$expiryTime = date('Y-m-d H:i:s', strtotime('+10 minutes')) ?? null;
+$countryName = $buyData['country'] ?? $country;
+$createdAt = isset($buyData['created_at']) ? date('Y-m-d H:i:s', strtotime($buyData['created_at'])) : date('Y-m-d H:i:s');
+
 $stmt = $conn->prepare("
-    INSERT INTO sms_orders (
-        service_id, user_id, reseller_id,
-        cost, admin_profit, reseller_profit,
-        country, operator, phone_no, service,
-        expiry_time, status, order_id
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO sms_orders
+    (order_id, user_id, reseller_id, cost, admin_profit, reseller_profit, country, operator, phone_no, otp, service, expiry_time, status, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ");
 
+
 $stmt->bind_param(
-    "iiidddsssssss",
-    $serviceId,
+    "siidddssssssss",
+    $orderId,
     $userId,
     $resellerId,
-    $cost,
+    $price,
     $adminProfit,
     $resellerProfit,
-    $country,
-    $operator,
+    $countryName,
+    $operatorName,
     $phoneNo,
-    $serviceName,
+    $otp,
+    $productName,
     $expiryTime,
     $status,
-    $order['id']
+    $createdAt
 );
 
 if ($stmt->execute()) {
-    $orderId = $stmt->insert_id;
+    $updateBalanceStmt = $conn->prepare("
+        UPDATE user_data
+        SET balance = balance - ?
+        WHERE id = ? AND balance >= ?
+    ");
 
-    // Deduct user balance
-    $stmt = $conn->prepare("UPDATE user_data SET balance = balance - ? WHERE id = ?");
-    $stmt->bind_param("di", $cost, $userId);
-    $stmt->execute();
-    $stmt->close();
+    $updateBalanceStmt->bind_param("dii", $price, $userId, $price);
 
-    echo json_encode([
-        'status' => 'success',
-        'message' => 'Order placed successfully.',
-        'order_id' => $orderId,
-        'phone' => $phoneNo
-    ]);
+    if ($updateBalanceStmt->execute()) {
+        echo json_encode([
+            'status' => 'success',
+            'message' => 'SMS order placed successfully.',
+            'order_id' => $orderId
+        ]);
+    } else {
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Order inserted but failed to deduct balance: ' . $updateBalanceStmt->error
+        ]);
+    }
+
+    $updateBalanceStmt->close();
 } else {
     echo json_encode([
         'status' => 'error',
-        'message' => 'Failed to save order: ' . $stmt->error
+        'message' => 'Failed to SMS order: ' . $stmt->error
     ]);
 }
+
+$stmt->close();

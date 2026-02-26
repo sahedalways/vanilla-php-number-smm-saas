@@ -17,9 +17,7 @@ if (empty($_SESSION['csrf_token'])) {
 }
 $csrf_token = $_SESSION['csrf_token'];
 
-// Fetch SMS services for reseller
-$servicesQuery = $conn->query("SELECT * FROM sms_provider_services ORDER BY country, service_code, operator");
-$services = $servicesQuery->fetch_all(MYSQLI_ASSOC);
+
 ?>
 
 <!DOCTYPE html>
@@ -28,7 +26,7 @@ $services = $servicesQuery->fetch_all(MYSQLI_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage SMS Services | Reseller</title>
+    <title>SMS Services | Reseller</title>
     <link rel="shortcut icon" href="/images/logo-png.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -43,136 +41,97 @@ $services = $servicesQuery->fetch_all(MYSQLI_ASSOC);
 <body>
     <div class="container mt-4">
         <?php include __DIR__ . '/../../components/header.php'; ?>
-        <h4 class="mb-4">Manage SMS Services</h4>
+
         <input type="hidden" id="csrf_token" value="<?php echo $csrf_token; ?>">
         <!-- Filter Section -->
-        <div class="row mb-3 g-2">
-            <div class="col-md-3">
-                <select id="filterCountry" class="form-select">
-                    <option value="">All Countries</option>
-                    <?php
-                    $countries = array_unique(array_column($services, 'country'));
-                    foreach ($countries as $c): ?>
-                        <option value="<?= htmlspecialchars($c) ?>"><?= htmlspecialchars(ucfirst($c)) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <select id="filterOperator" class="form-select">
-                    <option value="">All Operators</option>
-                    <?php
-                    $operators = array_unique(array_column($services, 'operator'));
-                    foreach ($operators as $o): ?>
-                        <option value="<?= htmlspecialchars($o) ?>"><?= htmlspecialchars($o) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <select id="filterService" class="form-select">
-                    <option value="">All Services</option>
-                    <?php
-                    $serviceCodes = array_unique(array_column($services, 'service_code'));
-                    foreach ($serviceCodes as $sc): ?>
-                        <option value="<?= htmlspecialchars($sc) ?>"><?= htmlspecialchars($sc) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <button id="resetFilters" class="btn btn-secondary w-100">Reset Filters</button>
-            </div>
-        </div>
 
-        <!-- Services Table -->
-        <div class="table-responsive">
-            <table class="table table-striped table-bordered align-middle" id="smsServicesTable">
-                <thead class="table-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Country</th>
-                        <th>Service Code</th>
-                        <th>Operator</th>
-                        <th>Base Price</th>
-                        <th>Selling Price</th>
-                        <th>Count</th>
+        <div class="container mt-4">
 
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($services as $s): ?>
+            <input type="hidden" id="userBalance" value="<?= $balance ?? 0 ?>">
+
+
+            <h4 class="mb-4"> SMS Services</h4>
+            <input type="hidden" id="csrf_token" value="<?php echo $csrf_token; ?>">
+            <!-- Filter Section -->
+            <div class="row mb-3 g-2 justify-content-center align-items-center">
+                <div class="col-md-3">
+                    <select id="filterCountry" class="form-select">
+                        <option value="" disabled selected>Select a Country</option>
+                        <option value="any">Any</option>
                         <?php
-                        $stmt = $conn->prepare("SELECT reseller_price FROM reseller_sms_services_prices WHERE reseller_id = ? AND service_id = ?");
-                        $stmt->bind_param("ii", $userId, $s['id']);
-                        $stmt->execute();
-                        $stmt->bind_result($reseller_price);
-                        $stmt->fetch();
-                        $stmt->close();
-
-                        // Use reseller price if exists, else use base price
-                        $selling_price = $reseller_price ? $reseller_price : $s['base_price'];
-                        ?>
-
-                        <tr data-country="<?= htmlspecialchars($s['country']) ?>"
-                            data-operator="<?= htmlspecialchars($s['operator']) ?>"
-                            data-service="<?= htmlspecialchars($s['service_code']) ?>">
-                            <td><?= $s['id'] ?></td>
-                            <td><?= htmlspecialchars($s['country']) ?></td>
-                            <td><?= htmlspecialchars($s['service_code']) ?></td>
-                            <td><?= htmlspecialchars($s['operator']) ?></td>
-
-
-                            <td>₦ <?= number_format($s['base_price'], 2) ?></td>
-                            <td>₦ <?= number_format($selling_price, 2) ?></td>
-                            <td><?= $s['count'] ?></td>
-
-                            <td>
-                                <button class="btn btn-sm btn-success editPriceBtn"
-                                    data-service-id="<?= $s['id'] ?>"
-                                    data-selling-price="<?= $selling_price ?>"
-                                    data-base-price="<?= $s['base_price'] ?>">
-                                    <i class="fa-solid fa-pen-to-square"></i> Set Price
-                                </button>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Edit Price Modal -->
-    <div class="modal fade" id="customPriceModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title text-success">Edit Reseller Price</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        include __DIR__ . '/../../../../utils/countries.php';
+                        foreach ($countries as $name => $slug): ?>
+                            <option value="<?= htmlspecialchars($slug) ?>">
+                                <?= htmlspecialchars($name) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
-                <div class="modal-body">
-                    <input type="hidden" id="modalServiceId">
-                    <div class="mb-3">
-                        <label class="text-dark">Base Price</label>
-                        <input type="text" id="modalBasePrice" class="form-control" readonly>
+
+                <div class="col-md-3">
+                    <select id="filterOperator" class="form-select">
+                        <option value="" disabled selected>Select a Operator</option>
+                        <option value="any">Any</option>
+                        <?php
+                        include __DIR__ . '/../../../../utils/operators.php';
+                        foreach ($operators as $name => $value): ?>
+                            <option value="<?= htmlspecialchars($value) ?>"><?= htmlspecialchars($name) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <button id="searchFilters" class="btn btn-primary w-100">Search</button>
+                </div>
+
+                <div class="col-md-3">
+                    <button id="resetFilters" class="btn btn-secondary w-100">Reset Filters</button>
+                </div>
+            </div>
+
+            <!-- Services Table -->
+            <div class="table-responsive">
+                <div class="container mt-4">
+
+                    <!-- Section Title -->
+                    <div id="servicesSection" class="d-none">
+                        <div class="d-flex align-items-center mb-4" style="animation: fadeIn 0.8s ease-out;">
+                            <div style="width: 5px; height: 30px; background: #0d6efd; border-radius: 10px; margin-right: 15px;"></div>
+                            <h4 class="mb-0" style="font-weight: 800; color: #1f2020; letter-spacing: -0.5px;">
+                                Available SMS Services
+                            </h4>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="text-dark">Selling Price</label>
-                        <input type="number" min="0" step="0.01" id="modalResellerPrice" class="form-control">
+
+                    <div id="initialPlaceholder" class="text-center text-muted my-5">
+                        Search for SMS services to see results.
                     </div>
-                    <div id="modalPriceError" class="text-danger small"></div>
+
+                    <div id="buyError" class="text-danger small mt-2 d-flex align-items-center" style="font-weight: 500;"></div>
+
+
+
+                    <div id="filterLoader" class="text-center my-3 d-none">
+                        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <div class="mt-2">Loading services...</div>
+                    </div>
+
+
+                    <div id="servicesContainer" class="row g-3 mt-3">
+                        <!-- Cards will be injected here dynamically -->
+                    </div>
+
                 </div>
 
-                <div class="modal-footer border-0 p-4 pt-0">
-                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" id="savePriceBtn" class="btn btn-success btn-create px-5">
-                        <span class="btn-text"><i class="bi bi-check-circle me-2"></i>Set</span>
-                        <span class="spinner-border spinner-border-sm ms-2 d-none" role="status"></span>
-                    </button>
-                </div>
 
 
             </div>
         </div>
     </div>
+
+
 
 
     <?php
@@ -182,125 +141,101 @@ $services = $servicesQuery->fetch_all(MYSQLI_ASSOC);
 
 
     <script>
-        // Filter Table
-        function filterTable() {
+        function fetchFilteredServices() {
             let country = $('#filterCountry').val();
             let operator = $('#filterOperator').val();
-            let service = $('#filterService').val();
+            selectedCountry = country;
+            $('#initialPlaceholder').addClass('d-none');
 
-            $('#smsServicesTable tbody tr').each(function() {
-                let show = true;
-                if (country && $(this).data('country') !== country) show = false;
-                if (operator && $(this).data('operator') !== operator) show = false;
-                if (service && $(this).data('service') !== service) show = false;
-                $(this).toggle(show);
+            $.ajax({
+                url: '/controllers/reseller/services/sms/get-numbers',
+                method: 'GET',
+                data: {
+                    country: country,
+                    operator: operator,
+                    csrf_token: $('#csrf_token').val(),
+                },
+                dataType: 'json',
+                beforeSend: function() {
+                    $('#filterLoader').removeClass('d-none');
+                    $('#servicesContainer').empty();
+                },
+
+                success: function(res) {
+                    $('#filterLoader').addClass('d-none');
+                    let $container = $('#servicesContainer');
+                    $container.empty();
+                    $('#initialPlaceholder').addClass('d-none');
+                    $('#servicesSection').removeClass('d-none');
+
+                    if (res.success && res.data && Object.keys(res.data).length > 0) {
+                        Object.entries(res.data).forEach(([serviceCode, serviceData]) => {
+                            let $card = $(`
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 border-0 shadow-lg service-card"
+                         style="border-radius: 20px; transition: transform 0.3s ease, box-shadow 0.3s ease; background: #ffffff;">
+
+                        <div class="card-header border-0 p-4" style="background-color: #001f3f; border-radius: 20px 20px 0 0;">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <small class="text-white-50 d-block mb-1 text-uppercase fw-bold" style="font-size: 10px; letter-spacing: 1px;">Operator</small>
+                                    <h6 class="text-white fw-bold mb-0">${serviceCode}</h6>
+                                </div>
+                                <span class="badge bg-light text-dark fw-bold" style="font-size: 11px; border-radius: 8px; padding: 6px 12px;">
+                                    ${serviceData.Category}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="card-body p-4">
+                            <div class="row text-center mb-4">
+                                <div class="col-6 border-end">
+                                    <p class="text-muted mb-0" style="font-size: 12px;">Available Qty</p>
+                                    <h5 class="fw-bold mb-0 text-dark">${serviceData.Qty}</h5>
+                                </div>
+                              <div class="col-6">
+                            <p class="text-muted mb-0" style="font-size: 12px;">Unit Price</p>
+                            <h5 class="fw-bold mb-0 text-primary">₦${parseFloat(serviceData.PriceWithProfit).toLocaleString()}</h5>
+                            <p class="text-muted mb-0" style="font-size: 11px;">Your Profit: ₦${parseFloat(serviceData.reseller_profit).toLocaleString()}</p>
+                        </div>
+                            </div>
+
+
+
+
+                        </div>
+                    </div>
+                </div>
+            `);
+                            $container.append($card);
+                        });
+                    } else {
+                        $('#servicesSection').addClass('d-none');
+                        $('#initialPlaceholder').addClass('d-none');
+
+                        $container.html(
+                            '<div class="col-12 text-center py-5"><div class="p-5 bg-light rounded-4"><i class="fas fa-search fa-3x text-muted mb-3"></i><h5 class="text-muted">No services found</h5></div></div>'
+                        );
+                    }
+                },
+
+                error: function() {
+                    $('#filterLoader').addClass('d-none');
+
+                    console.error('API call failed');
+                },
             });
         }
 
-        $('#filterCountry, #filterOperator, #filterService').on('change', filterTable);
+        // Search button click
+        $('#searchFilters').on('click', fetchFilteredServices);
+
+        // Reset button click
         $('#resetFilters').on('click', function() {
-            $('#filterCountry, #filterOperator, #filterService').val('');
-            filterTable();
-        });
-
-
-        // Edit Price Modal
-        $('.editPriceBtn').on('click', function() {
-            let row = $(this).closest('tr');
-
-            const serviceId = this.dataset.serviceId;
-
-            const basePrice = parseFloat(this.dataset.basePrice);
-            const sellingPrice = parseFloat(this.dataset.sellingPrice);
-            const resellerPrice = parseFloat(this.dataset.resellerPrice);
-
-            $('#modalServiceId').val(serviceId);
-            $('#modalBasePrice').val('₦ ' + basePrice.toFixed(2));
-            $('#modalResellerPrice').val(sellingPrice.toFixed(2));
-            $('#modalPriceError').text('');
-
-            $('#customPriceModal').modal('show');
-        });
-
-        // Save Custom Price
-        $('#savePriceBtn').on('click', function() {
-            const btn = this;
-            const spinner = $(btn).find('.spinner-border')[0];
-            const btnText = $(btn).find('.btn-text')[0];
-            const errorEl = $('#modalPriceError');
-
-            let serviceId = $('#modalServiceId').val();
-            let newPrice = parseFloat($('#modalResellerPrice').val());
-            let basePrice = parseFloat($('#modalBasePrice').val().replace(/[^0-9.-]+/g, ""));
-            const csrfToken = $('#csrf_token').val();
-
-            // Validation
-            if (isNaN(newPrice) || newPrice <= 0) {
-                errorEl.text('Please enter a valid price.');
-                return;
-            }
-            if (newPrice < basePrice) {
-                errorEl.text('Selling price cannot be less than base price.');
-                return;
-            }
-            errorEl.text('');
-
-            // Disable button and show spinner
-            btn.disabled = true;
-            if (btnText) btnText.innerHTML = 'Saving...';
-            if (spinner) spinner.classList.remove('d-none');
-            console.log({
-                serviceId,
-                newPrice,
-                csrfToken
-            });
-            $.ajax({
-                url: '/controllers/reseller/services/sms/set-custom-price',
-                method: 'POST',
-                data: {
-                    service_id: serviceId,
-                    custom_price: newPrice,
-                    csrf_token: csrfToken
-                },
-                dataType: 'json',
-                success: function(res) {
-                    btn.disabled = false;
-                    if (btnText) btnText.innerHTML = '<i class="bi bi-check-circle me-2"></i>Set';
-                    if (spinner) spinner.classList.add('d-none');
-
-                    if (res.status === 'success') {
-                        Toastify({
-                            text: res.message,
-                            duration: 4000,
-                            gravity: 'top',
-                            position: 'right',
-                            backgroundColor: 'linear-gradient(to right, #00b09b, #96c93d)',
-                        }).showToast();
-
-                        // Close modal
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('customPriceModal'));
-                        if (modal) modal.hide();
-
-                        // Update table dynamically
-                        const row = $('#smsServicesTable tbody tr').filter(function() {
-                            return $(this).data('id') == serviceId;
-                        });
-                        row.find('td:eq(6)').text('₦ ' + newPrice.toFixed(2));
-
-                        setTimeout(() => {
-                            location.reload();
-                        }, 500);
-
-                    } else {
-                        errorEl.text(res.message || 'Something went wrong.');
-                    }
-                },
-                error: function() {
-                    btn.disabled = false;
-                    if (btnText) btnText.innerHTML = '<i class="bi bi-check-circle me-2"></i>Set';
-                    if (spinner) spinner.classList.add('d-none');
-                    errorEl.text('Something went wrong.');
-                }
-            });
+            $('#filterCountry, #filterOperator').val('');
+            $('.service-card').show();
+            $('#servicesContainer').empty();
+            $('#initialPlaceholder').removeClass('d-none');
+            $('#servicesSection').addClass('d-none');
         });
     </script>
