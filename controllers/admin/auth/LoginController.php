@@ -1,10 +1,10 @@
-
 <?php
+
 session_start();
 header('Content-Type: application/json');
-
-include 'include/config.php';
 require_once __DIR__ . '/../../../helpers/session.php';
+include 'include/config.php';
+
 
 // get POST data
 $email = $_POST['email'] ?? '';
@@ -24,7 +24,7 @@ if (!$email || !$password) {
 }
 
 // fetch user from database
-$stmt = $conn->prepare("SELECT id, name, email, phone, type, password FROM user_data WHERE email = ?");
+$stmt = $conn->prepare("SELECT id, name, email, phone, type,balance, password FROM user_data WHERE email = ?");
 $stmt->bind_param("s", $email);
 $stmt->execute();
 $result = $stmt->get_result();

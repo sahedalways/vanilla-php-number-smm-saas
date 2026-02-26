@@ -229,6 +229,15 @@ $('#confirmPurchaseBtn').on('click', function () {
             btn.disabled = false;
             btnText.innerHTML = '<i class="fa-solid fa-circle-check me-1"></i> Confirm & Buy';
             spinner.classList.add('d-none');
+
+            Toastify({
+                text: 'Something went wrong',
+                duration: 4000,
+                gravity: 'top',
+                position: 'right',
+                backgroundColor: 'linear-gradient(to right, #ff5f6d, #ffc371)',
+            }).showToast();
+
             errorEl.textContent = 'Something went wrong';
         },
     });

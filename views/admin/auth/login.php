@@ -74,7 +74,7 @@ $page_title = "Login - " . $site_data['web_name'];
     <div class="login-container">
         <div class="text-center">
             <div class="text-center px-4 py-5 bg-light shadow-sm rounded" style="max-width: 400px; margin: 40px auto;">
-                <img src="<?php echo $WEBSITE_URL; ?>/images/logo-png.png"
+                <img src="/images/logo-png.png"
                     alt="Logo"
                     class="brand-logo"
                     style="width: 100px; height: auto; display: block; margin: 0 auto 0px auto;">

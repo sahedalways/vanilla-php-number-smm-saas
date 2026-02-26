@@ -1,15 +1,14 @@
-
-
-
 <?php
 
+session_start();
+header('Content-Type: application/json');
 require_once __DIR__ . '/../../../../helpers/session.php';
 require_once __DIR__ . '/../../../../helpers/currency_helper.php';
 require_once __DIR__ . '/../../../../include/config.php';
 require_once __DIR__ . '/../../../../class/FiveSimApi.php';
 
+
 $api = new FiveSimApi();
-header('Content-Type: application/json');
 authOnly();
 
 $userId = $_SESSION['user_id'] ?? 0;
@@ -85,7 +84,11 @@ $resellerRow = $conn->query("
     LIMIT 1
 ")->fetch_assoc();
 
-$resellerProfitPercent = floatval($resellerRow['profit_percentage'] ?? 0);
+$resellerProfitPercent = 0;
+if ($resellerRow) {
+    $resellerProfitPercent = floatval($resellerRow['reseller_profit_percentage'] ?? 0);
+}
+
 
 
 $adminMultiplier = 1 + ($adminProfitPercent / 100);
@@ -105,6 +108,7 @@ $resellerProfit = round(($basePrice + $adminProfit) * ($resellerProfitPercent / 
 
 $basePrice = round($basePrice, 4);
 $basePrice = nairaToUsd($basePrice);
+
 
 
 // $isApiBalanceAvailable = $api->getBalance();

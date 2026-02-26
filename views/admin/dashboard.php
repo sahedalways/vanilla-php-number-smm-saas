@@ -72,9 +72,6 @@ $stmt->execute();
 $yearlyRevenue = $stmt->get_result()->fetch_assoc()['total'] ?? 0;
 $stmt->close();
 
-
-// Total combined
-$totalServices = $servicesCount + $smsServicesCount;
 ?>
 
 <!DOCTYPE html>
@@ -122,7 +119,7 @@ $totalServices = $servicesCount + $smsServicesCount;
                 <div class="card text-center p-3">
                     <i class="fa-solid fa-cogs text-warning fa-2x mb-2"></i>
                     <h6>Total Services</h6>
-                    <h4><?= $totalServices ?></h4>
+                    <h4>2</h4>
                 </div>
             </div>
 

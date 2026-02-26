@@ -23,6 +23,7 @@ $stmt->close();
 <head>
     <meta charset="UTF-8">
     <title>Admin | All SMM Services</title>
+    <link rel="shortcut icon" href="/images/logo-png.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/admin_dashboard.css">
@@ -34,6 +35,21 @@ $stmt->close();
 
         <h4 class="mb-4">All SMM Services</h4>
 
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-white">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <input type="text"
+                        id="serviceSearch"
+                        class="form-control"
+                        placeholder="Search service, category, type..."
+                        style="height:48px; font-weight:500;">
+                </div>
+            </div>
+        </div>
+
         <div class="row g-4">
             <?php foreach ($services as $index => $s):
                 $delay = $index * 0.05;
@@ -44,20 +60,7 @@ $stmt->close();
                     : 0;
             ?>
 
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <div class="input-group">
-                            <span class="input-group-text bg-white">
-                                <i class="fa-solid fa-magnifying-glass"></i>
-                            </span>
-                            <input type="text"
-                                id="serviceSearch"
-                                class="form-control"
-                                placeholder="Search service, category, type..."
-                                style="height:48px; font-weight:500;">
-                        </div>
-                    </div>
-                </div>
+
 
                 <div class="col-md-6 col-lg-4 service-item"
                     data-name="<?= strtolower(htmlspecialchars($s['name'])) ?>"
