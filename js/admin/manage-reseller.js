@@ -114,7 +114,7 @@ document.getElementById('register').addEventListener('click', function (e) {
                 }, 500);
             } else {
                 Toastify({
-                    text: res.message,
+                    text: res.message || 'Something went wrong.',
                     duration: 4000,
                     gravity: 'top',
                     position: 'right',
@@ -122,12 +122,13 @@ document.getElementById('register').addEventListener('click', function (e) {
                 }).showToast();
             }
         },
-        error: function () {
+        error: function (xhr, status, error) {
             registerBtn.disabled = false;
-            btnText.innerHTML = '<i class="bi bi-check-circle me-2"></i>Create Reseller Account';
             spinner.classList.add('d-none');
+            btnText.innerHTML = '<i class="bi bi-check-circle me-2"></i>Create Reseller Account';
+
             Toastify({
-                text: 'Something went wrong.',
+                text: 'Server error: ' + error,
                 duration: 4000,
                 gravity: 'top',
                 position: 'right',

@@ -122,12 +122,13 @@ document.getElementById('register').addEventListener('click', function (e) {
                 }).showToast();
             }
         },
-        error: function () {
+        error: function (xhr, status, error) {
             registerBtn.disabled = false;
-            btnText.innerHTML = '<i class="bi bi-check-circle me-2"></i>Create Customer Account';
             spinner.classList.add('d-none');
+            btnText.innerHTML = '<i class="bi bi-check-circle me-2"></i>Create Customer Account';
+
             Toastify({
-                text: 'Something went wrong.',
+                text: 'Server error: ' + error,
                 duration: 4000,
                 gravity: 'top',
                 position: 'right',

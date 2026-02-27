@@ -111,18 +111,15 @@ $basePrice = nairaToUsd($basePrice);
 
 
 
-// $isApiBalanceAvailable = $api->getBalance();
-
-// $frozenBalance = floatval($isApiBalanceAvailable['data']['frozen_balance'] ?? 0);
-// $availableBalance = $apiBalance - $frozenBalance;
+$isApiBalanceAvailable = $api->getBalance();
 
 
 
-// echo json_encode([
-//     'status' => 'error',
-//     'message' => $isApiBalanceAvailable
-// ]);
-// exit;
+echo json_encode([
+    'status' => 'error',
+    'message' => $isApiBalanceAvailable
+]);
+exit;
 
 
 // $buyData = $api->buyNumber($country, $operator, $product);
