@@ -1,13 +1,7 @@
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
-
-use Dotenv\Dotenv;
-
-$dotenv = Dotenv::createImmutable(__DIR__);
-$dotenv->load();
-
-$apiKey = $_ENV['FIVESIM_API_KEY'] ?? null;
+loadEnv(__DIR__ . '/../.env');
+$apiKey = getenv('FIVESIM_API_KEY');
 
 class FiveSimApi
 {
@@ -15,11 +9,11 @@ class FiveSimApi
     private $baseUrl = "https://5sim.net/v1/user";
     private $buyUrl = "https://5sim.net/v1/user/buy/activation";
     private $getProductBaseUrl = "https://5sim.net/v1/guest";
-    private $checkOrderOtp = "https://5sim.net/v1/user/check";
+    private $checkOrderOtpUrl = "https://5sim.net/v1/user/check";
 
     public function __construct($apiKey = null)
     {
-        $this->apiKey = $apiKey;
+        $this->apiKey = 'eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE4MDM2NjU4ODEsImlhdCI6MTc3MjEyOTg4MSwicmF5IjoiODdkMWQ2YTQxOGVjNTUwMjcyMjE4YmMxMTBhODc1YTkiLCJzdWIiOjM4MTIzMDB9.vHMRukSCVBt74wXe1AH-jZsCweZnAtaA49ord0_RD8z7kPGwI_fZUoMFVW7npnpRy73_YD5GswqbLWOwsc_16tYCd0rMWV-5R9-MaImdi88w23qD5L5ML8sgam1IFlmjc5xjWbzJlfW649xkoDYwvZtEeqzUhPXTD2OJ3-2h9MbKYWcJISrVufZCGRb3nqMHyCdcXjQfFKurSns3KCOAWHidvttqTkvV-2t0pxWEbK0Un-mTn_VNBVHy_YLEIGgCHwwy_2kxj1U7PyZGJM8MPZei1LbHWMmAoUwhwSv46RW3aXLDGvE7KJLitmJmLs1Z1wkxAqqaaGnc3XQWT1dPGA';
     }
 
     private function getProductRequest($endpoint, $method = "GET")
@@ -139,15 +133,14 @@ class FiveSimApi
             CURLOPT_URL => $this->buyUrl . $endpoint,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_TIMEOUT => 30,
+            CURLOPT_FAILONERROR => false,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_CUSTOMREQUEST => $method,
             CURLOPT_HTTPHEADER => [
                 "Authorization: Bearer " . $this->apiKey,
                 "Accept: application/json"
             ]
         ]);
-
-        if ($method === "POST") {
-            curl_setopt($ch, CURLOPT_POST, true);
-        }
 
         $response = curl_exec($ch);
 
@@ -162,28 +155,34 @@ class FiveSimApi
             ];
         }
 
-
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
-        $data = json_decode($response, true);
+
+        $decoded = json_decode($response, true);
+
+
+        if ($decoded === null && json_last_error() !== JSON_ERROR_NONE) {
+            $decoded = null;
+        }
 
         if ($httpCode >= 400) {
             return [
                 'success' => false,
                 'type' => 'http_error',
                 'status_code' => $httpCode,
-                'response' => $data
+                'response' => $decoded,
+                'raw' => trim($response)
             ];
         }
 
         return [
             'success' => true,
             'status_code' => $httpCode,
-            'data' => $data
+            'data' => $decoded,
+            'raw' => trim($response)
         ];
     }
-
 
 
     private function checkOrderRequest($endpoint, $method = "GET")
@@ -191,7 +190,7 @@ class FiveSimApi
         $ch = curl_init();
 
         curl_setopt_array($ch, [
-            CURLOPT_URL => $this->checkOrderOtp . $endpoint,
+            CURLOPT_URL => $this->checkOrderOtpUrl . $endpoint,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_TIMEOUT => 30,
             CURLOPT_HTTPHEADER => [
@@ -221,25 +220,31 @@ class FiveSimApi
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
-        $data = json_decode($response, true);
+
+        $decoded = json_decode($response, true);
+
+
+        if ($decoded === null && json_last_error() !== JSON_ERROR_NONE) {
+            $decoded = null;
+        }
 
         if ($httpCode >= 400) {
             return [
                 'success' => false,
                 'type' => 'http_error',
                 'status_code' => $httpCode,
-                'response' => $data
+                'response' => $decoded,
+                'raw' => trim($response)
             ];
         }
 
         return [
             'success' => true,
             'status_code' => $httpCode,
-            'data' => $data
+            'data' => $decoded,
+            'raw' => trim($response)
         ];
     }
-
-
 
 
 

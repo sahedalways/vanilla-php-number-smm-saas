@@ -164,17 +164,9 @@ if ($userId) {
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Product:</label>
-                            <select id="modalProduct" class="form-select">
-                                <option value="" disabled selected>Select an Product</option>
-
-                                <?php
-                                include __DIR__ . '/../../../../utils/smsServices.php';
-                                foreach ($smsServices as $name => $value): ?>
-                                    <option value="<?= htmlspecialchars($value) ?>"><?= htmlspecialchars($name) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <span class="text-danger small d-none" id="modalProductError"></span>
+                            <label class="form-label fw-bold">Operator:</label>
+                            <input type="text" id="modalOperator" class="form-control" readonly>
+                            <span class="text-danger small d-none" id="modalOperatorError"></span>
                         </div>
 
                         <div class="mb-3">
@@ -184,7 +176,7 @@ if ($userId) {
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Operator:</label>
+                            <label class="form-label fw-bold">Service:</label>
                             <input type="text" id="modalServiceCode" class="form-control" readonly>
                             <span class="text-danger small d-none" id="modalOperatorError"></span>
                         </div>

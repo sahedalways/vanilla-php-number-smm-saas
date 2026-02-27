@@ -22,8 +22,8 @@ if ($csrf_token !== ($_SESSION['csrf_token'] ?? '')) {
 
 
 $country  = strtolower(trim($_POST['country'] ?? ''));
-$operator = strtolower(trim($_POST['operator'] ?? 'any'));
-$product  = strtolower(trim($_POST['product'] ?? ''));
+$serviceCode = strtolower(trim($_POST['serviceCode'] ?? 'any'));
+$operator  = strtolower(trim($_POST['operator'] ?? ''));
 $price    = floatval($_POST['price'] ?? 0);
 
 
@@ -32,8 +32,13 @@ if (empty($country)) {
     exit;
 }
 
-if (empty($product)) {
-    echo json_encode(['status' => 'error', 'message' => 'Product is required.']);
+if (empty($operator)) {
+    echo json_encode(['status' => 'error', 'message' => 'Operator is required.']);
+    exit;
+}
+
+if (empty($serviceCode)) {
+    echo json_encode(['status' => 'error', 'message' => 'Service is required.']);
     exit;
 }
 
@@ -111,77 +116,69 @@ $basePrice = nairaToUsd($basePrice);
 
 
 
-$isApiBalanceAvailable = $api->getBalance();
+$balanceResponse = $api->getBalance();
 
 
+$frozenBalance = floatval($balanceResponse['data']['frozen_balance'] ?? 0);
+$mainBalance = floatval($balanceResponse['data']['balance'] ?? 0);
 
-echo json_encode([
-    'status' => 'error',
-    'message' => $isApiBalanceAvailable
-]);
-exit;
+$availableBalance = $mainBalance - $frozenBalance;
 
-
-// $buyData = $api->buyNumber($country, $operator, $product);
-
-
-
-// if (!$buyData) {
-//     echo json_encode([
-//         'status' => 'error',
-//         'message' => 'Failed to purchase number',
-//     ]);
-//     exit;
-// }
+if ($availableBalance < $basePrice) {
+    echo json_encode(['status' => 'error', 'message' => 'An error occured! Please try again later.']);
+    exit;
+}
 
 
-// // Send response to frontend
-// echo json_encode([
-//     'status' => 'success',
-//     'message' => 'Number purchased successfully',
-//     'data' => $buyData
-// ]);
-// exit;
+$buyData = $api->buyNumber($country, $operator, $serviceCode);
+
+
+if (
+    empty($buyData) ||
+    empty($buyData['success']) ||
+    $buyData['success'] !== true ||
+    (isset($buyData['raw']) &&
+        in_array(strtolower($buyData['raw']), ['no free phones', 'bad operator', 'not enough balance']))
+) {
+    echo json_encode([
+        'status' => 'error',
+        'message' => $buyData['raw'] ?? 'Failed to purchase number',
+        'debug' => $buyData
+    ]);
+    exit;
+}
+
+
+$purchase = $buyData['data'] ?? null;
+
+
 
 $resellerId = $resellerRow['reseller_id'] ?? null;
-
-$buyData = [
-    'id' => 12345678,
-    'phone' => '+447350690992',
-    'operator' => 'vodafone',
-    'product' => 'facebook',
-    'price' => 21.00,
-    'status' => 'PENDING',
-    'country' => 'england',
-    'sms' => null,
-    'forwarding' => false,
-    'forwarding_number' => '',
-    'created_at' => '2026-02-26T09:00:00Z'
-];
-
 
 
 $otp = '';
 
-$orderId = $buyData['id'] ?? null;
-$phoneNo = $buyData['phone'] ?? null;
-$operatorName = $buyData['operator'] ?? $operator;
-$productName = $buyData['product'] ?? $product;
+$orderId = $purchase['id'] ?? null;
+$phoneNo = $purchase['phone'] ?? null;
+$operatorName = $purchase['operator'] ?? $operator;
+$productName = $purchase['product'] ?? $product;
 $price = $price ?? 0;
-$status = $buyData['status'] ?? 'PENDING';
-$expiryTime = date('Y-m-d H:i:s', strtotime('+10 minutes')) ?? null;
-$countryName = $buyData['country'] ?? $country;
-$createdAt = isset($buyData['created_at']) ? date('Y-m-d H:i:s', strtotime($buyData['created_at'])) : date('Y-m-d H:i:s');
+$status = $purchase['status'] ?? 'RECEIVED';
+$expiryTime = isset($purchase['expires']) ? date('Y-m-d H:i:s', strtotime($purchase['expires'])) : date('Y-m-d H:i:s', strtotime('+5 minutes'));
+$otpInTime = date('Y-m-d H:i:s', strtotime('+10 minutes'));
+$countryName = $purchase['country'] ?? $country;
+$createdAt = isset($purchase['created_at']) ? date('Y-m-d H:i:s', strtotime($purchase['created_at'])) : date('Y-m-d H:i:s');
+$resellerId = $resellerRow['reseller_id'] ?? 0;
+$otp = '';
 
 $stmt = $conn->prepare("
     INSERT INTO sms_orders
-    (order_id, user_id, reseller_id, cost, admin_profit, reseller_profit, country, operator, phone_no, otp, service, expiry_time, status, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    (order_id, user_id, reseller_id, cost, admin_profit, reseller_profit, country, operator, phone_no, otp, service, expiry_time, otp_in_time, status, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ");
 
-
 $stmt->bind_param(
-    "siidddssssssss",
+    "siidddsssssssss",
     $orderId,
     $userId,
     $resellerId,
@@ -194,9 +191,12 @@ $stmt->bind_param(
     $otp,
     $productName,
     $expiryTime,
+    $otpInTime,
     $status,
     $createdAt
 );
+
+
 
 if ($stmt->execute()) {
     $updateBalanceStmt = $conn->prepare("

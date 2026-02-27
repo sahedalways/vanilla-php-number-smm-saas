@@ -1,9 +1,11 @@
 let selectedCountry = null;
+let selectedOperator = null;
 
 function fetchFilteredServices() {
     let country = $('#filterCountry').val();
     let operator = $('#filterOperator').val();
     selectedCountry = country;
+    selectedOperator = operator;
     $('#initialPlaceholder').addClass('d-none');
 
     $.ajax({
@@ -37,7 +39,7 @@ function fetchFilteredServices() {
                         <div class="card-header border-0 p-4" style="background-color: #001f3f; border-radius: 20px 20px 0 0;">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
-                                    <small class="text-white-50 d-block mb-1 text-uppercase fw-bold" style="font-size: 10px; letter-spacing: 1px;">Operator</small>
+                                    <small class="text-white-50 d-block mb-1 text-uppercase fw-bold" style="font-size: 10px; letter-spacing: 1px;">Service</small>
                                     <h6 class="text-white fw-bold mb-0">${serviceCode}</h6>
                                 </div>
                                 <span class="badge bg-light text-dark fw-bold" style="font-size: 11px; border-radius: 8px; padding: 6px 12px;">
@@ -101,6 +103,13 @@ $('#resetFilters').on('click', function () {
 });
 
 $(document).on('click', '.purchase-btn', function () {
+    $('#modalServiceCode').val('');
+    $('#modalOperator').val('');
+    $('#modalCategory').val('');
+    $('#modalQty').val('');
+    $('#modalPrice').val('');
+    $('#modalCountry').val('');
+
     let $card = $(this).closest('.card');
 
     let serviceCode = $card.find('.card-header h6').text().trim();
@@ -109,12 +118,11 @@ $(document).on('click', '.purchase-btn', function () {
     let price = $card.find('.card-body .col-6:nth-child(2) h5').text().trim();
 
     $('#modalServiceCode').val(serviceCode);
+    $('#modalOperator').val(selectedOperator);
     $('#modalCategory').val(category);
     $('#modalQty').val(qty);
     $('#modalPrice').val(price);
     $('#modalCountry').val(selectedCountry);
-
-    $('#modalOperator').val('');
 
     var purchaseModal = new bootstrap.Modal(document.getElementById('purchaseModal'));
     purchaseModal.show();
@@ -131,8 +139,8 @@ $('#confirmPurchaseBtn').on('click', function () {
     errorEl.textContent = '';
 
     const country = $('#modalCountry').val();
-    const operator = $('#modalServiceCode').val() || 'any';
-    const product = $('#modalProduct').val();
+    const serviceCode = $('#modalServiceCode').val() || 'any';
+    const operator = $('#modalOperator').val() || 'any';
     const priceText = $('#modalPrice')
         .val()
         .replace(/[^\d.]/g, '');
@@ -141,14 +149,14 @@ $('#confirmPurchaseBtn').on('click', function () {
     const userBalance = parseFloat($('#userBalance').val()) || 0;
 
     // Clear all previous errors
-    $('#modalProductError, #modalCountryError, #modalOperatorError, #modalPriceError')
+    $('#modalServiceCodeError, #modalCountryError, #modalOperatorError, #modalPriceError')
         .text('')
         .addClass('d-none');
 
     let hasError = false;
 
-    if (!product) {
-        $('#modalProductError').text('Please select a product.').removeClass('d-none');
+    if (!serviceCode) {
+        $('#modalServiceCodeError').text('Service is required.').removeClass('d-none');
         hasError = true;
     }
 
@@ -190,7 +198,7 @@ $('#confirmPurchaseBtn').on('click', function () {
         data: {
             country: country,
             operator: operator,
-            product: product,
+            serviceCode: serviceCode,
             price: price,
             csrf_token: $('#csrf_token').val(),
         },
@@ -202,6 +210,23 @@ $('#confirmPurchaseBtn').on('click', function () {
             spinner.classList.add('d-none');
 
             if (res.status === 'success') {
+                const failMessages = ['no free phones', 'bad operator', 'not enough balance'];
+                const raw = (res.raw || '').toLowerCase();
+
+                if (failMessages.includes(raw)) {
+                    Toastify({
+                        text: raw || 'Failed to purchase number',
+                        duration: 4000,
+                        gravity: 'top',
+                        position: 'right',
+                        backgroundColor: 'linear-gradient(to right, #ff5f6d, #ffc371)',
+                    }).showToast();
+
+                    errorEl.textContent = raw || 'Failed to purchase number';
+                    return;
+                }
+
+                // Real success
                 Toastify({
                     text: res.message,
                     duration: 4000,
@@ -221,6 +246,14 @@ $('#confirmPurchaseBtn').on('click', function () {
                     window.location.href = '/views/customer/services/sms/orders';
                 }, 500);
             } else {
+                Toastify({
+                    text: res.message || 'Something went wrong',
+                    duration: 4000,
+                    gravity: 'top',
+                    position: 'right',
+                    backgroundColor: 'linear-gradient(to right, #ff5f6d, #ffc371)',
+                }).showToast();
+
                 errorEl.textContent = res.message || 'Something went wrong';
             }
         },
