@@ -9,12 +9,29 @@ $userName = $_SESSION['name'] ?? 'Admin';
 
 // Fetch orders from sms_orders
 $stmt = $conn->prepare("
-    SELECT o.id, o.service_id, o.user_id, o.reseller_id, o.cost, o.admin_profit, o.reseller_profit,o.order_id,o.otp,
-           o.country, o.operator, o.phone_no, o.service, o.expiry_time, o.status, o.created_at, o.updated_at
+    SELECT
+        o.id,
+        o.order_id,
+        o.user_id,
+        u.name AS user_name,
+        o.reseller_id,
+        o.cost,
+        o.reseller_profit,
+        o.country,
+        o.operator,
+        o.phone_no,
+        o.otp,
+        o.service,
+        o.expiry_time,
+        o.status,
+        o.created_at,
+        o.updated_at
     FROM sms_orders o
+    LEFT JOIN user_data u ON o.user_id = u.id
     WHERE o.reseller_id = ?
     ORDER BY o.created_at DESC
 ");
+
 $stmt->bind_param("i", $userId);
 $stmt->execute();
 $res = $stmt->get_result();
@@ -56,25 +73,29 @@ $csrf_token = $_SESSION['csrf_token'];
                     <thead class="table-dark">
                         <tr>
                             <th>#</th>
+                            <th>Customer</th>
                             <th>Service</th>
                             <th>Phone</th>
                             <th>Country</th>
                             <th>Operator</th>
                             <th>Cost (₦)</th>
+                            <th>Profit (₦)</th>
                             <th>Status</th>
                             <th>OTP</th>
-                            <th>Ordered At</th>
+
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($orders as $order): ?>
                             <tr>
                                 <td><?= $order['order_id'] ?></td>
+                                <td><?= htmlspecialchars($order['user_name']) ?></td>
                                 <td><?= htmlspecialchars($order['service']) ?></td>
                                 <td><?= htmlspecialchars($order['phone_no'] ?? '-') ?></td>
                                 <td><?= htmlspecialchars($order['country']) ?></td>
                                 <td><?= htmlspecialchars($order['operator']) ?></td>
                                 <td><?= number_format($order['cost'], 2) ?></td>
+                                <td><?= number_format($order['reseller_profit'], 2) ?></td>
 
 
 
@@ -104,7 +125,7 @@ $csrf_token = $_SESSION['csrf_token'];
                                     ?>
                                 </td>
 
-                                <td><?= $order['created_at'] ?></td>
+
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

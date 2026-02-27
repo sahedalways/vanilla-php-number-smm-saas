@@ -97,7 +97,7 @@ $csrf_token = $_SESSION['csrf_token'];
                                     ];
                                     $statusClass = $statusColors[$order['status']] ?? 'text-dark';
                                     ?>
-                                    <span class="<?= $statusClass ?>"><?= ucfirst(strtolower($order['status'])) ?></span>
+                                    <span class="<?= $statusClass ?>"><?= ($order['status']) ?></span>
                                 </td>
 
                                 <td style="position: relative; min-width: 120px;" id="otp-col-<?= $order['order_id'] ?>">

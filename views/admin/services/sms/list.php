@@ -180,7 +180,7 @@ $csrf_token = $_SESSION['csrf_token'];
                         <div class="card-header border-0 p-4" style="background-color: #001f3f; border-radius: 20px 20px 0 0;">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
-                                    <small class="text-white-50 d-block mb-1 text-uppercase fw-bold" style="font-size: 10px; letter-spacing: 1px;">Operator</small>
+                                    <small class="text-white-50 d-block mb-1 text-uppercase fw-bold" style="font-size: 10px; letter-spacing: 1px;">Service</small>
                                     <h6 class="text-white fw-bold mb-0">${serviceCode}</h6>
                                 </div>
                                 <span class="badge bg-light text-dark fw-bold" style="font-size: 11px; border-radius: 8px; padding: 6px 12px;">
