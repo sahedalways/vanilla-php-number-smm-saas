@@ -80,7 +80,7 @@ if ($userId) {
                 <div class="col-md-3">
                     <select id="filterCountry" class="form-select">
                         <option value="" disabled selected>Select a Country</option>
-                        <option value="any">Any</option>
+
                         <?php
                         include __DIR__ . '/../../../../utils/countries.php';
                         foreach ($countries as $name => $slug): ?>
@@ -92,12 +92,12 @@ if ($userId) {
                 </div>
 
                 <div class="col-md-3">
-                    <select id="filterOperator" class="form-select">
-                        <option value="" disabled selected>Select a Operator</option>
-                        <option value="any">Any</option>
+                    <select id="filterService" class="form-select">
+                        <option value="" disabled selected>Select a Service</option>
+
                         <?php
-                        include __DIR__ . '/../../../../utils/operators.php';
-                        foreach ($operators as $name => $value): ?>
+                        include __DIR__ . '/../../../../utils/smsServices.php';
+                        foreach ($smsServices as $name => $value): ?>
                             <option value="<?= htmlspecialchars($value) ?>"><?= htmlspecialchars($name) ?></option>
                         <?php endforeach; ?>
                     </select>
@@ -181,10 +181,6 @@ if ($userId) {
                             <span class="text-danger small d-none" id="modalOperatorError"></span>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Category:</label>
-                            <input type="text" id="modalCategory" class="form-control" readonly>
-                        </div>
 
 
 

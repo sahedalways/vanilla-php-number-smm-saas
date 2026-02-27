@@ -8,7 +8,7 @@ class FiveSimApi
     private $apiKey;
     private $baseUrl = "https://5sim.net/v1/user";
     private $buyUrl = "https://5sim.net/v1/user/buy/activation";
-    private $getProductBaseUrl = "https://5sim.net/v1/guest";
+    private $getProductBaseUrl = "https://5sim.net/v1/guest/prices";
     private $checkOrderOtpUrl = "https://5sim.net/v1/user/check";
 
     public function __construct($apiKey = null)
@@ -255,9 +255,10 @@ class FiveSimApi
     }
 
     // Get available numbers
-    public function getProducts($country, $operator)
+    public function getProducts($country, $service)
     {
-        return $this->getProductRequest("/products/$country/$operator");
+        $endpoint = "?country=" . urlencode($country) . "&product=" . urlencode($service);
+        return $this->getProductRequest($endpoint);
     }
 
     // Buy number

@@ -1,11 +1,12 @@
 let selectedCountry = null;
 let selectedOperator = null;
+let selectedService = null;
 
 function fetchFilteredServices() {
     let country = $('#filterCountry').val();
-    let operator = $('#filterOperator').val();
+    let service = $('#filterService').val();
     selectedCountry = country;
-    selectedOperator = operator;
+    selectedService = service;
     $('#initialPlaceholder').addClass('d-none');
 
     $.ajax({
@@ -13,7 +14,7 @@ function fetchFilteredServices() {
         method: 'GET',
         data: {
             country: country,
-            operator: operator,
+            service: service,
             csrf_token: $('#csrf_token').val(),
         },
         dataType: 'json',
@@ -21,7 +22,6 @@ function fetchFilteredServices() {
             $('#filterLoader').removeClass('d-none');
             $('#servicesContainer').empty();
         },
-
         success: function (res) {
             $('#filterLoader').addClass('d-none');
             let $container = $('#servicesContainer');
@@ -30,47 +30,81 @@ function fetchFilteredServices() {
             $('#servicesSection').removeClass('d-none');
 
             if (res.success && res.data && Object.keys(res.data).length > 0) {
-                Object.entries(res.data).forEach(([serviceCode, serviceData]) => {
-                    let $card = $(`
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card h-100 border-0 shadow-lg service-card"
-                         style="border-radius: 20px; transition: transform 0.3s ease, box-shadow 0.3s ease; background: #ffffff;">
+                Object.entries(res.data).forEach(([countryCode, countryData]) => {
+                    Object.entries(countryData).forEach(([serviceName, products]) => {
+                        if (serviceName === 'PriceWithProfit') return;
 
-                        <div class="card-header border-0 p-4" style="background-color: #001f3f; border-radius: 20px 20px 0 0;">
-                            <div class="d-flex justify-content-between align-items-start">
+                        Object.entries(products).forEach(([operator, productInfo]) => {
+                            // Skip invalid entries
+                            if (
+                                !productInfo ||
+                                typeof productInfo !== 'object' ||
+                                !('cost' in productInfo)
+                            )
+                                return;
+
+                            let qty = productInfo.count ?? 0;
+                            let price = parseFloat(
+                                productInfo.PriceWithProfit ?? 0
+                            ).toLocaleString();
+
+                            let isDisabled = qty === 0 ? 'disabled' : '';
+                            let btnStyle =
+                                qty === 0
+                                    ? 'background: #cccccc; color: #666666; cursor: not-allowed;'
+                                    : 'background: #001f3f; color: white;';
+
+                            let $card = $(`
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card h-100 border-0 shadow-lg service-card"
+                                 style="border-radius: 20px; transition: transform 0.3s ease, box-shadow 0.3s ease; background: #ffffff;">
+                        <div class="card-header p-3"
+                            style="background: linear-gradient(90deg, #001f3f, #003366); border-radius: 20px 20px 0 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            <div class="d-flex flex-column gap-2">
+                                <!-- Country -->
                                 <div>
-                                    <small class="text-white-50 d-block mb-1 text-uppercase fw-bold" style="font-size: 10px; letter-spacing: 1px;">Service</small>
-                                    <h6 class="text-white fw-bold mb-0">${serviceCode}</h6>
+                                    <small class="text-white-50 text-uppercase fw-bold" style="font-size: 10px; letter-spacing: 1px;">Country</small>
+                                    <h6 class="text-white fw-bold mb-0">${countryCode}</h6>
                                 </div>
-                                <span class="badge bg-light text-dark fw-bold" style="font-size: 11px; border-radius: 8px; padding: 6px 12px;">
-                                    ${serviceData.Category}
-                                </span>
+
+                                <!-- Operator -->
+                                <div>
+                                    <small class="text-white-50 text-uppercase fw-bold" style="font-size: 10px; letter-spacing: 1px;">Operator</small>
+                                    <h6 class="text-white fw-bold mb-0">${operator}</h6>
+                                </div>
+
+                                <!-- Product -->
+                                <div>
+                                    <small class="text-white-50 text-uppercase fw-bold" style="font-size: 10px; letter-spacing: 1px;">Product</small>
+                                    <h6 class="text-white fw-bold mb-0">${serviceName}</h6>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="card-body p-4">
-                            <div class="row text-center mb-4">
-                                <div class="col-6 border-end">
-                                    <p class="text-muted mb-0" style="font-size: 12px;">Available Qty</p>
-                                    <h5 class="fw-bold mb-0 text-dark">${serviceData.Qty}</h5>
-                                </div>
-                                <div class="col-6">
-                                    <p class="text-muted mb-0" style="font-size: 12px;">Unit Price</p>
-                                    <h5 class="fw-bold mb-0 text-primary">₦${parseFloat(serviceData.PriceWithProfit).toLocaleString()}</h5>
+                                <div class="card-body p-4">
+                                    <div class="row text-center mb-4">
+                                        <div class="col-6 border-end">
+                                            <p class="text-muted mb-0" style="font-size: 12px;">Available Qty</p>
+                                            <h5 class="fw-bold mb-0 text-dark">${qty}</h5>
+                                        </div>
+                                        <div class="col-6">
+                                            <p class="text-muted mb-0" style="font-size: 12px;">Unit Price</p>
+                                            <h5 class="fw-bold mb-0 text-primary">₦${price}</h5>
+                                        </div>
+                                    </div>
+
+                                  <button class="btn w-100 py-2 fw-bold shadow-sm d-flex align-items-center justify-content-center purchase-btn"
+                                    style="border-radius: 12px; border: none; font-size: 14px; ${btnStyle}" ${isDisabled}>
+                                <i class="fas fa-shopping-basket me-2"></i> Purchase Now
+                            </button>
                                 </div>
                             </div>
-
-
-
-                      <button class="btn btn-navy w-100 py-2 fw-bold shadow-sm d-flex align-items-center justify-content-center purchase-btn"
-                        style="background: #001f3f; color: white; border-radius: 12px; border: none; font-size: 14px;">
-                    <i class="fas fa-shopping-basket me-2"></i> Purchase Now
-                </button>
                         </div>
-                    </div>
-                </div>
-            `);
-                    $container.append($card);
+                    `);
+
+                            $container.append($card);
+                        });
+                    });
                 });
             } else {
                 $('#servicesSection').addClass('d-none');
@@ -103,31 +137,35 @@ $('#resetFilters').on('click', function () {
 });
 
 $(document).on('click', '.purchase-btn', function () {
+    // Reset modal inputs
     $('#modalServiceCode').val('');
     $('#modalOperator').val('');
-    $('#modalCategory').val('');
     $('#modalQty').val('');
     $('#modalPrice').val('');
     $('#modalCountry').val('');
+    $('#modalCategory').val('');
 
     let $card = $(this).closest('.card');
 
-    let serviceCode = $card.find('.card-header h6').text().trim();
-    let category = $card.find('.badge').text().trim();
-    let qty = $card.find('.card-body .col-6:nth-child(1) h5').text().trim();
+    let $headerH6s = $card.find('.card-header h6');
+    let country = $headerH6s.eq(0).text().trim();
+    let operator = $headerH6s.eq(1).text().trim();
+    let product = $headerH6s.eq(2).text().trim();
+
+    // Grab card body info
+    let qty = parseInt($card.find('.card-body .col-6:nth-child(1) h5').text().trim()) || 0;
     let price = $card.find('.card-body .col-6:nth-child(2) h5').text().trim();
 
-    $('#modalServiceCode').val(serviceCode);
-    $('#modalOperator').val(selectedOperator);
-    $('#modalCategory').val(category);
+    // Set modal values
+    $('#modalCountry').val(country);
+    $('#modalOperator').val(operator);
+    $('#modalServiceCode').val(product);
     $('#modalQty').val(qty);
     $('#modalPrice').val(price);
-    $('#modalCountry').val(selectedCountry);
 
     var purchaseModal = new bootstrap.Modal(document.getElementById('purchaseModal'));
     purchaseModal.show();
 });
-
 $('#confirmPurchaseBtn').on('click', function () {
     const btn = this;
     const $btn = $(this);

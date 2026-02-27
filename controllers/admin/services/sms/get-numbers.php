@@ -17,18 +17,18 @@ if ($csrf_token !== ($_SESSION['csrf_token'] ?? '')) {
 }
 
 $country = $_GET['country'] ?? 'any';
-$operator = $_GET['operator'] ?? 'any';
+$service = $_GET['service'] ?? 'any';
 
 
 
 $api = new FiveSimApi();
-$servicesResponse = $api->getProducts($country, $operator);
+$servicesResponse = $api->getProducts($country, $service);
+
+
 
 
 $profitRow = $conn->query("SELECT profit_percentage FROM profit_settings ORDER BY id DESC LIMIT 1")->fetch_assoc();
 $adminProfitPercent = floatval($profitRow['profit_percentage'] ?? 0);
-
-
 
 if (!($servicesResponse['success'] ?? false)) {
     echo json_encode([
@@ -39,21 +39,30 @@ if (!($servicesResponse['success'] ?? false)) {
     exit;
 }
 
-// Get the actual services data
+
 $services = $servicesResponse['data'] ?? [];
 
 
-foreach ($services as $serviceId => $service) {
-    $usdPrice = floatval($service['Price'] ?? 0);
-    $basePrice = usdToNaira($usdPrice);
+foreach ($services as $countryCode => &$countryData) {
+    foreach ($countryData as $operatorName => &$products) {
+        if ($operatorName === 'PriceWithProfit') continue;
 
-    $adminProfit = $basePrice * $adminProfitPercent / 100;
+        foreach ($products as $productId => &$product) {
+            $usdPrice = floatval($product['cost'] ?? 0);
+            $basePrice = usdToNaira($usdPrice);
 
-    $services[$serviceId]['PriceWithProfit'] = $basePrice + $adminProfit + $resellerProfit;
-    $services[$serviceId]['admin_profit'] = round($adminProfit, 2);
+            $adminProfit = $basePrice * $adminProfitPercent / 100;
+            $resellerProfit = 0;
+
+            $product['PriceWithProfit'] = round($basePrice + $adminProfit + $resellerProfit, 2);
+            $product['admin_profit'] = round($adminProfit, 2);
+        }
+
+
+        $operatorTotal = array_sum(array_map(fn($p) => $p['PriceWithProfit'] ?? 0, $products));
+        $products['PriceWithProfit'] = round($operatorTotal, 2);
+    }
 }
-
-
 
 echo json_encode([
     'success' => true,
