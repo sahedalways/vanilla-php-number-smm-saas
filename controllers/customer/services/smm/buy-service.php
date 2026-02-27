@@ -82,6 +82,8 @@ $totalPriceUSD = nairaToUsd($totalPriceNaira);
 
 
 $apiBalanceObj = $api->balance();
+
+
 $apiBalance = floatval($apiBalanceObj->balance ?? 0);
 
 
@@ -188,8 +190,6 @@ $stmt->bind_param(
     $cancel,
     $refill
 );
-
-
 
 
 

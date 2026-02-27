@@ -45,11 +45,13 @@ if ($userId) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/admin_dashboard.css">
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 </head>
 
 <body>
@@ -78,21 +80,37 @@ if ($userId) {
             <!-- Filter Section -->
             <div class="row mb-3 g-2 justify-content-center align-items-center">
                 <div class="col-md-3">
-                    <select id="filterCountry" class="form-select">
+                    <select id="filterCountry" class="form-select select2-search">
                         <option value="" disabled selected>Select a Country</option>
-
                         <?php
                         include __DIR__ . '/../../../../utils/countries.php';
                         foreach ($countries as $name => $slug): ?>
-                            <option value="<?= htmlspecialchars($slug) ?>">
-                                <?= htmlspecialchars($name) ?>
-                            </option>
+                            <option value="<?= htmlspecialchars($slug) ?>"><?= htmlspecialchars($name) ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
 
+                <style>
+                    .select2-container .select2-selection--single {
+                        height: 38px;
+
+                        padding: 5px 12px;
+                    }
+
+                    /* Dropdown arrow er positioning thik kora */
+                    .select2-container--default .select2-selection--single .select2-selection__arrow {
+                        height: 43px;
+                        right: 10px;
+                    }
+
+                    /* Selected text er positioning */
+                    .select2-container--default .select2-selection--single .select2-selection__rendered {
+                        line-height: 28px;
+                    }
+                </style>
+
                 <div class="col-md-3">
-                    <select id="filterService" class="form-select">
+                    <select id="filterService" class="form-select select2-search">
                         <option value="" disabled selected>Select a Service</option>
 
                         <?php
@@ -214,6 +232,30 @@ if ($userId) {
         <script src="/js/customer/manage-sms.js"></script>
 
     </div>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize both dropdowns
+            $('#filterService, #filterCountry').select2({
+                placeholder: 'Search...',
+                allowClear: true,
+                width: '100%'
+            });
+
+            // Different placeholder for each dropdown (optional)
+            $('#filterService').select2({
+                placeholder: 'Search for a service...',
+                allowClear: true,
+                width: '100%'
+            });
+
+            $('#filterCountry').select2({
+                placeholder: 'Search for a country...',
+                allowClear: true,
+                width: '100%'
+            });
+        });
+    </script>
 </body>
 
 </html>

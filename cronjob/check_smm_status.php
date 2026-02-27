@@ -4,9 +4,6 @@ require_once __DIR__ . '/../class/SMMApi.php';
 
 $api = new SMMApi();
 
-
-
-
 $stmt = $conn->prepare("SELECT * FROM smm_orders WHERE status = 'In Progress'");
 $stmt->execute();
 $res = $stmt->get_result();
