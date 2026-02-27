@@ -1,11 +1,15 @@
 <?php
-// get-services.php
 require_once __DIR__ . '/../../../../helpers/session.php';
 require_once __DIR__ . '/../../../../include/config.php';
+
+header('Content-Type: application/json');
 
 authOnly();
 
 $userId = $_SESSION['user_id'];
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 20;
+$offset = ($page - 1) * $limit;
 
 // Check if current user is a reseller's customer
 $resellerId = null;
@@ -18,72 +22,35 @@ if ($row = $res->fetch_assoc()) {
 }
 $stmt->close();
 
+// Get total count for pagination
+$countSql = "SELECT COUNT(*) as total FROM services WHERE status = 'active'";
+$countResult = $conn->query($countSql);
+$totalRows = $countResult->fetch_assoc()['total'];
+$totalPages = ceil($totalRows / $limit);
 
-// Fetch services
-$sql = "SELECT * FROM services WHERE status = 'active' ORDER BY id DESC";
-$result = $conn->query($sql);
-
-
+// Fetch services with pagination
+$sql = "SELECT * FROM services WHERE status = 'active' ORDER BY id DESC LIMIT ? OFFSET ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("ii", $limit, $offset);
+$stmt->execute();
+$result = $stmt->get_result();
 
 $services = [];
 
 while ($row = $result->fetch_assoc()) {
     $price = floatval($row['base_price']);
 
-
     if ($resellerId) {
-        $stmt = $conn->prepare("SELECT price FROM reseller_prices WHERE service_id = ? AND reseller_id = ?");
-        $stmt->bind_param("ii", $row['api_service_id'], $resellerId);
-        $stmt->execute();
-        $resPriceResult = $stmt->get_result();
+        $priceStmt = $conn->prepare("SELECT price FROM reseller_prices WHERE service_id = ? AND reseller_id = ?");
+        $priceStmt->bind_param("ii", $row['api_service_id'], $resellerId);
+        $priceStmt->execute();
+        $resPriceResult = $priceStmt->get_result();
         if ($resPriceRow = $resPriceResult->fetch_assoc()) {
             $price = floatval($resPriceRow['price']);
         }
-        $stmt->close();
-    }
-    $orderParams = [];
-
-    switch ($row['type'] ?? 'Default') {
-        case 'Default':
-            $orderParams = [
-                'link' => '',
-                'quantity' => null,
-            ];
-            break;
-
-        case 'Custom Comments':
-        case 'Custom Comments Package':
-            $orderParams = [
-                'link' => '',
-                'comments' => '',
-            ];
-            break;
-
-        case 'Comment Likes':
-            $orderParams = [
-                'link' => '',
-                'username' => '',
-                'quantity' => null,
-            ];
-            break;
-
-        case 'YouTube Likes':
-        case 'TikTok Views':
-            $orderParams = [
-                'link' => '',
-                'quantity' => null,
-            ];
-            break;
-
-        default:
-            $orderParams = [
-                'link' => '',
-                'quantity' => null,
-            ];
-            break;
+        $priceStmt->close();
     }
 
-    // Add service to array
     $services[] = [
         'id' => $row['id'],
         'api_service_id' => $row['api_service_id'],
@@ -96,8 +63,18 @@ while ($row = $result->fetch_assoc()) {
         'status' => $row['status'],
         'type' => $row['type'] ?? 'Default',
         'category' => $row['category'] ?? '',
-        'refill' => $row['refill'] ?? false,
-        'cancel' => $row['cancel'] ?? false,
-        'order_params' => $orderParams
+        'refill' => (bool)($row['refill'] ?? false),
+        'cancel' => (bool)($row['cancel'] ?? false)
     ];
 }
+
+$stmt->close();
+
+echo json_encode([
+    'success' => true,
+    'services' => $services,
+    'current_page' => $page,
+    'total_pages' => $totalPages,
+    'total_rows' => $totalRows,
+    'limit' => $limit
+]);
