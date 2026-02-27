@@ -200,18 +200,25 @@ if ($stmt->execute()) {
     $userId = (int)$userId;
     $price  = (float)$price;
 
+
     $updateWalletStmt = $conn->prepare("
     UPDATE user_wallet
     SET balance = balance - ?
     WHERE user_id = ? AND balance >= ?
 ");
-
     $updateWalletStmt->bind_param("did", $price, $userId, $price);
-
-    // Execute
     $updateWalletStmt->execute();
 
-    if ($updateWalletStmt->affected_rows > 0) {
+
+    $updateUserDataStmt = $conn->prepare("
+    UPDATE user_data
+    SET balance = balance - ?
+    WHERE id = ? AND balance >= ?
+");
+    $updateUserDataStmt->bind_param("did", $price, $userId, $price);
+    $updateUserDataStmt->execute();
+
+    if ($updateWalletStmt->affected_rows > 0 && $updateUserDataStmt->affected_rows > 0) {
         echo json_encode([
             'status' => 'success',
             'message' => 'SMS order placed successfully.',
@@ -225,8 +232,6 @@ if ($stmt->execute()) {
             'price' => $price,
         ]);
     }
-
-    $updateWalletStmt->close();
 } else {
     echo json_encode([
         'status' => 'error',
