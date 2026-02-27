@@ -8,6 +8,8 @@ if (!isset($_SESSION['type']) || !in_array($_SESSION['type'], ['customer', 'rese
     header("Location: $back");
     exit;
 }
+$userId = $_SESSION['user_id'] ?? null;
+
 
 authOnly();
 
@@ -19,7 +21,21 @@ $referwallet = $wallet->refer_data();
 
 $wallet->closeConnection();
 $userType = $_SESSION['type'];
+
+
+$balance = 0.0;
+
+if ($userId) {
+    $stmt = $conn->prepare("SELECT balance FROM user_data WHERE id = ?");
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $stmt->bind_result($balance);
+    $stmt->fetch();
+    $stmt->close();
+}
+
 ?>
+
 <?php
 $page_title = "Recharge - " . $site_data['web_name'];
 ?>

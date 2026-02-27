@@ -25,6 +25,19 @@ $wallet->closeConnection();
 
 
 $userType = $_SESSION['type'];
+
+$userId = $_SESSION['user_id'] ?? null;
+
+$balance = 0.0;
+
+if ($userId) {
+    $stmt = $conn->prepare("SELECT balance FROM user_data WHERE id = ?");
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $stmt->bind_result($balance);
+    $stmt->fetch();
+    $stmt->close();
+}
 ?>
 <?php
 $page_title = "Recharge History - " . $site_data['web_name'];

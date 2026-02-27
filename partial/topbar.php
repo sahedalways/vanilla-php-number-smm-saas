@@ -27,7 +27,7 @@
                     <div style="border: 2px solid orange; border-radius: 20px; padding: 5px; ">
                         <img src="https://cdn-icons-png.flaticon.com/512/2704/2704312.png" class="mr-1" width="21" height="21" alt="Rupee icon">
                         <span class="font-bold text-sm" style="font-weight:bold; font-size:15px" id="current_balance">
-                            ₦<?php echo isset($userwallet['balance']) ? $userwallet['balance'] : '0.00'; ?>
+                            ₦<?php echo isset($balance) ? $balance : '0.00'; ?>
                         </span>
                     </div>
                 </li>
