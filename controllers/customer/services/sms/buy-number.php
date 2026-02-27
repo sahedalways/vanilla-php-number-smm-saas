@@ -165,7 +165,6 @@ $productName = $purchase['product'] ?? $product;
 $price = $price ?? 0;
 $status = $purchase['status'] ?? 'RECEIVED';
 $expiryTime = isset($purchase['expires']) ? date('Y-m-d H:i:s', strtotime($purchase['expires'])) : date('Y-m-d H:i:s', strtotime('+5 minutes'));
-$otpInTime = date('Y-m-d H:i:s', strtotime('+10 minutes'));
 $countryName = $purchase['country'] ?? $country;
 $createdAt = isset($purchase['created_at']) ? date('Y-m-d H:i:s', strtotime($purchase['created_at'])) : date('Y-m-d H:i:s');
 $resellerId = $resellerRow['reseller_id'] ?? 0;
@@ -173,12 +172,12 @@ $otp = '';
 
 $stmt = $conn->prepare("
     INSERT INTO sms_orders
-    (order_id, user_id, reseller_id, cost, admin_profit, reseller_profit, country, operator, phone_no, otp, service, expiry_time, otp_in_time, status, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    (order_id, user_id, reseller_id, cost, admin_profit, reseller_profit, country, operator, phone_no, otp, service, expiry_time, status, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ");
 
 $stmt->bind_param(
-    "siidddsssssssss",
+    "siidddssssssss",
     $orderId,
     $userId,
     $resellerId,
@@ -191,7 +190,6 @@ $stmt->bind_param(
     $otp,
     $productName,
     $expiryTime,
-    $otpInTime,
     $status,
     $createdAt
 );
@@ -199,15 +197,21 @@ $stmt->bind_param(
 
 
 if ($stmt->execute()) {
-    $updateBalanceStmt = $conn->prepare("
-        UPDATE user_data
-        SET balance = balance - ?
-        WHERE id = ? AND balance >= ?
-    ");
+    $userId = (int)$userId;
+    $price  = (float)$price;
 
-    $updateBalanceStmt->bind_param("dii", $price, $userId, $price);
+    $updateWalletStmt = $conn->prepare("
+    UPDATE user_wallet
+    SET balance = balance - ?
+    WHERE user_id = ? AND balance >= ?
+");
 
-    if ($updateBalanceStmt->execute()) {
+    $updateWalletStmt->bind_param("did", $price, $userId, $price);
+
+    // Execute
+    $updateWalletStmt->execute();
+
+    if ($updateWalletStmt->affected_rows > 0) {
         echo json_encode([
             'status' => 'success',
             'message' => 'SMS order placed successfully.',
@@ -216,11 +220,13 @@ if ($stmt->execute()) {
     } else {
         echo json_encode([
             'status' => 'error',
-            'message' => 'Order inserted but failed to deduct balance: ' . $updateBalanceStmt->error
+            'message' => 'Failed to deduct balance. Either user not found or insufficient funds.',
+            'user_id' => $userId,
+            'price' => $price,
         ]);
     }
 
-    $updateBalanceStmt->close();
+    $updateWalletStmt->close();
 } else {
     echo json_encode([
         'status' => 'error',

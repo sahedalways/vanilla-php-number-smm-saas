@@ -12,7 +12,7 @@ $now = date('Y-m-d H:i:s');
 $stmt = $conn->prepare("
     SELECT * FROM sms_orders
     WHERE status IN ('PENDING', 'RECEIVED')
-      AND otp_in_time > ?
+      AND expiry_time > ?
 ");
 $stmt->bind_param("s", $now);
 $stmt->execute();

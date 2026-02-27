@@ -9,7 +9,7 @@ $userId = $_SESSION['user_id'] ?? null;
 // Fetch orders
 $stmt = $conn->prepare("
     SELECT id, order_id, user_id, reseller_id, cost, admin_profit, reseller_profit, otp,
-           country, operator, phone_no, service, expiry_time, otp_in_time, status, created_at, updated_at
+           country, operator, phone_no, service, expiry_time, status, created_at, updated_at
     FROM sms_orders
     WHERE user_id = ?
     ORDER BY created_at DESC
@@ -60,7 +60,6 @@ $csrf_token = $_SESSION['csrf_token'];
                             <th>Country</th>
                             <th>Operator</th>
                             <th>Cost (₦)</th>
-                            <th>OTP IN</th>
                             <th>Status</th>
                             <th>OTP</th>
                             <th>Expire Time</th>
@@ -71,18 +70,20 @@ $csrf_token = $_SESSION['csrf_token'];
                             <tr>
                                 <td><?= htmlspecialchars($order['order_id']) ?></td>
                                 <td><?= htmlspecialchars($order['service']) ?></td>
-                                <td><?= htmlspecialchars($order['phone_no'] ?? '-') ?></td>
+                                <td>
+                                    <?php if (!empty($order['phone_no'])): ?>
+                                        <span class="phone-text" style="font-weight: bold; color: #1a73e8; cursor: pointer;" title="Click to copy">
+                                            <?= htmlspecialchars($order['phone_no']) ?>
+                                        </span>
+                                    <?php else: ?>
+                                        <span class="text-muted">-</span>
+                                    <?php endif; ?>
+                                </td>
                                 <td><?= htmlspecialchars($order['country']) ?></td>
                                 <td><?= htmlspecialchars($order['operator']) ?></td>
                                 <td><?= number_format($order['cost'], 2) ?></td>
 
-                                <td>
-                                    <span class="expiry-timer"
-                                        data-otp="<?= date('c', strtotime($order['otp_in_time'])) ?>"
-                                        data-order-id="<?= htmlspecialchars($order['order_id']) ?>" data-status="<?= $order['status'] ?>">
-
-                                    </span>
-                                </td>
+                                <span hidden class="expiry-timer" data-order-id="<?= $order['order_id'] ?>" data-status="<?= $order['status'] ?>"></span>
 
                                 <td id="status-col-<?= $order['order_id'] ?>">
                                     <?php
@@ -101,45 +102,26 @@ $csrf_token = $_SESSION['csrf_token'];
 
                                 <td style="position: relative; min-width: 120px;" id="otp-col-<?= $order['order_id'] ?>">
                                     <?php if (!empty($order['otp'])): ?>
-                                        <span id="otp-<?= $order['id'] ?>" class="otp-text" style="font-weight: bold; color: #1a73e8; cursor: pointer;">
+                                        <span id="otp-<?= $order['id'] ?>" class="otp-text"
+                                            style="font-weight: bold; color: #1a73e8; cursor: pointer;"
+                                            title="Click to copy">
                                             <?= htmlspecialchars($order['otp']) ?>
                                         </span>
-                                        <button class="btn btn-sm btn-outline-secondary copy-otp-btn"
-                                            data-otp-id="otp-<?= $order['id'] ?>"
-                                            style="margin-left: 5px; font-size: 0.75rem;">
-                                            Copy
-                                        </button>
                                     <?php else: ?>
                                         <span class="text-muted">N/A</span>
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <?php
-                                    $expiryTimestamp = strtotime($order['expiry_time']);
-                                    $now = time();
-                                    $remainingSeconds = $expiryTimestamp - $now;
-
-                                    if ($remainingSeconds <= 0) {
-                                        // Already expired
-                                        echo '<span class="text-danger">Expired</span>';
-                                    } else {
-
-                                        $hours = floor($remainingSeconds / 3600);
-                                        $minutes = floor(($remainingSeconds % 3600) / 60);
-                                        $seconds = $remainingSeconds % 60;
-
-
-                                        $timeLeftStr = '';
-                                        if ($hours > 0) $timeLeftStr .= $hours . 'h ';
-                                        if ($minutes > 0) $timeLeftStr .= $minutes . 'm ';
-                                        $timeLeftStr .= $seconds . 's';
-
-
-                                        $textClass = ($remainingSeconds <= 600) ? 'text-warning' : 'text-success';
-
-                                        echo "<span class='{$textClass}'>{$timeLeftStr} left</span>";
-                                    }
-                                    ?>
+                                    <?php if (in_array($order['status'], ['PENDING', 'RECEIVED'])): ?>
+                                        <span class="expiry-timer"
+                                            data-order-id="<?= htmlspecialchars($order['order_id']) ?>"
+                                            data-expiry="<?= strtotime($order['expiry_time']) ?>"
+                                            data-status="<?= $order['status'] ?>">
+                                            Calculating...
+                                        </span>
+                                    <?php else: ?>
+                                        ---
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -156,51 +138,57 @@ $csrf_token = $_SESSION['csrf_token'];
     include __DIR__ . '/../../components/bottom-nav.php';
     ?>
 
-
     <script>
-        function formatTime(seconds) {
-            if (seconds <= 0) return "---";
-            const m = Math.floor(seconds / 60);
-            const s = seconds % 60;
-            return m + 'm ' + s + 's';
-        }
+        const statusColors = {
+            'PENDING': 'text-warning',
+            'RECEIVED': 'text-primary',
+            'CANCELED': 'text-danger',
+            'TIMEOUT': 'text-secondary',
+            'FINISHED': 'text-success',
+            'BANNED': 'text-danger'
+        };
 
-        function startTimers() {
+        function startOrderIntervals() {
             const csrfToken = $('#csrf_token').val();
 
             $('.expiry-timer').each(function() {
                 const $el = $(this);
-                const otpTimeStr = $el.data('otp');
                 const orderId = $el.data('order-id');
-                const orderStatus = $el.data('status'); // initial status
-                const $otpColumn = $('#otp-col-' + orderId); // OTP field td
-                const $statusColumn = $('#status-col-' + orderId); // Status field td
+                let orderStatus = $el.data('status').toUpperCase();
+                const expiryTimestamp = parseInt($el.data('expiry'));
+                const $otpColumn = $('#otp-col-' + orderId);
+                const $statusColumn = $('#status-col-' + orderId);
 
-                const otpIn = Math.floor(new Date(otpTimeStr).getTime() / 1000);
-                if (isNaN(otpIn)) return;
+                if (!['PENDING', 'RECEIVED'].includes(orderStatus)) {
+                    $el.text('---');
+                    return;
+                }
 
-                // Countdown interval
-                let timerInterval;
-                if (['PENDING', 'RECEIVED'].includes(orderStatus)) {
-                    timerInterval = setInterval(() => {
-                        const now = Math.floor(Date.now() / 1000);
-                        const remainingOtp = otpIn - now;
-                        $el.text(remainingOtp > 0 ? formatTime(remainingOtp) : 'Expired');
+                if ($el.data('intervalId')) return; // already running
 
-                        if (remainingOtp <= 0) {
-                            clearInterval(timerInterval);
-                        }
-                    }, 1000);
+                const intervalId = setInterval(() => {
+                    const now = Math.floor(Date.now() / 1000);
+                    const remaining = expiryTimestamp - now;
 
-                    // AJAX interval
-                    const ajaxInterval = setInterval(() => {
-                        const now = Math.floor(Date.now() / 1000);
-                        if (now >= otpIn) {
-                            clearInterval(ajaxInterval);
-                            clearInterval(timerInterval);
-                            return;
-                        }
+                    // Countdown timer
+                    if (remaining <= 0) {
+                        $el.text('Expired').removeClass('text-success text-warning').addClass('text-danger');
+                    } else {
+                        const hours = Math.floor(remaining / 3600);
+                        const minutes = Math.floor((remaining % 3600) / 60);
+                        const seconds = remaining % 60;
 
+                        let str = '';
+                        if (hours > 0) str += hours + 'h ';
+                        if (minutes > 0) str += minutes + 'm ';
+                        str += seconds + 's';
+
+                        const textClass = (remaining <= 600) ? 'text-warning' : 'text-success';
+                        $el.removeClass('text-success text-warning').addClass(textClass).text(str + ' left');
+                    }
+
+                    // Poll AJAX every 10s
+                    if (remaining > 0 && ['PENDING', 'RECEIVED'].includes(orderStatus)) {
                         $.ajax({
                             url: '/controllers/customer/services/sms/check-status',
                             method: 'POST',
@@ -212,36 +200,140 @@ $csrf_token = $_SESSION['csrf_token'];
                             success: function(res) {
                                 const finalStatuses = ['CANCELED', 'TIMEOUT', 'BANNED', 'FINISHED'];
 
-
-                                if (finalStatuses.includes(res.order_status)) {
-                                    clearInterval(timerInterval);
-                                    clearInterval(ajaxInterval);
-
-                                }
-
                                 if (res.otp) {
-                                    clearInterval(timerInterval);
-                                    clearInterval(ajaxInterval);
-
-                                    $otpColumn.text(res.otp);
-                                    $statusColumn.text(res.order_status);
+                                    $otpColumn.html('<span class="otp-text" style="font-weight:bold;color:#1a73e8;cursor:pointer" title="Click to copy">' + res.otp + '</span>');
+                                    attachOtpCopy($otpColumn.find('.otp-text'));
                                 }
 
                                 if (res.order_status) {
-                                    $statusColumn.text(res.order_status);
+                                    orderStatus = res.order_status.toUpperCase();
+                                    $statusColumn.removeClass().addClass(statusColors[orderStatus] || 'text-dark').text(orderStatus);
+                                }
+
+                                if (res.otp || finalStatuses.includes(orderStatus)) {
+                                    clearInterval($el.data('intervalId'));
+                                    $el.removeData('intervalId');
+                                    if (!res.otp && finalStatuses.includes(orderStatus)) {
+                                        $otpColumn.text('---');
+                                        $el.text('---').removeClass('text-success text-warning').addClass('text-danger');
+                                    }
                                 }
                             },
                             error: function(err) {
                                 console.error('AJAX error for order', orderId, err);
                             }
                         });
-                    }, 5000); // every 5 seconds
-                }
+                    }
+
+                }, 10000);
+
+                $el.data('intervalId', intervalId);
+            });
+        }
+
+        // OTP copy handler
+        function attachOtpCopy($el) {
+            $el.off('click').on('click', function() {
+                const otpText = $(this).text().trim();
+                if (!otpText) return;
+                navigator.clipboard.writeText(otpText).then(() => {
+                    Toastify({
+                        text: `OTP "${otpText}" copied!`,
+                        duration: 2000,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "#4CAF50",
+                    }).showToast();
+                });
             });
         }
 
         $(document).ready(function() {
-            startTimers();
+            startOrderIntervals();
+        });
+    </script>
+
+
+    <script>
+        $(document).ready(function() {
+            $('.otp-text').on('click', function() {
+                const otpText = $(this).text().trim();
+
+                if (!otpText) return;
+
+                // Copy to clipboard
+                navigator.clipboard.writeText(otpText).then(() => {
+                    // Optional: show toast / alert
+                    Toastify({
+                        text: `OTP "${otpText}" copied!`,
+                        duration: 2000,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "#4CAF50",
+                    }).showToast();
+                }).catch(err => {
+                    console.error('Failed to copy OTP:', err);
+                });
+            });
+
+
+
+            $('.phone-text').on('click', function() {
+                const phoneText = $(this).text().trim();
+                if (!phoneText) return;
+
+                navigator.clipboard.writeText(phoneText).then(() => {
+                    Toastify({
+                        text: `Phone number "${phoneText}" copied!`,
+                        duration: 2000,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "#2196F3",
+                    }).showToast();
+                });
+            });
+        });
+    </script>
+
+
+
+
+
+    <script>
+        function startExpiryCountdowns() {
+            $('.expiry-timer').each(function() {
+                const $el = $(this);
+                const expiryTimestamp = parseInt($el.data('expiry'));
+                const orderStatus = $el.data('status');
+
+                // Update every second
+                const timerInterval = setInterval(() => {
+                    const now = Math.floor(Date.now() / 1000);
+                    let remaining = expiryTimestamp - now;
+
+                    if (remaining <= 0) {
+                        $el.text('Expired').removeClass('text-success text-warning').addClass('text-danger');
+                        clearInterval(timerInterval);
+                        return;
+                    }
+
+                    const hours = Math.floor(remaining / 3600);
+                    const minutes = Math.floor((remaining % 3600) / 60);
+                    const seconds = remaining % 60;
+
+                    let str = '';
+                    if (hours > 0) str += hours + 'h ';
+                    if (minutes > 0) str += minutes + 'm ';
+                    str += seconds + 's';
+
+                    const textClass = (remaining <= 600) ? 'text-warning' : 'text-success';
+                    $el.removeClass('text-success text-warning').addClass(textClass).text(str + ' left');
+                }, 1000);
+            });
+        }
+
+        $(document).ready(function() {
+            startExpiryCountdowns();
         });
     </script>
 </body>

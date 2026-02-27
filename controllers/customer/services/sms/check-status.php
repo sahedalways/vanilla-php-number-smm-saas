@@ -98,7 +98,7 @@ if ($order && in_array($order['status'], ['PENDING', 'RECEIVED'])) {
         if ($expiryUpdate) {
             $updateStmt = $conn->prepare("
             UPDATE sms_orders
-            SET status = ?, otp = ?, updated_at = NOW(), otp_in_time = ?
+            SET status = ?, otp = ?, updated_at = NOW(), expiry_time = ?
             WHERE id = ?
         ");
             $updateStmt->bind_param("sssi", $orderStatus, $otpCode, $expiryUpdate, $order['id']);
