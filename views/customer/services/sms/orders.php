@@ -155,75 +155,7 @@ $csrf_token = $_SESSION['csrf_token'];
     $active = 'orders';
     include __DIR__ . '/../../components/bottom-nav.php';
     ?>
-    <script>
-        function formatTime(seconds) {
-            if (seconds <= 0) return "Expired";
-            const m = Math.floor(seconds / 60);
-            const s = seconds % 60;
-            return m + 'm ' + s + 's';
-        }
 
-        function startTimers() {
-            const csrfToken = $('#csrf_token').val();
-
-            $('.expiry-timer').each(function() {
-                const $el = $(this);
-                const otpTimeStr = $el.data('otp');
-                const orderId = $el.data('order-id');
-                const orderStatus = $el.data('status');
-
-                const otpIn = Math.floor(new Date(otpTimeStr).getTime() / 1000);
-
-                if (isNaN(otpIn)) return;
-
-                // Countdown only for PENDING or RECEIVED
-                if (['PENDING', 'RECEIVED'].includes(orderStatus)) {
-                    const timerInterval = setInterval(() => {
-                        const now = Math.floor(Date.now() / 1000);
-                        const remainingOtp = otpIn - now;
-
-                        $el.text(remainingOtp > 0 ? formatTime(remainingOtp) : 'Expired');
-
-                        if (remainingOtp <= 0) {
-                            clearInterval(timerInterval);
-                        }
-                    }, 1000);
-
-
-                    const ajaxInterval = setInterval(() => {
-                        const now = Math.floor(Date.now() / 1000);
-                        if (now >= otpIn) {
-                            clearInterval(ajaxInterval);
-                            return;
-                        }
-
-                        $.ajax({
-                            url: '/controllers/customer/services/sms/check-status',
-                            method: 'POST',
-                            data: {
-                                order_id: orderId,
-                                csrf_token: csrfToken
-                            },
-                            dataType: 'json',
-                            success: function(res) {
-                                console.log('OTP check for order', orderId, res);
-                            },
-                            error: function(err) {
-                                console.error('AJAX error for order', orderId, err);
-                            }
-                        });
-                    }, 5000);
-                } else {
-
-                    $el.text('-');
-                }
-            });
-        }
-
-        $(document).ready(function() {
-            startTimers();
-        });
-    </script>
 
     <script>
         function formatTime(seconds) {
@@ -278,7 +210,14 @@ $csrf_token = $_SESSION['csrf_token'];
                             },
                             dataType: 'json',
                             success: function(res) {
-                                console.log('OTP check for order', orderId, res);
+                                const finalStatuses = ['CANCELED', 'TIMEOUT', 'BANNED', 'FINISHED'];
+
+
+                                if (finalStatuses.includes(res.order_status)) {
+                                    clearInterval(timerInterval);
+                                    clearInterval(ajaxInterval);
+
+                                }
 
                                 if (res.otp) {
                                     clearInterval(timerInterval);
